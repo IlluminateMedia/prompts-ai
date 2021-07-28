@@ -9,11 +9,12 @@ export interface ChoiceResult {
 }
 
 class GptAPI {
-    static generateCompletions(prompt: string | Array<string>, completionParams: CompletionParameters,
+    static generateCompletions(prompt: string | Array<string>, completionParams: CompletionParameters, modelName: string,
                                n: number = 1): AxiosPromise {
         return axios({
             method: "POST",
-            url: `https://api.openai.com/v1/engines/${completionParams.engine}/completions`,
+            //url: `https://api.openai.com/v1/engines/${completionParams.engine}/completions`,
+            url: 'https://api.openai.com/v1/completions',
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${completionParams.apiKey}`,
@@ -26,7 +27,8 @@ class GptAPI {
                 "stop": completionParams.stop,
                 "top_p": completionParams.topP,
                 "presence_penalty": completionParams.presencePenalty,
-                "frequency_penalty": completionParams.frequencyPenalty
+                "frequency_penalty": completionParams.frequencyPenalty,
+                "model": modelName
             }
         });
     }

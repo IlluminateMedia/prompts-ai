@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 import os
+import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,11 +22,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-%5_c2eg%7940mqv&ic3b*a#5tb!tpq*h*0wfwlun9*-*h)g*wj'
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+env = environ.Env(
+    # set casting, default value
+    DEBUG=(bool, False)
+)
+# reading .env file
+environ.Env.read_env(f'{BASE_DIR}/.env')
 
+SECRET_KEY = env('SECRET_KEY')
 ALLOWED_HOSTS = ["147.182.204.83", "illuminatenetwork.org"]
 
 
@@ -38,6 +45,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'restapi'
 ]
 
 MIDDLEWARE = [
@@ -75,14 +84,8 @@ WSGI_APPLICATION = 'illuminate.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'illuminatemedia',
-	'USER': 'illuminate_media',
-	'PASSWORD': 'FJ*2rH&(@HRwud9&r2',
-	'HOST': 'localhost',
-	'PORT': '5432'
-    }
+    'default': env.db(),
+    'extra': env.db('SQLITE_URL', default='sqlite:////tmp/my-tmp-sqlite.db')
 }
 
 

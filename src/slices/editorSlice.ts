@@ -644,7 +644,7 @@ const fetchBasicOutputAsync = (): AppThunk => (dispatch, getState) => {
 
     const completionParams = selectCompletionParameters(state);
     dispatch(setBasicLoading(true));
-    GptAPI.generateCompletions(completionParams.prompt, completionParams).then(response => {
+    GptAPI.generateCompletions(completionParams.prompt, completionParams, workspace.modelName).then(response => {
         console.log(response.data);
         return { ...response.data };
     }).then(response => {
@@ -686,7 +686,7 @@ const fetchExamplesOutputsAsync = (): AppThunk => (dispatch, getState) => {
     const exampleIds = examples.map(example => example.id);
     exampleIds.map((exampleId) => dispatch(markExampleAsLoading(exampleId)));
 
-    GptAPI.generateCompletions(examplePrompts, completionParams).then(response => {
+    GptAPI.generateCompletions(examplePrompts, completionParams, workspace.modelName).then(response => {
         console.log(response.data);
         return { ...response.data };
     }).then(response => {
@@ -718,7 +718,7 @@ const fetchVariationsAsync = (): AppThunk => (dispatch, getState) => {
 
     const completionParams = selectCompletionParameters(state);
 
-    GptAPI.generateCompletions(completionParams.prompt, completionParams, workspace.maxVariations).then(response => {
+    GptAPI.generateCompletions(completionParams.prompt, completionParams, workspace.modelName, workspace.maxVariations).then(response => {
         console.log(response.data);
         return { ...response.data };
     }).then(response => {
@@ -775,7 +775,7 @@ const sendMessageInConversationAsync = (conversationId: string): AppThunk => (di
     }
     const completionParams = {apiKey: state.editor.present.apiKey, ...updatedConversation.completionParams!};
     const prompt = updatedConversation.initialPrompt + updatedConversation.parts.map(p => p.text).join('');
-    GptAPI.generateCompletions(prompt, completionParams).then(response => {
+    GptAPI.generateCompletions(prompt, completionParams, updatedWorkspace.modelName).then(response => {
         console.log(response.data);
         return { ...response.data };
     }).then(response => {
