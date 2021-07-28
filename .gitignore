@@ -114,6 +114,8 @@ dist
 
 # production
 /build
+/backend/static
+*.pyc
 
 # misc
 .DS_Store
