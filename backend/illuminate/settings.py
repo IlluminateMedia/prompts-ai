@@ -32,8 +32,9 @@ env = environ.Env(
 # reading .env file
 environ.Env.read_env(f'{BASE_DIR}/.env')
 
+DEBUG = env('DEBUG')
 SECRET_KEY = env('SECRET_KEY')
-ALLOWED_HOSTS = ["147.182.204.83", "illuminatenetwork.org"]
+ALLOWED_HOSTS = ["147.182.204.83", "illuminatenetwork.org", "localhost"]
 
 
 # Application definition
@@ -125,8 +126,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATIC_URL = '/be/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+STATIC_URL = env('STATIC_URL', default='/static/')
+STATIC_ROOT = environ.Path('static/')
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
