@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import uniqid from "uniqid";
 import {AppThunk, RootState} from "../store";
 import GptAPI, {ChoiceResult} from "../services/GptAPI";
+import RestAPI from "../services/RestAPI";
 
 // TODO: This file grew too fast. It needs to be split into separate slices for different modes.
 
@@ -111,6 +112,12 @@ interface Workspace {
     conversations: Array<Conversation>;
 }
 
+interface SelectOption {
+    id: number;
+    value: string;
+    label: string;
+}
+
 interface EditorState {
     apiKey?: string;
     currentWorkspaceId: string;
@@ -119,12 +126,14 @@ interface EditorState {
 
     showApiKeyDialog: boolean;
     showTemplateDialog: boolean;
+    availableModels: Array<SelectOption>;
 }
 
 const initialState: EditorState = {
     apiKey: undefined,
     currentWorkspaceId: 'first_workspace',
     editableWorkspaceName: 'Draft #1',
+    availableModels: [],
     workspaces: [{
         id: 'first_workspace',
         name: 'Draft #1',
@@ -333,7 +342,9 @@ const editorSlice = createSlice({
             let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
             workspace.basic.loading = action.payload;
         },
-
+        setAvailableModels: (state, action: PayloadAction<Array<SelectOption>>) => {
+            state.availableModels = action.payload;
+        },
         updateVariationsLoadingStatus: (state, action: PayloadAction<boolean>) => {
             let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
             workspace.loadingVariations = action.payload;
@@ -659,6 +670,15 @@ const fetchBasicOutputAsync = (): AppThunk => (dispatch, getState) => {
     });
 };
 
+const fetchAvailableModelsAsync = (): AppThunk => (dispatch, getState) => {
+    RestAPI.getAvailableModels().then(response => {
+        dispatch(setAvailableModels(response.data));
+    }).catch(error => {
+        alert('API returned an error. Refer to the console to inspect it.')
+        console.log(error.response);
+    });
+}
+
 const fetchExamplesOutputsAsync = (): AppThunk => (dispatch, getState) => {
     const state = getState();
     let workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!
@@ -796,6 +816,7 @@ const selectWorkspacesList = (state: RootState) => state.editor.present.workspac
 
 const selectTabIndex = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.tabIndex;
 const selectPrompt = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.prompt;
+const selectAvailableModels = (state: RootState) => state.editor.present.availableModels;
 const selectStopSymbols = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.stopSymbols;
 
 const selectModelName = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.modelName;
@@ -884,20 +905,20 @@ export {
     // Modes
     selectExamples, selectExamplePreviousOutputsStatus,
     selectVariationsLoadingStatus, selectVariations, selectMaxVariations,
-    selectShowPromptForVariations, selectBasicOutput, selectBasicLoading,
+    selectShowPromptForVariations, selectBasicOutput, selectBasicLoading, selectAvailableModels
 };
 
 // Async Actions
 
 export {
-    fetchForCurrentTab, fetchExamplesOutputsAsync, fetchBasicOutputAsync,
+    fetchForCurrentTab, fetchExamplesOutputsAsync, fetchBasicOutputAsync, fetchAvailableModelsAsync,
     fetchVariationsAsync, sendMessageInConversationAsync
 };
 
 // Actions
 export const {
     updateWorkspaceId, createWorkspace, deleteCurrentWorkspace, updateCurrentWorkspaceName, updateEditableWorkspaceName,
-    editExample, loadOutputForExample, deleteExample, cleanExampleList, markExampleAsLoading, updateExamplePreviousOutputsStatus, loadBasicOutput, setBasicLoading,
+    editExample, loadOutputForExample, deleteExample, cleanExampleList, markExampleAsLoading, updateExamplePreviousOutputsStatus, loadBasicOutput, setBasicLoading, setAvailableModels,
     markAllExamplesAsNotLoading,
     addVariation, editMaxVariations, cleanVariations, updateShowPromptForVariations, updateVariationsLoadingStatus,
     setConversationCompletionParams, normalizeConversations, updateConversationLoadingStatus, updateConversationInputValue,

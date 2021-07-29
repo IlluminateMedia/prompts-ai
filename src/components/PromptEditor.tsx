@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {useDispatch, useSelector} from "react-redux";
 import {
     Typography,
@@ -26,7 +26,9 @@ import {
     editFrequencyPenalty,
     editPresencePenalty,
     selectTopP,
-    selectFrequencyPenalty, selectPresencePenalty, selectModelName, editModelName
+    selectFrequencyPenalty, selectPresencePenalty, 
+    selectModelName, editModelName, 
+    fetchAvailableModelsAsync, selectAvailableModels
 } from "../slices/editorSlice";
 import {makeStyles} from "@material-ui/styles";
 import ModeTabs from "./ModeTabs";
@@ -49,15 +51,12 @@ export function PromptEditor() {
     const presencePenalty = useSelector(selectPresencePenalty);
     const maxTokens = useSelector(selectMaxTokens);
     const stopSymbols = useSelector(selectStopSymbols);
+    const availableModelNames = useSelector(selectAvailableModels);
 
-    const availableModelNames = [
-        'davinci',
-        'davinci-instruct-beta',
-        'curie',
-        'curie-instruct-beta',
-        'babbage',
-        'ada'
-    ];
+    useEffect(() => {
+        dispatch(fetchAvailableModelsAsync());
+    });
+
     const modelName = useSelector(selectModelName);
 
     const handlePromptChange = (event: React.FormEvent<HTMLTextAreaElement | HTMLInputElement>) => {
@@ -295,8 +294,8 @@ export function PromptEditor() {
                                 Model name:
                             </Typography>
                             <Select native id="model-name-select" name="modelName" value={modelName} onChange={handleModelNameChange} className={styles.fullWidth}>
-                                {availableModelNames.map((modelName, ind) => (
-                                    <option key={ind} value={modelName}>{modelName}</option>
+                                {availableModelNames && Object.keys(availableModelNames).map((index: any) => (
+                                    <option key={availableModelNames[index].id} value={availableModelNames[index].value}>{availableModelNames[index].label}</option>
                                 ))}
                             </Select>
                         </CardContent>
