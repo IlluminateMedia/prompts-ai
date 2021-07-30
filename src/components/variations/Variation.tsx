@@ -38,13 +38,13 @@ export default function Variation(props: Props) {
             { showPromptForVariations && (
                 <>
                     <Typography className={styles.prompt}>{props.prompt}</Typography>
-                    <span role={"img"} aria-label={"brain"}>🧠️</span>
+                    <span> </span>
                     <Typography className={styles.output} component={'span'}><strong>{props.output}</strong></Typography>
                 </>
             )}
             { !showPromptForVariations && (
                 <>
-                    <span role={"img"} aria-label={"brain"}>🧠️</span>
+                    <span> </span>
                     <Typography className={styles.output} component={'span'}>{props.output}</Typography>
                 </>
             )}
