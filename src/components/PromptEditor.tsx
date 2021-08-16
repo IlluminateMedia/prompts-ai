@@ -54,8 +54,9 @@ export function PromptEditor() {
     const availableModelNames = useSelector(selectAvailableModels);
 
     useEffect(() => {
+        console.log('run useEffect');
         dispatch(fetchAvailableModelsAsync());
-    });
+    }, []);
 
     const modelName = useSelector(selectModelName);
 
