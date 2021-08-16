@@ -87,7 +87,8 @@ WSGI_APPLICATION = 'illuminate.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
-    'default': env.db(),
+    # 'default': env.db(),
+    'default': env.db('SQLITE_URL', default='sqlite:////tmp/my-tmp-sqlite.db'),
     'extra': env.db('SQLITE_URL', default='sqlite:////tmp/my-tmp-sqlite.db')
 }
 
