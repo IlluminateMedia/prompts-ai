@@ -6,7 +6,7 @@ class RestAPI {
         return axios({
             method: "GET",
             // url: '/be/api/v1/models/',
-            url: 'http://localhost:8000/be/api/v1/models/',
+            url: 'http://localhost:8000/api/v1/models/',
             headers: {
                 "Content-Type": "application/json",
             },

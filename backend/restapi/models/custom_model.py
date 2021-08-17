@@ -9,4 +9,4 @@ class CustomModel(models.Model):
         db_table = "restapi_custom_model"
 
     def __str__(self):
-        return self.value
+        return self.label
