@@ -161,3 +161,4 @@ __pycache__/
 
 # C extensions
 *.so
+*.db

@@ -88,7 +88,14 @@ WSGI_APPLICATION = 'illuminate.wsgi.application'
 
 DATABASES = {
     # 'default': env.db(),
-    'default': env.db('SQLITE_URL', default='sqlite:////tmp/my-tmp-sqlite.db'),
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.abspath('prompts_ai.db'),
+        'USER': '',
+        'PASSWORD': '',
+        'HOST': '',
+        'PORT': '',
+    },
     'extra': env.db('SQLITE_URL', default='sqlite:////tmp/my-tmp-sqlite.db')
 }
 
