@@ -3,139 +3,26 @@ import uniqid from "uniqid";
 import {AppThunk, RootState} from "../store";
 import GptAPI, {ChoiceResult} from "../services/GptAPI";
 import RestAPI from "../services/RestAPI";
+import {
+    Example, CompletionParameters, TabIndex, Variation, Basic, ConversationPartSource,
+    CustomModel, ConversationPart, ConversationCompletionParameters, Conversation, SelectOption, EditorState, Workspace,
+    EditExampleActionPayload, LoadExampleOutputActionPayload, AddVariationActionPayload, SetConversationCompletionParametersActionPayload,
+    SetConversationInitialPromptActionPayload, UpdateConversationLoadingStatusActionPayload, UpdateConversationInputValueActionPayload,
+    UpdateConversationStartSequenceActionPayload, UpdateConversationRestartSequenceActionPayload, AddMessageToConversationFromUserActionPayload,
+    AddMessageToConversationFromGptActionPayload, LoadTemplateFromFileDataActionPayload, LoadTemplateActionExample, LoadTemplateActionPayload
+} from "../common/interfaces";
 
 // TODO: This file grew too fast. It needs to be split into separate slices for different modes.
 
 // State
 
-interface Example {
-    id: string;
-    text: string;
-    isLoading: boolean;
-    output?: string;
-    previousOutput?: string;
-}
-
-interface CompletionParameters {
-    apiKey: string;
-    engine: string;
-    maxTokens: number;
-    stop: string | Array<string>;
-    prompt: string;
-    temperature: number;
-    topP: number;
-    presencePenalty: number;
-    frequencyPenalty: number;
-}
-
-enum TabIndex {
-    basic = 0,
-    multipleExamples,
-    variations,
-    conversations
-}
-
-interface Variation {
-    id: string;
-    prompt: string;
-    output: string;
-    temperature: number;
-    maxTokens: number;
-    topP: number;
-    frequencyPenalty: number;
-    presencePenalty: number;
-    modelName: string;
-}
-
-interface Basic {
-    output: string;
-    loading: boolean;
-}
-
-enum ConversationPartSource {
-    user = 'user',
-    gpt = 'gpt'
-}
-
-interface ConversationPart {
-    source: ConversationPartSource;
-    text: string;
-    submitted: boolean;
-}
-
-interface ConversationCompletionParameters {
-    engine: string;
-    maxTokens: number;
-    stop: string | Array<string>;
-    prompt: string;
-    temperature: number;
-    topP: number;
-    presencePenalty: number;
-    frequencyPenalty: number;
-}
-
-interface Conversation {
-    id: string;
-    initialPrompt?: string;
-    inputValue: string;
-    isLoading: boolean;
-    startSequence: string;
-    restartSequence: string;
-    parts: Array<ConversationPart>;
-    completionParams?: ConversationCompletionParameters;
-}
-
-interface Workspace {
-    id: string;
-    name: string;
-
-    prompt: string;
-    modelName: string;
-    temperature: number;
-    topP: number;
-    frequencyPenalty: number;
-    presencePenalty: number;
-    stopSymbols: Array<string>;
-    maxTokens: number;
-    tabIndex: TabIndex;
-
-    showExamplePreviousOutputs: boolean;
-    examples: Array<Example>;
-
-    loadingVariations: boolean;
-    variations: Array<Variation>;
-    maxVariations: number;
-    showPromptForVariations: boolean;
-
-    basic: Basic;
-
-    conversations: Array<Conversation>;
-}
-
-interface SelectOption {
-    id: number;
-    value: string;
-    label: string;
-}
-
-interface EditorState {
-    apiKey?: string;
-    currentWorkspaceId: string;
-    editableWorkspaceName: string;
-    workspaces: Array<Workspace>;
-
-    showApiKeyDialog: boolean;
-    showTemplateDialog: boolean;
-    availableModels: Array<SelectOption>;
-}
-
 const initialState: EditorState = {
     apiKey: undefined,
-    currentWorkspaceId: 'first_workspace',
+    currentWorkspaceId: 1,
     editableWorkspaceName: 'Draft #1',
     availableModels: [],
     workspaces: [{
-        id: 'first_workspace',
+        id: 1,
         name: 'Draft #1',
         prompt: "Input: Anna and Mike is going skiing.\n" +
             "Output: Anna and Mike are going skiing.\n" +
@@ -146,8 +33,10 @@ const initialState: EditorState = {
             "Input: {example}\n" +
             "Output:",
         modelName: 'davinci',
+        customModel: undefined,
         temperature: 0.5,
         topP: 1,
+        n: 1,
         frequencyPenalty: 0,
         presencePenalty: 0,
         stopSymbols: ["\\n"],
@@ -175,102 +64,6 @@ const initialState: EditorState = {
     showApiKeyDialog: false,
     showTemplateDialog: false,
 };
-
-// Action Payloads: Examples
-
-interface EditExampleActionPayload {
-    id: string;
-    text: string;
-}
-
-interface LoadExampleOutputActionPayload {
-    id: string;
-    output: string;
-}
-
-// Action Payloads: Variations
-
-interface AddVariationActionPayload {
-    output: string;
-    prompt: string;
-    temperature: number;
-    maxTokens: number;
-    topP: number;
-    frequencyPenalty: number;
-    presencePenalty: number;
-    modelName: string;
-}
-
-// Action Payloads: Conversations
-
-interface SetConversationCompletionParametersActionPayload {
-    conversationId: string;
-    parameters: ConversationCompletionParameters;
-}
-
-interface SetConversationInitialPromptActionPayload {
-    conversationId: string;
-    initialPrompt: string;
-}
-
-interface UpdateConversationLoadingStatusActionPayload {
-    conversationId: string;
-    status: boolean;
-}
-
-interface UpdateConversationInputValueActionPayload {
-    conversationId: string;
-    inputValue: string;
-}
-
-interface UpdateConversationStartSequenceActionPayload {
-    conversationId: string;
-    startSequence: string;
-}
-
-interface UpdateConversationRestartSequenceActionPayload {
-    conversationId: string;
-    restartSequence: string;
-}
-
-
-interface AddMessageToConversationFromUserActionPayload {
-    conversationId: string;
-    source: ConversationPartSource.user;
-}
-
-interface AddMessageToConversationFromGptActionPayload {
-    conversationId: string;
-    text: string;
-    source: ConversationPartSource.gpt;
-}
-
-// Action Payloads: Templates
-
-interface LoadTemplateFromFileDataActionPayload {
-    prompt: string;
-    temperature: number;
-    topP: number;
-    frequencyPenalty: number;
-    presencePenalty: number;
-    maxTokens: number;
-    stopSymbols: Array<string>;
-    modelName: string;
-}
-
-interface LoadTemplateActionExample {
-    text: string;
-    output: string;
-}
-
-interface LoadTemplateActionPayload {
-    prompt: string;
-    examples: Array<LoadTemplateActionExample>;
-    stopSymbols?: Array<string>;
-    tabIndex: number;
-    startSequence?: string;
-    restartSequence?: string;
-}
 
 const editorSlice = createSlice({
     name: 'editor',
@@ -344,6 +137,9 @@ const editorSlice = createSlice({
         },
         setAvailableModels: (state, action: PayloadAction<Array<SelectOption>>) => {
             state.availableModels = action.payload;
+        },
+        setWorkspaces: (state, action: PayloadAction<Array<Workspace>>) => {
+            state.workspaces = action.payload;
         },
         updateVariationsLoadingStatus: (state, action: PayloadAction<boolean>) => {
             let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
@@ -577,7 +373,7 @@ const editorSlice = createSlice({
             workspace.tabIndex = action.payload;
         },
 
-        updateWorkspaceId: (state, action: PayloadAction<string>) => {
+        updateWorkspaceId: (state, action: PayloadAction<number>) => {
             const newWorkspace = state.workspaces.find(w => w.id === action.payload);
             if (newWorkspace === undefined) {
                 return;
@@ -589,7 +385,7 @@ const editorSlice = createSlice({
             let currentWorkspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
             const newWorkspace = {
                 ...currentWorkspace,
-                id: uniqid('workspace_'),
+                id: currentWorkspace.id + 1, // demo code line
                 name: `Draft #${state.workspaces.length + 1}`
             };
             state.workspaces.push(newWorkspace);
@@ -762,6 +558,16 @@ const fetchVariationsAsync = (): AppThunk => (dispatch, getState) => {
     });
 }
 
+const fetchWorkspacesAsync = (): AppThunk => (dispatch, getState) => {
+    RestAPI.getWorkspaces().then(response => {
+        console.log(response.data);
+        dispatch(setAvailableModels(response.data));
+    }).catch(error => {
+        alert('API returned an error. Refer to the console to inspect it.')
+        console.log(error.response);
+    });
+}
+
 const sendMessageInConversationAsync = (conversationId: string): AppThunk => (dispatch, getState) => {
     const state = getState();
     let workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!;
@@ -812,6 +618,7 @@ const selectTemplateDialogVisible = (state: RootState) => state.editor.present.s
 const selectCurrentWorkspaceId = (state: RootState) => state.editor.present.currentWorkspaceId;
 const selectEditableWorkspaceName = (state: RootState) => state.editor.present.editableWorkspaceName;
 const selectCurrentWorkspaceName = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.name;
+const selectWorkspaces = (state: RootState) => state.editor.present.workspaces;
 const selectWorkspacesList = (state: RootState) => state.editor.present.workspaces.map(w => ({id: w.id, name: w.name}));
 
 const selectTabIndex = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.tabIndex;
@@ -820,6 +627,7 @@ const selectAvailableModels = (state: RootState) => state.editor.present.availab
 const selectStopSymbols = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.stopSymbols;
 
 const selectModelName = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.modelName;
+const selectModel = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)
 const selectTemperature = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.temperature;
 const selectTopP = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.topP;
 const selectFrequencyPenalty = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.frequencyPenalty;
@@ -912,7 +720,7 @@ export {
 
 export {
     fetchForCurrentTab, fetchExamplesOutputsAsync, fetchBasicOutputAsync, fetchAvailableModelsAsync,
-    fetchVariationsAsync, sendMessageInConversationAsync
+    fetchVariationsAsync, fetchWorkspacesAsync, sendMessageInConversationAsync
 };
 
 // Actions

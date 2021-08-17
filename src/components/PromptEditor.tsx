@@ -28,7 +28,8 @@ import {
     selectTopP,
     selectFrequencyPenalty, selectPresencePenalty, 
     selectModelName, editModelName, 
-    fetchAvailableModelsAsync, selectAvailableModels
+    fetchAvailableModelsAsync, selectAvailableModels, 
+    fetchWorkspacesAsync
 } from "../slices/editorSlice";
 import {makeStyles} from "@material-ui/styles";
 import ModeTabs from "./ModeTabs";
@@ -55,6 +56,7 @@ export function PromptEditor() {
 
     useEffect(() => {
         dispatch(fetchAvailableModelsAsync());
+        dispatch(fetchWorkspacesAsync());
     }, []);
 
     const modelName = useSelector(selectModelName);

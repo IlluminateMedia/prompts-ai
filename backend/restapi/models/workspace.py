@@ -12,8 +12,9 @@ class Workspace(models.Model):
     n = models.IntegerField(default=1)
     presence_penalty = models.DecimalField(help_text=_("Presence Penalty"), max_digits=5, decimal_places=2, default=0.00)
     frequency_penalty = models.DecimalField(help_text=_("Frequency Penalty"), max_digits=5, decimal_places=2, default=0.00)
-    stop = models.JSONField(default=dict)
-    prompt = models.CharField(max_length=255, blank=True, null=True)
+    stop_symbols = models.JSONField(default=dict)
+    prompt = models.TextField(blank=True, null=True)
+
 
     class Meta:
         app_label = "restapi"

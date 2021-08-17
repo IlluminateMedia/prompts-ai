@@ -21,7 +21,7 @@ export default function WorkspaceSelector() {
     const workspaces = useSelector(selectWorkspacesList);
 
     const handleSelectChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-        dispatch(updateWorkspaceId(event.target.value as string));
+        dispatch(updateWorkspaceId(event.target.value as number));
         dispatch(ActionCreators.clearHistory())
     }
     return <Grid container alignItems={'center'} spacing={1}>

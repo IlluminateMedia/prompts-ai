@@ -17,7 +17,7 @@ class WorkspaceReadSerializer(serializers.ModelSerializer):
             "n",
             "presence_penalty",
             "frequency_penalty",
-            "stop",
+            "stop_symbols",
             "prompt",
             "custom_model"
         )
