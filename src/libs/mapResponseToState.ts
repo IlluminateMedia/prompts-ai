@@ -55,7 +55,5 @@ export function mapWorkspaceResponse(response: Array<WorkspaceResponse>): Array<
         return workspace;
     });
 
-    console.log(workspaces);
-
     return workspaces;
 }

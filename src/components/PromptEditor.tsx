@@ -173,7 +173,7 @@ export function PromptEditor() {
                             </Tooltip>
                             <Slider
                                 defaultValue={0.5}
-                                value={temperature}
+                                // value={temperature}
                                 onChange={handleTemperatureChange}
                                 aria-labelledby="temperature-slider"
                                 valueLabelDisplay="auto"
@@ -218,7 +218,7 @@ export function PromptEditor() {
                                 value={stopSymbols}
                                 onAdd={(chip) => dispatch(addStopSymbol(chip))}
                                 onDelete={(deletedChip) => dispatch(deleteStopSymbol(deletedChip))}
-                                onBeforeAdd={() => stopSymbols.length !== 4}
+                                onBeforeAdd={() => stopSymbols?.length !== 4}
                                 newChipKeys={['Tab']}
                                 className={styles.fullWidth}
                             />

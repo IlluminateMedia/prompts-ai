@@ -64,6 +64,10 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'illuminate.urls'
 
+REST_FRAMEWORK = {
+    'COERCE_DECIMAL_TO_STRING': False
+}
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',

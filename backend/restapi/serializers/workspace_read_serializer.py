@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from .custom_model_serializer import CustomModelSerializer
-from ..models import Workspace, CustomModel
+from ..models import Workspace
 
 class WorkspaceReadSerializer(serializers.ModelSerializer):
     custom_model = CustomModelSerializer()

@@ -71,70 +71,88 @@ const editorSlice = createSlice({
     initialState,
     reducers: {
         editExample: (state, action: PayloadAction<EditExampleActionPayload>) => {
-            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
-            workspace.examples = workspace.examples.map(value => {
-                if (value.id === action.payload.id) {
-                    value.text = action.payload.text;
-                }
-                return value;
-            });
+            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)
+            if (workspace) {
+                workspace.examples = workspace.examples.map(value => {
+                    if (value.id === action.payload.id) {
+                        value.text = action.payload.text;
+                    }
+                    return value;
+                });
+            }
         },
         cleanExampleList: (state) => {
-            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
-            // Always add an empty example for user to fill out
-            if (workspace.examples.length < 1 || workspace.examples[workspace.examples.length - 1].text.length) {
-                workspace.examples.push({id: uniqid("input_"), text: "", output: undefined, isLoading: false});
-            }
-            // Delete all empty inputs except for the last one
-            workspace.examples = workspace.examples.filter((value, index) => {
-                if (index === workspace.examples.length - 1) {
-                    return true;
+            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)
+            if (workspace) {
+                // Always add an empty example for user to fill out
+                if (workspace.examples.length < 1 || workspace.examples[workspace.examples.length - 1].text.length) {
+                    workspace.examples.push({id: uniqid("input_"), text: "", output: undefined, isLoading: false});
                 }
-                return value.text.length > 0;
-            })
+                // Delete all empty inputs except for the last one
+                workspace.examples = workspace.examples.filter((value, index) => {
+                    if (index === workspace!.examples.length - 1) {
+                        return true;
+                    }
+                    return value.text.length > 0;
+                })
+            }
         },
         markExampleAsLoading: (state, action: PayloadAction<string>) => {
-            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
-            workspace.examples = workspace.examples.map(value => {
-                if (value.id === action.payload) {
-                    value.isLoading = true;
-                }
-                return value;
-            });
+            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)
+            if (workspace) {
+                workspace.examples = workspace.examples.map(value => {
+                    if (value.id === action.payload) {
+                        value.isLoading = true;
+                    }
+                    return value;
+                });
+            }
         },
         markAllExamplesAsNotLoading: (state) => {
-            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
-            workspace.examples = workspace.examples.map(value => {
-                value.isLoading = false;
-                return value;
-            });
+            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)
+            if (workspace) {
+                workspace.examples = workspace.examples.map(value => {
+                    value.isLoading = false;
+                    return value;
+                });
+            }
         },
         loadOutputForExample: (state, action: PayloadAction<LoadExampleOutputActionPayload>) => {
-            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
-            workspace.examples = workspace.examples.map(value => {
-                if (value.id === action.payload.id) {
-                    value.previousOutput = value.output;
-                    value.output = action.payload.output;
-                    value.isLoading = false;
-                }
-                return value;
-            });
+            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)
+            if (workspace) {
+                workspace.examples = workspace.examples.map(value => {
+                    if (value.id === action.payload.id) {
+                        value.previousOutput = value.output;
+                        value.output = action.payload.output;
+                        value.isLoading = false;
+                    }
+                    return value;
+                });
+            }
         },
         deleteExample: (state, action: PayloadAction<string>) => {
-            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
-            workspace.examples = workspace.examples.filter(example => example.id !== action.payload);
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
+            if (workspace) {
+                workspace.examples = workspace.examples.filter(example => example.id !== action.payload);
+            }
         },
         updateExamplePreviousOutputsStatus: (state, action: PayloadAction<boolean>) => {
-            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
-            workspace.showExamplePreviousOutputs = action.payload;
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
+            if (workspace) {
+                workspace.showExamplePreviousOutputs = action.payload;
+            }
         },
         loadBasicOutput: (state, action: PayloadAction<string>) => {
-            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
-            workspace.basic.output = action.payload;
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
+            if (workspace) {
+                workspace.basic.output = action.payload;
+            }
         },
         setBasicLoading: (state, action: PayloadAction<boolean>) => {
-            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
-            workspace.basic.loading = action.payload;
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
+            if (workspace) {
+                workspace.basic.loading = action.payload;
+            }
         },
         setAvailableModels: (state, action: PayloadAction<Array<SelectOption>>) => {
             state.availableModels = action.payload;
@@ -147,36 +165,44 @@ const editorSlice = createSlice({
             workspace.loadingVariations = action.payload;
         },
         addVariation: (state, action: PayloadAction<AddVariationActionPayload>) => {
-            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
-            workspace.variations.push({
-                id: uniqid('variation_'),
-                output: action.payload.output,
-                prompt: action.payload.prompt,
-                temperature: action.payload.temperature,
-                maxTokens: action.payload.maxTokens,
-                topP: action.payload.topP,
-                frequencyPenalty: action.payload.frequencyPenalty,
-                presencePenalty: action.payload.presencePenalty,
-                modelName: action.payload.modelName,
-            });
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
+            if (workspace) {
+                workspace.variations.push({
+                    id: uniqid('variation_'),
+                    output: action.payload.output,
+                    prompt: action.payload.prompt,
+                    temperature: action.payload.temperature,
+                    maxTokens: action.payload.maxTokens,
+                    topP: action.payload.topP,
+                    frequencyPenalty: action.payload.frequencyPenalty,
+                    presencePenalty: action.payload.presencePenalty,
+                    modelName: action.payload.modelName,
+                });
+            }
         },
         editMaxVariations: (state, action: PayloadAction<number>) => {
-            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
-            workspace.maxVariations = action.payload;
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
+            if (workspace) {
+                workspace.maxVariations = action.payload;
+            }
         },
         cleanVariations: (state) => {
-            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
-            workspace.variations = [];
+            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
+            if (workspace) {
+                workspace.variations = [];
+            }
         },
         updateShowPromptForVariations: (state, action: PayloadAction<boolean>) => {
-            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
-            workspace.showPromptForVariations = action.payload;
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
+            if (workspace) {
+                workspace.showPromptForVariations = action.payload;
+            }
         },
 
         normalizeConversations: (state) => {
-            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
-            // Always add an empty conversation for user to start
-            if (workspace.conversations.length < 1 || workspace.conversations[0].parts.length > 1) {
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
+                // Always add an empty conversation for user to start
+            if (workspace && (workspace.conversations.length < 1 || workspace.conversations[0].parts.length > 1)) {
                 let startSequence = "\nAI:";
                 let restartSequence = "\nUser: ";
                 if (workspace.conversations.length >= 1) {
@@ -197,61 +223,77 @@ const editorSlice = createSlice({
         },
         setConversationCompletionParams: (state,
                                           action: PayloadAction<SetConversationCompletionParametersActionPayload>) => {
-            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
-            workspace.conversations = workspace.conversations.map(conversation => {
-                if (conversation.id === action.payload.conversationId) {
-                    conversation.completionParams = action.payload.parameters;
-                }
-                return conversation;
-            });
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
+            if (workspace) {
+                workspace.conversations = workspace.conversations.map(conversation => {
+                    if (conversation.id === action.payload.conversationId) {
+                        conversation.completionParams = action.payload.parameters;
+                    }
+                    return conversation;
+                });
+            }
+            
         },
         setConversationInitialPrompt: (state, action: PayloadAction<SetConversationInitialPromptActionPayload>) => {
-            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
-            workspace.conversations = workspace.conversations.map(conversation => {
-                if (conversation.id === action.payload.conversationId) {
-                    conversation.initialPrompt = action.payload.initialPrompt;
-                }
-                return conversation;
-            });
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
+            if (workspace) {
+                workspace.conversations = workspace.conversations.map(conversation => {
+                    if (conversation.id === action.payload.conversationId) {
+                        conversation.initialPrompt = action.payload.initialPrompt;
+                    }
+                    return conversation;
+                });
+            }
         },
         updateConversationLoadingStatus: (state, action: PayloadAction<UpdateConversationLoadingStatusActionPayload>) => {
-            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
-            workspace.conversations = workspace.conversations.map(conversation => {
-                if (conversation.id === action.payload.conversationId) {
-                    conversation.isLoading = action.payload.status;
-                }
-                return conversation;
-            });
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
+            if (workspace) {
+                workspace.conversations = workspace.conversations.map(conversation => {
+                    if (conversation.id === action.payload.conversationId) {
+                        conversation.isLoading = action.payload.status;
+                    }
+                    return conversation;
+                });
+            }
         },
         updateConversationInputValue: (state, action: PayloadAction<UpdateConversationInputValueActionPayload>) => {
-            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
-            workspace.conversations = workspace.conversations.map(conversation => {
-                if (conversation.id === action.payload.conversationId) {
-                    conversation.inputValue = action.payload.inputValue;
-                }
-                return conversation;
-            });
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
+            if (workspace) {
+                workspace.conversations = workspace.conversations.map(conversation => {
+                    if (conversation.id === action.payload.conversationId) {
+                        conversation.inputValue = action.payload.inputValue;
+                    }
+                    return conversation;
+                });
+            }
         },
         updateConversationStartSequence: (state, action: PayloadAction<UpdateConversationStartSequenceActionPayload>) => {
-            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
-            workspace.conversations = workspace.conversations.map(conversation => {
-                if (conversation.id === action.payload.conversationId) {
-                    conversation.startSequence = action.payload.startSequence;
-                }
-                return conversation;
-            });
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
+            if (workspace) {
+                workspace.conversations = workspace.conversations.map(conversation => {
+                    if (conversation.id === action.payload.conversationId) {
+                        conversation.startSequence = action.payload.startSequence;
+                    }
+                    return conversation;
+                });
+            }
         },
         updateConversationRestartSequence: (state, action: PayloadAction<UpdateConversationRestartSequenceActionPayload>) => {
-            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
-            workspace.conversations = workspace.conversations.map(conversation => {
-                if (conversation.id === action.payload.conversationId) {
-                    conversation.restartSequence = action.payload.restartSequence;
-                }
-                return conversation;
-            });
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
+            if (workspace) {
+                workspace.conversations = workspace.conversations.map(conversation => {
+                    if (conversation.id === action.payload.conversationId) {
+                        conversation.restartSequence = action.payload.restartSequence;
+                    }
+                    return conversation;
+                });
+            }
         },
         addMessageInConversation: (state, action: PayloadAction<AddMessageToConversationFromUserActionPayload | AddMessageToConversationFromGptActionPayload>) => {
-            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
+            if (!workspace) {
+                return;
+            }
             workspace.conversations = workspace.conversations.map(conversation => {
                 if (conversation.id !== action.payload.conversationId) {
                     return conversation;
@@ -297,12 +339,17 @@ const editorSlice = createSlice({
             });
         },
         deleteConversation: (state, action: PayloadAction<string>) => {
-            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
-            workspace.conversations = workspace.conversations.filter(c => c.id !== action.payload);
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
+            if (workspace) {
+                workspace.conversations = workspace.conversations.filter(c => c.id !== action.payload);
+            }
         },
 
         loadTemplate: (state, action: PayloadAction<LoadTemplateActionPayload>) => {
-            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
+            if (!workspace) {
+                return;
+            }
             workspace.prompt = action.payload.prompt;
             workspace.examples = action.payload.examples.map((example) => {
                 return {id: uniqid('example_'), text: example.text, output: example.output, isLoading: false}
@@ -320,7 +367,10 @@ const editorSlice = createSlice({
             workspace.tabIndex = action.payload.tabIndex;
         },
         loadTemplateFromFileData: (state, action: PayloadAction<LoadTemplateFromFileDataActionPayload>) => {
-            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
+            if (!workspace) {
+                return;
+            }
             workspace.prompt = action.payload.prompt;
             workspace.temperature = action.payload.temperature;
             workspace.topP = action.payload.topP;
@@ -331,46 +381,76 @@ const editorSlice = createSlice({
             workspace.modelName = action.payload.modelName;
         },
         editPrompt: (state, action: PayloadAction<string>) => {
-            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
+            if (!workspace) {
+                return;
+            }
             workspace.prompt = action.payload;
         },
         editApiKey: (state, action: PayloadAction<string>) => {
             state.apiKey = action.payload;
         },
         editModelName: (state, action: PayloadAction<string>) => {
-            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
+            if (!workspace) {
+                return;
+            }
             workspace.modelName = action.payload;
         },
         editTemperature: (state, action: PayloadAction<number>) => {
-            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
+            if (!workspace) {
+                return;
+            }
             workspace.temperature = action.payload;
         },
         editTopP: (state, action: PayloadAction<number>) => {
-            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
+            if (!workspace) {
+                return;
+            }
             workspace.topP = action.payload;
         },
         editFrequencyPenalty: (state, action: PayloadAction<number>) => {
-            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
+            if (!workspace) {
+                return;
+            }
             workspace.frequencyPenalty = action.payload;
         },
         editPresencePenalty: (state, action: PayloadAction<number>) => {
-            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
+            if (!workspace) {
+                return;
+            }
             workspace.presencePenalty = action.payload;
         },
         addStopSymbol: (state, action: PayloadAction<string>) => {
-            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
+            if (!workspace) {
+                return;
+            }
             workspace.stopSymbols.push(action.payload);
         },
         deleteStopSymbol: (state, action: PayloadAction<string>) => {
-            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
+            if (!workspace) {
+                return;
+            }
             workspace.stopSymbols = workspace.stopSymbols.filter((symbol) => symbol !== action.payload);
         },
         editMaxTokens: (state, action: PayloadAction<number>) => {
-            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
+            if (!workspace) {
+                return;
+            }
             workspace.maxTokens = action.payload;
         },
         updateTabIndex: (state, action: PayloadAction<number>) => {
-            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
+            if (!workspace) {
+                return;
+            }
             workspace.tabIndex = action.payload;
         },
 
@@ -383,7 +463,10 @@ const editorSlice = createSlice({
             state.editableWorkspaceName = newWorkspace.name;
         },
         createWorkspace: (state) => {
-            let currentWorkspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
+            const currentWorkspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
+            if (!currentWorkspace) {
+                return;
+            }
             const newWorkspace = {
                 ...currentWorkspace,
                 id: currentWorkspace.id + 1, // demo code line
@@ -394,7 +477,10 @@ const editorSlice = createSlice({
             state.editableWorkspaceName = newWorkspace.name;
         },
         updateCurrentWorkspaceName: (state) => {
-            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
+            if (!workspace) {
+                return;
+            }
             workspace.name = state.editableWorkspaceName;
         },
         updateEditableWorkspaceName: (state, action: PayloadAction<string>) => {
@@ -421,7 +507,10 @@ const editorSlice = createSlice({
 
 const fetchForCurrentTab = (): AppThunk => (dispatch, getState) => {
     const state = getState();
-    let workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!
+    const workspace = selectWorkspace(state);
+    if (!workspace) {
+        return;
+    }
     switch (workspace.tabIndex) {
         case TabIndex.basic: {
             dispatch(fetchBasicOutputAsync());
@@ -440,7 +529,10 @@ const fetchForCurrentTab = (): AppThunk => (dispatch, getState) => {
 
 const fetchBasicOutputAsync = (): AppThunk => (dispatch, getState) => {
     const state = getState();
-    let workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!
+    const workspace = selectWorkspace(state);
+    if (!workspace) {
+        return;
+    }
     if (state.editor.present.apiKey === undefined) {
         alert('Enter an API key before running requests.');
         return;
@@ -478,7 +570,10 @@ const fetchAvailableModelsAsync = (): AppThunk => (dispatch, getState) => {
 
 const fetchExamplesOutputsAsync = (): AppThunk => (dispatch, getState) => {
     const state = getState();
-    let workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!
+    const workspace = selectWorkspace(state);
+    if (!workspace) {
+        return;
+    }
     if (state.editor.present.apiKey === undefined) {
         alert('Enter an API key before running requests.');
         return;
@@ -521,7 +616,10 @@ const fetchExamplesOutputsAsync = (): AppThunk => (dispatch, getState) => {
 
 const fetchVariationsAsync = (): AppThunk => (dispatch, getState) => {
     const state = getState();
-    let workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!;
+    const workspace = selectWorkspace(state);
+    if (!workspace) {
+        return;
+    }
     if (state.editor.present.apiKey === undefined) {
         alert('Enter an API key before running requests.');
         return;
@@ -563,9 +661,9 @@ const fetchWorkspacesAsync = (): AppThunk => (dispatch, getState) => {
     RestAPI.getWorkspaces().then(response => {
         const workspaces = mapWorkspaceResponse(response.data);
         if (workspaces.length > 0) {
-            console.log(workspaces[0].id);
-            // dispatch(updateWorkspaceId(workspaces[0].id));
-            // dispatch(setWorkspaces(workspaces));
+            console.log(workspaces);
+            dispatch(updateWorkspaceId(workspaces[0].id));
+            dispatch(setWorkspaces(workspaces));
         }
     }).catch(error => {
         alert('API returned an error. Refer to the console to inspect it.')
@@ -575,20 +673,22 @@ const fetchWorkspacesAsync = (): AppThunk => (dispatch, getState) => {
 
 const sendMessageInConversationAsync = (conversationId: string): AppThunk => (dispatch, getState) => {
     const state = getState();
-    let workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!;
+    const initialPrompt = selectPrompt(state)
+    const workspace = selectWorkspace(state);
     if (state.editor.present.apiKey === undefined) {
         alert('Enter an API key before running requests.');
         return;
     }
-    const conversation = workspace.conversations.find(conversation => conversation.id === conversationId);
+    const conversation = workspace?.conversations.find(conversation => conversation.id === conversationId);
     if (conversation === undefined) {
         return;
     }
 
     // If it is a first message in the conversation, lock current completion parameters and prompt for whole conversation
-    if (conversation.parts.length === 1) {
+    if (conversation.parts.length === 1 && initialPrompt) {
         dispatch(setConversationInitialPrompt({
-            conversationId: conversationId, initialPrompt: selectPrompt(state)
+            conversationId: conversationId,
+            initialPrompt
         }));
         dispatch(setConversationCompletionParams({
             conversationId: conversationId, parameters: selectCompletionParameters(state)
@@ -626,18 +726,19 @@ const selectCurrentWorkspaceName = (state: RootState) => state.editor.present.wo
 const selectWorkspaces = (state: RootState) => state.editor.present.workspaces;
 const selectWorkspacesList = (state: RootState) => state.editor.present.workspaces.map(w => ({id: w.id, name: w.name}));
 
-const selectTabIndex = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.tabIndex;
-const selectPrompt = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.prompt;
+const selectTabIndex = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)?.tabIndex || TabIndex.basic;
+const selectPrompt = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)?.prompt;
 const selectAvailableModels = (state: RootState) => state.editor.present.availableModels;
-const selectStopSymbols = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.stopSymbols;
+const selectStopSymbols = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)?.stopSymbols;
 
-const selectModelName = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.modelName;
-const selectModel = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.model;
-const selectTemperature = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.temperature;
-const selectTopP = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.topP;
-const selectFrequencyPenalty = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.frequencyPenalty;
-const selectPresencePenalty = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.presencePenalty;
-const selectMaxTokens = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.maxTokens;
+const selectWorkspace = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId);
+const selectModelName = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)?.modelName;
+const selectModel = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)?.model;
+const selectTemperature = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)?.temperature || .5;
+const selectTopP = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)?.topP || 1.0;
+const selectFrequencyPenalty = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)?.frequencyPenalty || .00;
+const selectPresencePenalty = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)?.presencePenalty || .00;
+const selectMaxTokens = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)?.maxTokens || 30;
 const selectCompletionParameters = (state: RootState) => {
     const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!;
     return {
@@ -664,8 +765,8 @@ const selectCompletionParameters = (state: RootState) => {
 const selectExamples = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.examples;
 const selectExamplePreviousOutputsStatus = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.showExamplePreviousOutputs;
 
-const selectBasicOutput = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.basic.output;
-const selectBasicLoading = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.basic.loading;
+const selectBasicOutput = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)?.basic.output;
+const selectBasicLoading = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)?.basic.loading;
 
 const selectVariationsLoadingStatus = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.loadingVariations;
 const selectVariations = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.variations;
@@ -717,8 +818,8 @@ export {
 
     // Modes
     selectExamples, selectExamplePreviousOutputsStatus,
-    selectVariationsLoadingStatus, selectVariations, selectMaxVariations,
-    selectShowPromptForVariations, selectBasicOutput, selectBasicLoading, selectAvailableModels
+    selectVariationsLoadingStatus, selectVariations, selectMaxVariations, selectShowPromptForVariations, 
+    selectBasicOutput, selectBasicLoading, selectAvailableModels, selectWorkspace
 };
 
 // Async Actions
