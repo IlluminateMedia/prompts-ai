@@ -159,6 +159,7 @@ const editorSlice = createSlice({
         },
         setWorkspaces: (state, action: PayloadAction<Array<Workspace>>) => {
             state.workspaces = action.payload;
+            console.log(state.workspaces);
         },
         updateVariationsLoadingStatus: (state, action: PayloadAction<boolean>) => {
             let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
@@ -456,7 +457,9 @@ const editorSlice = createSlice({
 
         updateWorkspaceId: (state, action: PayloadAction<number>) => {
             const newWorkspace = state.workspaces.find(w => w.id === action.payload);
+            console.log(state.workspaces[1].id);
             if (newWorkspace === undefined) {
+                console.log(state.currentWorkspaceId);
                 return;
             }
             state.currentWorkspaceId = action.payload;
@@ -661,9 +664,8 @@ const fetchWorkspacesAsync = (): AppThunk => (dispatch, getState) => {
     RestAPI.getWorkspaces().then(response => {
         const workspaces = mapWorkspaceResponse(response.data);
         if (workspaces.length > 0) {
-            console.log(workspaces);
-            dispatch(updateWorkspaceId(workspaces[0].id));
             dispatch(setWorkspaces(workspaces));
+            dispatch(updateWorkspaceId(workspaces[0].id));
         }
     }).catch(error => {
         alert('API returned an error. Refer to the console to inspect it.')
@@ -723,7 +725,6 @@ const selectTemplateDialogVisible = (state: RootState) => state.editor.present.s
 const selectCurrentWorkspaceId = (state: RootState) => state.editor.present.currentWorkspaceId;
 const selectEditableWorkspaceName = (state: RootState) => state.editor.present.editableWorkspaceName;
 const selectCurrentWorkspaceName = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.name;
-const selectWorkspaces = (state: RootState) => state.editor.present.workspaces;
 const selectWorkspacesList = (state: RootState) => state.editor.present.workspaces.map(w => ({id: w.id, name: w.name}));
 
 const selectTabIndex = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)?.tabIndex || TabIndex.basic;

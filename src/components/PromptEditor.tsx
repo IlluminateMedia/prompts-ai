@@ -86,7 +86,7 @@ export function PromptEditor() {
     }
 
     return (
-        <div>
+        <>
             <Grid
                 container
                 direction="row"
@@ -337,6 +337,6 @@ export function PromptEditor() {
                 </Grid>
 
             </Grid>
-        </div>
+        </>
     );
 }
