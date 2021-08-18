@@ -104,7 +104,7 @@ export interface Workspace {
 
     prompt: string;
     modelName: string;
-    customModel?: CustomModel;
+    model?: CustomModel;
     temperature: number;
     topP: number;
     n: number;

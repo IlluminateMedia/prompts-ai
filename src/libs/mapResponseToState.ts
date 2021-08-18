@@ -16,7 +16,7 @@ interface WorkspaceResponse {
     custom_model: CustomModel
 }
 
-export function mapWorkspaceResponse(response: Array<WorkspaceResponse>): void {
+export function mapWorkspaceResponse(response: Array<WorkspaceResponse>): Array<Workspace> {
     // const workspaces: Array<Workspace> = [];
     const workspaces: Array<Workspace> = response.map((item) => {
         const workspace: Workspace = {
@@ -31,7 +31,8 @@ export function mapWorkspaceResponse(response: Array<WorkspaceResponse>): void {
             presencePenalty: item.presence_penalty,
             stopSymbols: item.stop_symbols,
             tabIndex: 0,
-            customModel: item.custom_model,
+            modelName: item.custom_model.label,
+            model: item.custom_model,
             showExamplePreviousOutputs: false,
             examples: [
                 {id: uniqid("input_"), text: "We all eat the fish and then made dessert.", output: "We all ate the fish and then made dessert.", isLoading: false},
@@ -52,5 +53,9 @@ export function mapWorkspaceResponse(response: Array<WorkspaceResponse>): void {
         };
 
         return workspace;
-    })
+    });
+
+    console.log(workspaces);
+
+    return workspaces;
 }

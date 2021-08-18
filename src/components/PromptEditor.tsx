@@ -29,7 +29,8 @@ import {
     selectFrequencyPenalty, selectPresencePenalty, 
     selectModelName, editModelName, 
     fetchAvailableModelsAsync, selectAvailableModels, 
-    fetchWorkspacesAsync
+    fetchWorkspacesAsync,
+    selectModel
 } from "../slices/editorSlice";
 import {makeStyles} from "@material-ui/styles";
 import ModeTabs from "./ModeTabs";
@@ -52,14 +53,15 @@ export function PromptEditor() {
     const presencePenalty = useSelector(selectPresencePenalty);
     const maxTokens = useSelector(selectMaxTokens);
     const stopSymbols = useSelector(selectStopSymbols);
-    const availableModelNames = useSelector(selectAvailableModels);
+    const availableModels = useSelector(selectAvailableModels);
+    const modelName = useSelector(selectModelName);
+    const model = useSelector(selectModel);
 
     useEffect(() => {
+        console.log('useEffect hook');
         dispatch(fetchAvailableModelsAsync());
         dispatch(fetchWorkspacesAsync());
     }, []);
-
-    const modelName = useSelector(selectModelName);
 
     const handlePromptChange = (event: React.FormEvent<HTMLTextAreaElement | HTMLInputElement>) => {
         dispatch(editPrompt(event.currentTarget.value));
@@ -295,10 +297,24 @@ export function PromptEditor() {
                             <Typography id="model-name-typography" gutterBottom>
                                 Model name:
                             </Typography>
-                            <Select native id="model-name-select" name="modelName" value={modelName} onChange={handleModelNameChange} className={styles.fullWidth}>
-                                {availableModelNames && Object.keys(availableModelNames).map((index: any) => (
-                                    <option key={availableModelNames[index].id} value={availableModelNames[index].value}>{availableModelNames[index].label}</option>
-                                ))}
+                            <Select 
+                                native id="model-name-select"
+                                name="modelName"
+                                value={model?.value}
+                                onChange={handleModelNameChange}
+                                className={styles.fullWidth}
+                            >
+                                {
+                                    availableModels && Object.keys(availableModels)
+                                        .map((index: any) => (
+                                            <option 
+                                                key={availableModels[index].id}
+                                                value={availableModels[index].value}
+                                            >
+                                                {availableModels[index].label}
+                                            </option>
+                                        ))
+                                }
                             </Select>
                         </CardContent>
                     </Card>

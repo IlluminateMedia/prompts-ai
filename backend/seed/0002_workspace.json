@@ -1,0 +1,32 @@
+[
+    {
+        "model": "restapi.Workspace",
+        "fields": {
+            "name": "Draft #1",
+            "prompt": "Input: Anna and Mike is going skiing.\nOutput: Anna and Mike are going skiing.\nInput: Anna and Pat are married; he has been together for 20 years.\nOutput: Anna and Pat are married; they have been together for 20 years.\nInput: I walk to the store and I bought milk.\nOutput: I walked to the store and I bought milk.\nInput: {example}\nOutput:",
+            "temperature": 0.5,
+            "top_p": 1,
+            "n": 1,
+            "frequency_penalty": 0,
+            "presence_penalty": 0,
+            "stop_symbols": ["\\n"],
+            "max_tokens": 30,
+            "custom_model": 1    
+        }
+    },
+    {
+        "model": "restapi.Workspace",
+        "fields": {
+            "name": "Draft #2",
+            "prompt": "Input: Anna and Mike is going skiing.\nOutput: Anna and Mike are going skiing.\nInput: Anna and Pat are married; he has been together for 20 years.\nOutput: Anna and Pat are married; they have been together for 20 years.\nInput: I walk to the store and I bought milk.\nOutput: I walked to the store and I bought milk.\nInput: {example}\nOutput:",
+            "temperature": 0.5,
+            "top_p": 1,
+            "n": 1,
+            "frequency_penalty": 0,
+            "presence_penalty": 0,
+            "stop_symbols": ["\\n"],
+            "max_tokens": 30,
+            "custom_model": 2
+        }
+    }
+]

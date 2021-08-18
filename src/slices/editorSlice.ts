@@ -11,6 +11,7 @@ import {
     UpdateConversationStartSequenceActionPayload, UpdateConversationRestartSequenceActionPayload, AddMessageToConversationFromUserActionPayload,
     AddMessageToConversationFromGptActionPayload, LoadTemplateFromFileDataActionPayload, LoadTemplateActionExample, LoadTemplateActionPayload
 } from "../common/interfaces";
+import { mapWorkspaceResponse } from "../libs/mapResponseToState";
 
 // TODO: This file grew too fast. It needs to be split into separate slices for different modes.
 
@@ -33,7 +34,7 @@ const initialState: EditorState = {
             "Input: {example}\n" +
             "Output:",
         modelName: 'davinci',
-        customModel: undefined,
+        model: undefined,
         temperature: 0.5,
         topP: 1,
         n: 1,
@@ -560,8 +561,12 @@ const fetchVariationsAsync = (): AppThunk => (dispatch, getState) => {
 
 const fetchWorkspacesAsync = (): AppThunk => (dispatch, getState) => {
     RestAPI.getWorkspaces().then(response => {
-        console.log(response.data);
-        dispatch(setAvailableModels(response.data));
+        const workspaces = mapWorkspaceResponse(response.data);
+        if (workspaces.length > 0) {
+            console.log(workspaces[0].id);
+            // dispatch(updateWorkspaceId(workspaces[0].id));
+            // dispatch(setWorkspaces(workspaces));
+        }
     }).catch(error => {
         alert('API returned an error. Refer to the console to inspect it.')
         console.log(error.response);
@@ -627,7 +632,7 @@ const selectAvailableModels = (state: RootState) => state.editor.present.availab
 const selectStopSymbols = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.stopSymbols;
 
 const selectModelName = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.modelName;
-const selectModel = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)
+const selectModel = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.model;
 const selectTemperature = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.temperature;
 const selectTopP = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.topP;
 const selectFrequencyPenalty = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.frequencyPenalty;
@@ -704,7 +709,7 @@ export type {
 
 export {
     // Common
-    selectTabIndex, selectPrompt, selectStopSymbols, selectApiKey, selectModelName,
+    selectTabIndex, selectPrompt, selectStopSymbols, selectApiKey, selectModelName, selectModel,
     selectTemperature, selectTopP, selectFrequencyPenalty, selectPresencePenalty,
     selectMaxTokens, selectApiKeyDialogVisible, selectTemplateDialogVisible,
     selectCompletionParameters, selectCurrentWorkspaceId, selectEditableWorkspaceName, selectCurrentWorkspaceName,
@@ -726,7 +731,8 @@ export {
 // Actions
 export const {
     updateWorkspaceId, createWorkspace, deleteCurrentWorkspace, updateCurrentWorkspaceName, updateEditableWorkspaceName,
-    editExample, loadOutputForExample, deleteExample, cleanExampleList, markExampleAsLoading, updateExamplePreviousOutputsStatus, loadBasicOutput, setBasicLoading, setAvailableModels,
+    editExample, loadOutputForExample, deleteExample, cleanExampleList, markExampleAsLoading, updateExamplePreviousOutputsStatus, loadBasicOutput,
+    setBasicLoading, setAvailableModels, setWorkspaces,
     markAllExamplesAsNotLoading,
     addVariation, editMaxVariations, cleanVariations, updateShowPromptForVariations, updateVariationsLoadingStatus,
     setConversationCompletionParams, normalizeConversations, updateConversationLoadingStatus, updateConversationInputValue,
