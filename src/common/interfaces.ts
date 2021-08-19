@@ -82,7 +82,8 @@ export interface SelectOption {
 }
 
 export interface EditorState {
-    apiKey?: string;
+    openaiApiKey?: string;
+    airtableApiKey?: string;
     currentWorkspaceId: number;
     editableWorkspaceName: string;
     workspaces: Array<Workspace>;

@@ -18,7 +18,8 @@ import { mapWorkspaceResponse } from "../libs/mapResponseToState";
 // State
 
 const initialState: EditorState = {
-    apiKey: undefined,
+    openaiApiKey: undefined,
+    airtableApiKey: undefined,
     currentWorkspaceId: 1,
     editableWorkspaceName: 'Draft #1',
     availableModels: [],
@@ -388,8 +389,11 @@ const editorSlice = createSlice({
             }
             workspace.prompt = action.payload;
         },
-        editApiKey: (state, action: PayloadAction<string>) => {
-            state.apiKey = action.payload;
+        editAirtableApiKey: (state, action: PayloadAction<string>) => {
+            state.airtableApiKey = action.payload
+        },
+        editOpenaiApiKey: (state, action: PayloadAction<string>) => {
+            state.openaiApiKey = action.payload;
         },
         editModelName: (state, action: PayloadAction<string>) => {
             const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
@@ -411,6 +415,13 @@ const editorSlice = createSlice({
                 return;
             }
             workspace.topP = action.payload;
+        },
+        editN: (state, action: PayloadAction<number>) => {
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
+            if (!workspace) {
+                return;
+            }
+            workspace.n = action.payload;
         },
         editFrequencyPenalty: (state, action: PayloadAction<number>) => {
             const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
@@ -466,18 +477,18 @@ const editorSlice = createSlice({
             state.editableWorkspaceName = newWorkspace.name;
         },
         createWorkspace: (state) => {
-            const currentWorkspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
-            if (!currentWorkspace) {
-                return;
-            }
-            const newWorkspace = {
-                ...currentWorkspace,
-                id: currentWorkspace.id + 1, // demo code line
-                name: `Draft #${state.workspaces.length + 1}`
-            };
-            state.workspaces.push(newWorkspace);
-            state.currentWorkspaceId = newWorkspace.id;
-            state.editableWorkspaceName = newWorkspace.name;
+            // const currentWorkspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
+            // if (!currentWorkspace) {
+            //     return;
+            // }
+            // const newWorkspace = {
+            //     ...currentWorkspace,
+            //     id: currentWorkspace.id + 1, // demo code line
+            //     name: `Draft #${state.workspaces.length + 1}`
+            // };
+            // state.workspaces.push(newWorkspace);
+            // state.currentWorkspaceId = newWorkspace.id;
+            // state.editableWorkspaceName = newWorkspace.name;
         },
         updateCurrentWorkspaceName: (state) => {
             const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
@@ -536,8 +547,8 @@ const fetchBasicOutputAsync = (): AppThunk => (dispatch, getState) => {
     if (!workspace) {
         return;
     }
-    if (state.editor.present.apiKey === undefined) {
-        alert('Enter an API key before running requests.');
+    if (state.editor.present.openaiApiKey === undefined) {
+        alert('Enter an Openai API key before running requests.');
         return;
     }
     if (workspace.prompt.length === 0) {
@@ -577,8 +588,8 @@ const fetchExamplesOutputsAsync = (): AppThunk => (dispatch, getState) => {
     if (!workspace) {
         return;
     }
-    if (state.editor.present.apiKey === undefined) {
-        alert('Enter an API key before running requests.');
+    if (state.editor.present.openaiApiKey === undefined) {
+        alert('Enter an Openai API key before running requests.');
         return;
     }
     if (workspace.prompt.length === 0) {
@@ -623,8 +634,8 @@ const fetchVariationsAsync = (): AppThunk => (dispatch, getState) => {
     if (!workspace) {
         return;
     }
-    if (state.editor.present.apiKey === undefined) {
-        alert('Enter an API key before running requests.');
+    if (state.editor.present.openaiApiKey === undefined) {
+        alert('Enter an Openai API key before running requests.');
         return;
     }
     if (workspace.prompt.length === 0) {
@@ -660,6 +671,10 @@ const fetchVariationsAsync = (): AppThunk => (dispatch, getState) => {
     });
 }
 
+const createWorkspaceAsync = (): AppThunk => (dispatch, getState) => {
+
+}
+
 const fetchWorkspacesAsync = (): AppThunk => (dispatch, getState) => {
     RestAPI.getWorkspaces().then(response => {
         const workspaces = mapWorkspaceResponse(response.data);
@@ -677,7 +692,7 @@ const sendMessageInConversationAsync = (conversationId: string): AppThunk => (di
     const state = getState();
     const initialPrompt = selectPrompt(state)
     const workspace = selectWorkspace(state);
-    if (state.editor.present.apiKey === undefined) {
+    if (state.editor.present.openaiApiKey === undefined) {
         alert('Enter an API key before running requests.');
         return;
     }
@@ -706,7 +721,7 @@ const sendMessageInConversationAsync = (conversationId: string): AppThunk => (di
     if (updatedConversation === undefined) {
         return;
     }
-    const completionParams = {apiKey: state.editor.present.apiKey, ...updatedConversation.completionParams!};
+    const completionParams = {apiKey: state.editor.present.openaiApiKey, ...updatedConversation.completionParams!};
     const prompt = updatedConversation.initialPrompt + updatedConversation.parts.map(p => p.text).join('');
     GptAPI.generateCompletions(prompt, completionParams, updatedWorkspace.modelName).then(response => {
         console.log(response.data);
@@ -719,7 +734,8 @@ const sendMessageInConversationAsync = (conversationId: string): AppThunk => (di
 
 }
 
-const selectApiKey = (state: RootState) => state.editor.present.apiKey;
+const selectOpenaiApiKey = (state: RootState) => state.editor.present.openaiApiKey;
+const selectAirtableApiKey = (state: RootState) => state.editor.present.airtableApiKey;
 const selectApiKeyDialogVisible = (state: RootState) => state.editor.present.showApiKeyDialog;
 const selectTemplateDialogVisible = (state: RootState) => state.editor.present.showTemplateDialog;
 const selectCurrentWorkspaceId = (state: RootState) => state.editor.present.currentWorkspaceId;
@@ -737,13 +753,14 @@ const selectModelName = (state: RootState) => state.editor.present.workspaces.fi
 const selectModel = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)?.model;
 const selectTemperature = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)?.temperature || .5;
 const selectTopP = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)?.topP || 1.0;
+const selectN = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)?.n || 1;
 const selectFrequencyPenalty = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)?.frequencyPenalty || .00;
 const selectPresencePenalty = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)?.presencePenalty || .00;
 const selectMaxTokens = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)?.maxTokens || 30;
 const selectCompletionParameters = (state: RootState) => {
     const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!;
     return {
-        apiKey: state.editor.present.apiKey === undefined ? '' : state.editor.present.apiKey,
+        apiKey: state.editor.present.openaiApiKey === undefined ? '' : state.editor.present.openaiApiKey,
         engine: workspace.modelName,
         maxTokens: workspace.maxTokens,
         stop: (() => {
@@ -811,9 +828,9 @@ export type {
 
 export {
     // Common
-    selectTabIndex, selectPrompt, selectStopSymbols, selectApiKey, selectModelName, selectModel,
+    selectTabIndex, selectPrompt, selectStopSymbols, selectAirtableApiKey, selectOpenaiApiKey, selectModelName, selectModel,
     selectTemperature, selectTopP, selectFrequencyPenalty, selectPresencePenalty,
-    selectMaxTokens, selectApiKeyDialogVisible, selectTemplateDialogVisible,
+    selectMaxTokens, selectApiKeyDialogVisible, selectTemplateDialogVisible, selectN,
     selectCompletionParameters, selectCurrentWorkspaceId, selectEditableWorkspaceName, selectCurrentWorkspaceName,
     selectWorkspacesList,
 
@@ -841,8 +858,8 @@ export const {
     updateConversationStartSequence, updateConversationRestartSequence, addMessageInConversation,
     setConversationInitialPrompt, deleteConversation,
     addStopSymbol, deleteStopSymbol,
-    editTopP, editFrequencyPenalty, editPresencePenalty,
+    editTopP, editN, editFrequencyPenalty, editPresencePenalty,
     loadTemplate, loadTemplateFromFileData,
-    editPrompt, editApiKey, editModelName, editTemperature, editMaxTokens, updateTabIndex, toggleApiKeyDialog, toggleTemplateDialog } = editorSlice.actions;
+    editPrompt, editAirtableApiKey, editOpenaiApiKey, editModelName, editTemperature, editMaxTokens, updateTabIndex, toggleApiKeyDialog, toggleTemplateDialog } = editorSlice.actions;
 
 // Action Payloads

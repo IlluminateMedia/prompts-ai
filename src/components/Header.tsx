@@ -7,7 +7,8 @@ import React from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import {useDispatch, useSelector} from "react-redux";
 import {
-    selectApiKey,
+    selectAirtableApiKey,
+    selectOpenaiApiKey,
     toggleApiKeyDialog,
 } from "../slices/editorSlice";
 import {ActionCreators} from "redux-undo";
@@ -25,8 +26,9 @@ export default function Header() {
     const dispatch = useDispatch();
     const classes = useStyles();
 
-    const apiKey = useSelector(selectApiKey);
-    const apiKeyPresent = !!apiKey;
+    const openaiApiKey = useSelector(selectOpenaiApiKey);
+    const airtableApiKey = useSelector(selectAirtableApiKey);
+    const isEachApiKeyPresent = !!(openaiApiKey && airtableApiKey);
     const handleApiKeyDialogOpen = () => {
         dispatch(toggleApiKeyDialog(true));
     };
@@ -46,7 +48,7 @@ export default function Header() {
                     </Typography>
                 </div>
                 <div className={classes.buttonGroup}>
-                    <IconButton onClick={handleApiKeyDialogOpen}><VpnKeyIcon color={apiKeyPresent ? "action" : "error"}/></IconButton>
+                    <IconButton onClick={handleApiKeyDialogOpen}><VpnKeyIcon color={isEachApiKeyPresent ? "action" : "error"}/></IconButton>
                 </div>
                 <div className={classes.buttonGroup}>
                     <IconButton onClick={handleUndoClick}><UndoIcon/></IconButton>
