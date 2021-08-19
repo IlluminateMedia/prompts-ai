@@ -22,28 +22,30 @@ export default function EditPopup(props: Props) {
         props.onClose();
     };
 
-    return <Dialog open={props.open} onClose={props.onClose} aria-labelledby="form-dialog-title">
-        <DialogTitle id="form-dialog-title">Edit</DialogTitle>
-        <DialogContent>
-            <TextField
-                autoFocus
-                value={editableName}
-                margin="dense"
-                id="name"
-                label="Name"
-                onChange={(event: React.FormEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-                    dispatch(updateEditableWorkspaceName(event.currentTarget.value));
-                }}
-                fullWidth
-            />
-        </DialogContent>
-        <DialogActions>
-            <Button onClick={props.onClose} color="primary">
-                Cancel
-            </Button>
-            <Button onClick={onSave} color="primary">
-                Save
-            </Button>
-        </DialogActions>
-    </Dialog>;
+    return (
+        <Dialog open={props.open} onClose={props.onClose} aria-labelledby="form-dialog-title">
+            <DialogTitle id="form-dialog-title">Edit</DialogTitle>
+            <DialogContent>
+                <TextField
+                    autoFocus
+                    value={editableName}
+                    margin="dense"
+                    id="name"
+                    label="Name"
+                    onChange={(event: React.FormEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+                        dispatch(updateEditableWorkspaceName(event.currentTarget.value));
+                    }}
+                    fullWidth
+                />
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={props.onClose} color="primary">
+                    Cancel
+                </Button>
+                <Button onClick={onSave} color="primary">
+                    Save
+                </Button>
+            </DialogActions>
+        </Dialog>
+    );
 }

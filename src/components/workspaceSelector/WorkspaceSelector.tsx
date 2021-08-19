@@ -17,24 +17,31 @@ const useStyles = makeStyles({
 export default function WorkspaceSelector() {
     const styles = useStyles();
     const dispatch = useDispatch();
-    const workspaceId = useSelector(selectCurrentWorkspaceId);
+    const currentWorkspaceId = useSelector(selectCurrentWorkspaceId);
     const workspaces = useSelector(selectWorkspacesList);
 
     const handleSelectChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-        dispatch(updateWorkspaceId(event.target.value as string));
-        dispatch(ActionCreators.clearHistory())
+        dispatch(updateWorkspaceId(Number(event.target.value)));
+        dispatch(ActionCreators.clearHistory());
     }
     return <Grid container alignItems={'center'} spacing={1}>
         <Grid item className={styles.selectGridItem}>
             <Select
                 native
-                value={workspaceId}
+                value={currentWorkspaceId}
                 fullWidth={true}
                 onChange={handleSelectChange}
             >
-                {workspaces.map((workspace) => (
-                    <option key={workspace.id} value={workspace.id}>{workspace.name}</option>
-                ))}
+                {
+                    workspaces.map((workspace) => (
+                        <option 
+                            key={workspace.id} 
+                            value={workspace.id}
+                        >
+                            {workspace.name}
+                        </option>
+                    ))
+                }
             </Select>
         </Grid>
         <Grid item>

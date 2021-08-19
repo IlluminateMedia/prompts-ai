@@ -22,13 +22,17 @@ import {
     selectStopSymbols,
     addStopSymbol,
     deleteStopSymbol,
+    selectTopP,
     editTopP,
+    selectN,
+    editN,
     editFrequencyPenalty,
     editPresencePenalty,
-    selectTopP,
     selectFrequencyPenalty, selectPresencePenalty, 
     selectModelName, editModelName, 
-    fetchAvailableModelsAsync, selectAvailableModels
+    fetchAvailableModelsAsync, selectAvailableModels, 
+    fetchWorkspacesAsync,
+    selectModel
 } from "../slices/editorSlice";
 import {makeStyles} from "@material-ui/styles";
 import ModeTabs from "./ModeTabs";
@@ -47,17 +51,20 @@ export function PromptEditor() {
     const prompt = useSelector(selectPrompt);
     const temperature = useSelector(selectTemperature);
     const topP = useSelector(selectTopP);
+    const n = useSelector(selectN);
     const frequencyPenalty = useSelector(selectFrequencyPenalty);
     const presencePenalty = useSelector(selectPresencePenalty);
     const maxTokens = useSelector(selectMaxTokens);
     const stopSymbols = useSelector(selectStopSymbols);
-    const availableModelNames = useSelector(selectAvailableModels);
+    const availableModels = useSelector(selectAvailableModels);
+    const modelName = useSelector(selectModelName);
+    const model = useSelector(selectModel);
 
     useEffect(() => {
+        console.log('useEffect hook');
         dispatch(fetchAvailableModelsAsync());
-    });
-
-    const modelName = useSelector(selectModelName);
+        dispatch(fetchWorkspacesAsync());
+    }, []);
 
     const handlePromptChange = (event: React.FormEvent<HTMLTextAreaElement | HTMLInputElement>) => {
         dispatch(editPrompt(event.currentTarget.value));
@@ -68,6 +75,9 @@ export function PromptEditor() {
     const handleTopPChange = (event: React.ChangeEvent<{}>, value: number | number[]) => {
         dispatch(editTopP(value as number));
     }
+    const handleNChange = (event: React.FormEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+        dispatch(editN(Number(event.currentTarget.value)));
+    }
     const handleFrequencyPenaltyChange = (event: React.ChangeEvent<{}>, value: number | number[]) => {
         dispatch(editFrequencyPenalty(value as number));
     }
@@ -77,12 +87,12 @@ export function PromptEditor() {
     const handleMaxTokensChange = (event: React.ChangeEvent<{}>, value: number | number[]) => {
         dispatch(editMaxTokens(value as number));
     }
-    const handleModelNameChange = (event: any) => {
-        dispatch(editModelName(event.target.value));
+    const handleModelNameChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+        dispatch(editModelName(event.target.value as string));
     }
 
     return (
-        <div>
+        <>
             <Grid
                 container
                 direction="row"
@@ -91,61 +101,6 @@ export function PromptEditor() {
                 spacing={3}
             >
                 <Grid item xs={12} sm={3} md={3}>
-                    {/*<Box mb={1}>
-                        <Card>
-                            <CardContent>
-                                <Box>
-                                    <Grid container>
-                                        <Grid item><Button
-                                            onClick={() => dispatch(ActionCreators.undo())}
-                                        >
-                                            Undo
-                                        </Button></Grid>
-                                        <Grid item>
-                                            <Button
-                                                aria-label="Undo last change"
-                                                onClick={() => dispatch(ActionCreators.redo())}
-                                            >
-                                                Redo
-                                            </Button>
-                                        </Grid>
-                                        <Grid item>
-                                            <Button
-                                                aria-label="Save as a file"
-                                                onClick={handleSaveAndDownload}
-                                            >
-                                                Save
-                                            </Button>
-                                        </Grid>
-                                    </Grid>
-                                </Box>
-                                <hr/>
-                                <Box mt={2}>
-                                    <Grid container>
-                                        <Grid item
-                                              className={styles.fullWidth}>
-                                            <TextField type="password"
-                                                       variant="outlined"
-                                                       label="API Key"
-                                                       size={'small'}
-                                                       value={apiKey}
-                                                       onChange={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-                                                           dispatch(editApiKey(event.currentTarget.value));
-                                                       }}
-                                                       inputProps={{
-                                                           autoComplete: 'new-password',
-                                                           form: {
-                                                               autoComplete: 'off',
-                                                           },
-                                                       }}
-                                                       className={styles.fullWidth}
-                                            />
-                                        </Grid>
-                                    </Grid>
-                                </Box>
-                            </CardContent>
-                        </Card>
-                    </Box>*/}
                     <Box mb={1}>
                         <Card>
                             <CardContent>
@@ -169,7 +124,7 @@ export function PromptEditor() {
                             </Tooltip>
                             <Slider
                                 defaultValue={0.5}
-                                value={temperature}
+                                // value={temperature}
                                 onChange={handleTemperatureChange}
                                 aria-labelledby="temperature-slider"
                                 valueLabelDisplay="auto"
@@ -205,7 +160,10 @@ export function PromptEditor() {
                                 max={512}
                             />
 
-                            <Tooltip title="On which symbols GPT-3 should stop generating text. Enter \n for a line break." placement="left">
+                            <Tooltip 
+                                title="On which symbols GPT-3 should stop generating text. Enter \n for a line break." 
+                                placement="left"
+                            >
                                 <Typography gutterBottom>
                                     Stop sequences:
                                 </Typography>
@@ -214,7 +172,7 @@ export function PromptEditor() {
                                 value={stopSymbols}
                                 onAdd={(chip) => dispatch(addStopSymbol(chip))}
                                 onDelete={(deletedChip) => dispatch(deleteStopSymbol(deletedChip))}
-                                onBeforeAdd={() => stopSymbols.length !== 4}
+                                onBeforeAdd={() => stopSymbols?.length !== 4}
                                 newChipKeys={['Tab']}
                                 className={styles.fullWidth}
                             />
@@ -224,7 +182,10 @@ export function PromptEditor() {
                             <Typography gutterBottom>
                                 <strong>Advanced parameters</strong>
                             </Typography>
-                            <Tooltip title={'"Controls diversity via nucleus sampling: 0.5 means half of all likelihood-weighted options are considered."'} placement="left">
+                            <Tooltip 
+                                title={'"Controls diversity via nucleus sampling: 0.5 means half of all likelihood-weighted options are considered."'}
+                                placement="left"
+                            >
                                 <Typography id="top-p-slider" gutterBottom>
                                     Top P: <strong>{topP}</strong>
                                 </Typography>
@@ -245,6 +206,23 @@ export function PromptEditor() {
                                 }]}
                                 min={0}
                                 max={1}
+                            />
+                            <Tooltip 
+                                title={'"Controls how many completions to generate for each prompt."'}
+                                placement="left"
+                            >
+                                <Typography id="top-p-slider" gutterBottom>
+                                    N
+                                </Typography>
+                            </Tooltip>
+                            <TextField 
+                                id="n-text"
+                                type={"number"}
+                                style={{marginBottom: '20px'}}
+                                rowsMax={100}
+                                fullWidth={true}
+                                value={n}
+                                onChange={handleNChange}
                             />
                             <Tooltip title={'"How much to penalize new tokens based on their existing frequency in the text so far. Decreases the model\'s likelihood to repeat the same line verbatim."'} placement="left">
                                 <Typography id="frequency-penalty-slider" gutterBottom>
@@ -293,13 +271,61 @@ export function PromptEditor() {
                             <Typography id="model-name-typography" gutterBottom>
                                 Model name:
                             </Typography>
-                            <Select native id="model-name-select" name="modelName" value={modelName} onChange={handleModelNameChange} className={styles.fullWidth}>
-                                {availableModelNames && Object.keys(availableModelNames).map((index: any) => (
-                                    <option key={availableModelNames[index].id} value={availableModelNames[index].value}>{availableModelNames[index].label}</option>
-                                ))}
+                            <Select 
+                                native id="model-name-select"
+                                name="modelName"
+                                margin="dense"
+                                value={model?.value}
+                                onChange={handleModelNameChange}
+                                className={styles.fullWidth}
+                            >
+                                {
+                                    availableModels && Object.keys(availableModels)
+                                        .map((index: any) => (
+                                            <option 
+                                                key={availableModels[index].id}
+                                                value={availableModels[index].value}
+                                            >
+                                                {availableModels[index].label}
+                                            </option>
+                                        ))
+                                }
                             </Select>
                         </CardContent>
                     </Card>
+                    <Box mt={1}>
+                        <Card>
+                            <CardContent>
+                                <Typography gutterBottom>
+                                    <strong>Airtable API parameters</strong>
+                                </Typography>
+                                <Typography id="top-p-slider" gutterBottom>
+                                    API Base
+                                </Typography>
+                                <TextField 
+                                    id="airtable-api-base-text"
+                                    style={{marginBottom: '20px'}}
+                                    fullWidth={true}
+                                />
+                                <Typography id="top-p-slider" gutterBottom>
+                                    API Table
+                                </Typography>
+                                <TextField 
+                                    id="airtable-api-table-text"
+                                    style={{marginBottom: '20px'}}
+                                    fullWidth={true}
+                                />
+                                <Typography id="top-p-slider" gutterBottom>
+                                    Category
+                                </Typography>
+                                <TextField 
+                                    id="airtable-api-base-text"
+                                    style={{marginBottom: '20px'}}
+                                    fullWidth={true}
+                                />
+                            </CardContent>
+                        </Card>
+                    </Box>
                 </Grid>
                 <Grid item xs={12} sm={9} md={9}>
                     <TextField
@@ -319,6 +345,6 @@ export function PromptEditor() {
                 </Grid>
 
             </Grid>
-        </div>
+        </>
     );
 }

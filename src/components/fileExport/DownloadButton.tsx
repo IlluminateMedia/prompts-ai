@@ -32,19 +32,27 @@ export default function DownloadButton(props: Props) {
 
     const handleSaveAndDownload = () => {
         const element = document.createElement("a");
-        const savedStopSymbols = stopSymbols.map(symbol => {
-            return symbol.split('\\n').join('\n');
-        });
-        const file = new Blob([
-            JSON.stringify({prompt, temperature, topP,
-                frequencyPenalty, presencePenalty,
-                maxTokens, stopSymbols: savedStopSymbols, modelName,
-            })
-        ], {type: 'text/plain'});
-        element.href = URL.createObjectURL(file);
-        element.download = `gpt3_workspace_${Math.trunc(Date.now() / 1000)}.json`;
-        document.body.appendChild(element);
-        element.click();
+        if (stopSymbols) {
+            const savedStopSymbols = stopSymbols.map(symbol => {
+                return symbol.split('\\n').join('\n');
+            });
+            const file = new Blob([
+                JSON.stringify({
+                    prompt,
+                    temperature,
+                    topP,
+                    frequencyPenalty,
+                    presencePenalty,
+                    maxTokens,
+                    stopSymbols: savedStopSymbols,
+                    modelName,
+                })
+            ], {type: 'text/plain'});
+            element.href = URL.createObjectURL(file);
+            element.download = `gpt3_workspace_${Math.trunc(Date.now() / 1000)}.json`;
+            document.body.appendChild(element);
+            element.click();
+        }
     }
 
     return <Button

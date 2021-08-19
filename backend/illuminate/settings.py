@@ -64,6 +64,10 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'illuminate.urls'
 
+REST_FRAMEWORK = {
+    'COERCE_DECIMAL_TO_STRING': False
+}
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -88,6 +92,14 @@ WSGI_APPLICATION = 'illuminate.wsgi.application'
 
 DATABASES = {
     'default': env.db(),
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': os.path.abspath('prompts_ai.db'),
+    #     'USER': '',
+    #     'PASSWORD': '',
+    #     'HOST': '',
+    #     'PORT': '',
+    # },
     'extra': env.db('SQLITE_URL', default='sqlite:////tmp/my-tmp-sqlite.db')
 }
 

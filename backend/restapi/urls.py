@@ -5,7 +5,7 @@ from . import views
 
 router = routers.DefaultRouter()
 router.register(r'models', views.CustomModelViewSet)
-router.register(r'shared-prompts', views.SharedPromptViewSet)
+router.register(r'workspace', views.WorkspaceViewSet)
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.

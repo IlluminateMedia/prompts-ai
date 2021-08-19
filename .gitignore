@@ -152,3 +152,13 @@ yarn-debug.log*
 yarn-error.log*
 
 venv
+prompts_ai_venv
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+*.db

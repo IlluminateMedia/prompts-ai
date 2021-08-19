@@ -1,14 +1,19 @@
 from rest_framework import viewsets
 
-from .serializers import CustomModelSerializer, SharedPromptSerializer
-from .models import CustomModel, SharedPrompt
+from .serializers import CustomModelSerializer, WorkspaceReadSerializer, WorkspaceWriteSerializer
+from .models import CustomModel, Workspace
 
 
 class CustomModelViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = CustomModel.objects.all()
     serializer_class = CustomModelSerializer
 
-class SharedPromptViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = SharedPrompt.objects.all()
-    serializer_class = SharedPromptSerializer
+class WorkspaceViewSet(viewsets.ModelViewSet):
+    queryset = Workspace.objects.all()
+
+    def get_serializer_class(self):
+        if self.action in ["create", "update", "partial_update", "destroy"]:
+            return WorkspaceWriteSerializer
+
+        return WorkspaceReadSerializer
 
