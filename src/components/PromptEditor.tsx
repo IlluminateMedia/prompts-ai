@@ -61,7 +61,6 @@ export function PromptEditor() {
     const model = useSelector(selectModel);
 
     useEffect(() => {
-        console.log('useEffect hook');
         dispatch(fetchAvailableModelsAsync());
         dispatch(fetchWorkspacesAsync());
     }, []);

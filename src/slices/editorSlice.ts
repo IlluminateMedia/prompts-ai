@@ -160,7 +160,6 @@ const editorSlice = createSlice({
         },
         setWorkspaces: (state, action: PayloadAction<Array<Workspace>>) => {
             state.workspaces = action.payload;
-            console.log(state.workspaces);
         },
         updateVariationsLoadingStatus: (state, action: PayloadAction<boolean>) => {
             let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
@@ -468,7 +467,6 @@ const editorSlice = createSlice({
 
         updateWorkspaceId: (state, action: PayloadAction<number>) => {
             const newWorkspace = state.workspaces.find(w => w.id === action.payload);
-            console.log(state.workspaces[1].id);
             if (newWorkspace === undefined) {
                 console.log(state.currentWorkspaceId);
                 return;
