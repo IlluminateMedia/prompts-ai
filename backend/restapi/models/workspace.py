@@ -18,4 +18,4 @@ class Workspace(models.Model):
 
     class Meta:
         app_label = "restapi"
-        db_table = "workspace"
+        db_table = "restapi_workspace"
