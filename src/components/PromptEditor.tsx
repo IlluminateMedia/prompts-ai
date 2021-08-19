@@ -87,8 +87,8 @@ export function PromptEditor() {
     const handleMaxTokensChange = (event: React.ChangeEvent<{}>, value: number | number[]) => {
         dispatch(editMaxTokens(value as number));
     }
-    const handleModelNameChange = (event: any) => {
-        dispatch(editModelName(event.target.value));
+    const handleModelNameChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+        dispatch(editModelName(event.target.value as string));
     }
 
     return (

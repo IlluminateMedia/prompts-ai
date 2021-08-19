@@ -37,42 +37,48 @@ export default function ApiKeyDialog() {
 
     const classes = useStyles();
 
-    return <Dialog open={apiKeyDialogOpen} onClose={handleApiKeyDialogClose} aria-labelledby="api-key-form-dialog-title">
-        <DialogTitle id="api-key-form-dialog-title">API Keys</DialogTitle>
-        <DialogContent>
-            <DialogContentText>
-                Please provide your OpenAI API Key and Airtable API Key. We only store these keys locally and never send it to our servers.
-            </DialogContentText>
-            <TextField
-                className={classes.apiKeyInput}
-                autoFocus
-                margin="dense"
-                id="open-api-key"
-                label="Open AI API Key"
-                type="text"
-                value={openaiApiKey}
-                fullWidth
-                onChange={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-                    dispatch(editOpenaiApiKey(event.currentTarget.value));
-                }}
-            />
-            <TextField
-                className={classes.apiKeyInput}
-                margin="dense"
-                id="airtable-api-key"
-                label="Airtable API Key"
-                type="text"
-                value={airtableApiKey}
-                fullWidth
-                onChange={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-                    dispatch(editAirtableApiKey(event.currentTarget.value));
-                }}
-            />
-        </DialogContent>
-        <DialogActions>
-            <Button onClick={handleApiKeyDialogClose} color="primary">
-                Done
-            </Button>
-        </DialogActions>
-    </Dialog>;
+    return (
+        <Dialog 
+            open={apiKeyDialogOpen}
+            onClose={handleApiKeyDialogClose}
+            aria-labelledby="api-key-form-dialog-title"
+        >
+            <DialogTitle id="api-key-form-dialog-title">API Keys</DialogTitle>
+            <DialogContent>
+                <DialogContentText>
+                    Please provide your OpenAI API Key and Airtable API Key. We only store these keys locally and never send it to our servers.
+                </DialogContentText>
+                <TextField
+                    className={classes.apiKeyInput}
+                    autoFocus
+                    margin="dense"
+                    id="open-api-key"
+                    label="Open AI API Key"
+                    type="text"
+                    value={openaiApiKey}
+                    fullWidth
+                    onChange={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+                        dispatch(editOpenaiApiKey(event.currentTarget.value));
+                    }}
+                />
+                <TextField
+                    className={classes.apiKeyInput}
+                    margin="dense"
+                    id="airtable-api-key"
+                    label="Airtable API Key"
+                    type="text"
+                    value={airtableApiKey}
+                    fullWidth
+                    onChange={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+                        dispatch(editAirtableApiKey(event.currentTarget.value));
+                    }}
+                />
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={handleApiKeyDialogClose} color="primary">
+                    Done
+                </Button>
+            </DialogActions>
+        </Dialog>
+    );
 }
