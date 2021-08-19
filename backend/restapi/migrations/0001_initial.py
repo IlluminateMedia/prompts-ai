@@ -18,10 +18,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('label', models.CharField(max_length=255)),
                 ('value', models.CharField(max_length=255)),
-            ],
-            options={
-                'db_table': 'restapi_custom_model',
-            },
+            ]
         ),
         migrations.CreateModel(
             name='SharedPrompt',
@@ -37,24 +34,5 @@ class Migration(migrations.Migration):
                 ('frequencyPenalty', models.IntegerField(default=0)),
                 ('examples', models.JSONField(default=dict)),
             ],
-        ),
-        migrations.CreateModel(
-            name='Workspace',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
-                ('temperature', models.DecimalField(decimal_places=2, default=0.0, help_text='Temperature', max_digits=5)),
-                ('max_tokens', models.DecimalField(decimal_places=2, default=0.0, help_text='Max Tokens', max_digits=5)),
-                ('top_p', models.DecimalField(decimal_places=2, default=0.0, help_text='Top P', max_digits=5)),
-                ('n', models.IntegerField(default=1)),
-                ('presence_penalty', models.DecimalField(decimal_places=2, default=0.0, help_text='Presence Penalty', max_digits=5)),
-                ('frequency_penalty', models.DecimalField(decimal_places=2, default=0.0, help_text='Frequency Penalty', max_digits=5)),
-                ('stop_symbols', models.JSONField(default=dict)),
-                ('prompt', models.TextField(blank=True, null=True)),
-                ('custom_model', models.ForeignKey(blank=True, on_delete=django.db.models.deletion.CASCADE, related_name='workspaces', to='restapi.custommodel')),
-            ],
-            options={
-                'db_table': 'restapi_workspace',
-            },
         ),
     ]

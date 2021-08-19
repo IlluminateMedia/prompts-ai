@@ -6,7 +6,6 @@ class CustomModel(models.Model):
 
     class Meta:
         app_label = "restapi"
-        db_table = "restapi_custom_model"
 
     def __str__(self):
         return self.label
