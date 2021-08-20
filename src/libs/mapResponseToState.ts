@@ -20,7 +20,7 @@ export function mapWorkspaceResponse(response: Array<WorkspaceResponse>): Array<
     // const workspaces: Array<Workspace> = [];
     const workspaces: Array<Workspace> = response.map((item) => {
         const workspace: Workspace = {
-            id: item.id,
+            id: uniqid(item.id.toString()),
             name: item.name,
             prompt: item.prompt,
             temperature: item.temperature,

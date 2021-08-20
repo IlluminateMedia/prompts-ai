@@ -292,39 +292,6 @@ export function PromptEditor() {
                             </Select>
                         </CardContent>
                     </Card>
-                    <Box mt={1}>
-                        <Card>
-                            <CardContent>
-                                <Typography gutterBottom>
-                                    <strong>Airtable API parameters</strong>
-                                </Typography>
-                                <Typography id="top-p-slider" gutterBottom>
-                                    API Base
-                                </Typography>
-                                <TextField 
-                                    id="airtable-api-base-text"
-                                    style={{marginBottom: '20px'}}
-                                    fullWidth={true}
-                                />
-                                <Typography id="top-p-slider" gutterBottom>
-                                    API Table
-                                </Typography>
-                                <TextField 
-                                    id="airtable-api-table-text"
-                                    style={{marginBottom: '20px'}}
-                                    fullWidth={true}
-                                />
-                                <Typography id="top-p-slider" gutterBottom>
-                                    Category
-                                </Typography>
-                                <TextField 
-                                    id="airtable-api-base-text"
-                                    style={{marginBottom: '20px'}}
-                                    fullWidth={true}
-                                />
-                            </CardContent>
-                        </Card>
-                    </Box>
                 </Grid>
                 <Grid item xs={12} sm={9} md={9}>
                     <TextField

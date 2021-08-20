@@ -20,11 +20,11 @@ import { mapWorkspaceResponse } from "../libs/mapResponseToState";
 const initialState: EditorState = {
     openaiApiKey: undefined,
     airtableApiKey: undefined,
-    currentWorkspaceId: 1,
+    currentWorkspaceId: 'first_workspace',
     editableWorkspaceName: 'Draft #1',
     availableModels: [],
     workspaces: [{
-        id: 1,
+        id: 'first_workspace',
         name: 'Draft #1',
         prompt: "Input: Anna and Mike is going skiing.\n" +
             "Output: Anna and Mike are going skiing.\n" +
@@ -396,10 +396,12 @@ const editorSlice = createSlice({
         },
         editModelName: (state, action: PayloadAction<string>) => {
             const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
+            const model = state.availableModels.find(m => m.value === action.payload);
             if (!workspace) {
                 return;
             }
             workspace.modelName = action.payload;
+            workspace.model = model;
         },
         editTemperature: (state, action: PayloadAction<number>) => {
             const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
@@ -465,28 +467,27 @@ const editorSlice = createSlice({
             workspace.tabIndex = action.payload;
         },
 
-        updateWorkspaceId: (state, action: PayloadAction<number>) => {
+        updateWorkspaceId: (state, action: PayloadAction<string>) => {
             const newWorkspace = state.workspaces.find(w => w.id === action.payload);
             if (newWorkspace === undefined) {
-                console.log(state.currentWorkspaceId);
                 return;
             }
             state.currentWorkspaceId = action.payload;
             state.editableWorkspaceName = newWorkspace.name;
         },
         createWorkspace: (state) => {
-            // const currentWorkspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
-            // if (!currentWorkspace) {
-            //     return;
-            // }
-            // const newWorkspace = {
-            //     ...currentWorkspace,
-            //     id: currentWorkspace.id + 1, // demo code line
-            //     name: `Draft #${state.workspaces.length + 1}`
-            // };
-            // state.workspaces.push(newWorkspace);
-            // state.currentWorkspaceId = newWorkspace.id;
-            // state.editableWorkspaceName = newWorkspace.name;
+            const currentWorkspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
+            if (!currentWorkspace) {
+                return;
+            }
+            const newWorkspace = {
+                ...currentWorkspace,
+                id: uniqid(`Draft #${state.workspaces.length + 1}`),
+                name: `Draft #${state.workspaces.length + 1}`
+            };
+            state.workspaces.push(newWorkspace);
+            state.currentWorkspaceId = newWorkspace.id;
+            state.editableWorkspaceName = newWorkspace.name;
         },
         updateCurrentWorkspaceName: (state) => {
             const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
@@ -669,10 +670,6 @@ const fetchVariationsAsync = (): AppThunk => (dispatch, getState) => {
     });
 }
 
-const createWorkspaceAsync = (): AppThunk => (dispatch, getState) => {
-
-}
-
 const fetchWorkspacesAsync = (): AppThunk => (dispatch, getState) => {
     RestAPI.getWorkspaces().then(response => {
         const workspaces = mapWorkspaceResponse(response.data);
@@ -738,25 +735,61 @@ const selectApiKeyDialogVisible = (state: RootState) => state.editor.present.sho
 const selectTemplateDialogVisible = (state: RootState) => state.editor.present.showTemplateDialog;
 const selectCurrentWorkspaceId = (state: RootState) => state.editor.present.currentWorkspaceId;
 const selectEditableWorkspaceName = (state: RootState) => state.editor.present.editableWorkspaceName;
-const selectCurrentWorkspaceName = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.name;
+const selectCurrentWorkspaceName = (state: RootState) => {
+    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
+    return workspace!.name;
+};
 const selectWorkspacesList = (state: RootState) => state.editor.present.workspaces.map(w => ({id: w.id, name: w.name}));
 
-const selectTabIndex = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)?.tabIndex || TabIndex.basic;
-const selectPrompt = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)?.prompt;
+const selectTabIndex = (state: RootState) => {
+    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
+    return workspace!.tabIndex;
+};
+const selectPrompt = (state: RootState) => {
+    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
+    return workspace!.prompt;
+};
 const selectAvailableModels = (state: RootState) => state.editor.present.availableModels;
-const selectStopSymbols = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)?.stopSymbols;
+const selectStopSymbols = (state: RootState) => {
+    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
+    return workspace!.stopSymbols;
+}
 
-const selectWorkspace = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId);
-const selectModelName = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)?.modelName;
-const selectModel = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)?.model;
-const selectTemperature = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)?.temperature || .5;
-const selectTopP = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)?.topP || 1.0;
-const selectN = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)?.n || 1;
-const selectFrequencyPenalty = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)?.frequencyPenalty || .00;
-const selectPresencePenalty = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)?.presencePenalty || .00;
-const selectMaxTokens = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)?.maxTokens || 30;
+const selectWorkspace = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
+const selectModelName = (state: RootState) => {
+    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
+    return workspace!.modelName
+};
+const selectModel = (state: RootState) => {
+    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
+    return workspace!.model;
+};
+const selectTemperature = (state: RootState) => {
+    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
+    return workspace!.temperature;
+};
+const selectTopP = (state: RootState) => {
+    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
+    return workspace!.topP;
+};
+const selectN = (state: RootState) => {
+    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
+    return workspace!.n;
+};
+const selectFrequencyPenalty = (state: RootState) => {
+    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
+    return workspace!.frequencyPenalty;
+};
+const selectPresencePenalty = (state: RootState) => {
+    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
+    return workspace!.presencePenalty;
+};
+const selectMaxTokens = (state: RootState) => {
+    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
+    return workspace!.maxTokens
+};
 const selectCompletionParameters = (state: RootState) => {
-    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!;
+    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
     return {
         apiKey: state.editor.present.openaiApiKey === undefined ? '' : state.editor.present.openaiApiKey,
         engine: workspace.modelName,
@@ -778,16 +811,40 @@ const selectCompletionParameters = (state: RootState) => {
     };
 };
 
-const selectExamples = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.examples;
-const selectExamplePreviousOutputsStatus = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.showExamplePreviousOutputs;
+const selectExamples = (state: RootState) => {
+    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
+    return workspace!.examples
+};
+const selectExamplePreviousOutputsStatus = (state: RootState) => {
+    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
+    return workspace!.showExamplePreviousOutputs
+};
 
-const selectBasicOutput = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)?.basic.output;
-const selectBasicLoading = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)?.basic.loading;
+const selectBasicOutput = (state: RootState) => {
+    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
+    return workspace!.basic.output
+};
+const selectBasicLoading = (state: RootState) => {
+    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
+    return workspace!.basic.loading;
+};
 
-const selectVariationsLoadingStatus = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.loadingVariations;
-const selectVariations = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.variations;
-const selectMaxVariations = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.maxVariations;
-const selectShowPromptForVariations = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.showPromptForVariations;
+const selectVariationsLoadingStatus = (state: RootState) => {
+    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
+    return workspace!.loadingVariations
+};
+const selectVariations = (state: RootState) => {
+    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
+    return workspace!.variations
+};
+const selectMaxVariations = (state: RootState) => {
+    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
+    return workspace!.maxVariations
+};
+const selectShowPromptForVariations = (state: RootState) => {
+    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
+    return workspace!.showPromptForVariations
+};
 
 // Helpers
 
