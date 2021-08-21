@@ -117,6 +117,7 @@ export interface Workspace {
 
     showExamplePreviousOutputs: boolean;
     examples: Array<Example>;
+    keywords: string[][];
 
     loadingVariations: boolean;
     variations: Array<Variation>;
