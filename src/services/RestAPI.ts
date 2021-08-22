@@ -1,8 +1,8 @@
 import axios from "axios";
 import {AxiosPromise} from "axios";
 
-// const baseUrl = 'http://localhost:8000/api/v1/';
-const baseUrl = '/be/api/v1/';
+const baseUrl = "http://localhost:8000/be/api/v1/";
+// const baseUrl = "/be/api/v1/";
 
 class RestAPI {
 

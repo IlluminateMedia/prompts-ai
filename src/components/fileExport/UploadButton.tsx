@@ -3,7 +3,11 @@ import React from 'react';
 import Files from "react-files";
 import {Button} from "@material-ui/core";
 import {useDispatch} from "react-redux";
-import {loadTemplateFromFileData, LoadTemplateFromFileDataActionPayload} from "../../slices/editorSlice";
+import {
+    loadKeywords,
+    loadTemplateFromFileData,
+    LoadTemplateFromFileDataActionPayload
+} from "../../slices/editorSlice";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 
 interface Props {
@@ -21,12 +25,13 @@ export default function UploadButton(props: Props) {
         if (event.target!.result === undefined) {
             return;
         }
-        const template: LoadTemplateFromFileDataActionPayload = JSON.parse(event.target!.result as string);
+        dispatch(loadKeywords(event.target!.result as string));
+        // const template: LoadTemplateFromFileDataActionPayload = JSON.parse(event.target!.result as string);
 
-        template.stopSymbols = template.stopSymbols.map(symbol => {
-            return symbol.split('\n').join('\\n');
-        });
-        dispatch(loadTemplateFromFileData(template));
+        // template.stopSymbols = template.stopSymbols.map(symbol => {
+        //     return symbol.split('\n').join('\\n');
+        // });
+        // dispatch(loadTemplateFromFileData(template));
     };
 
     return <Files
@@ -35,7 +40,7 @@ export default function UploadButton(props: Props) {
             fileReader.readAsText(file[0]);
         }}
         onError={(err: any) => console.log(err)}
-        accepts={['.json']}
+        accepts={['.csv']}
         maxFileSize={10000000}
         minFileSize={0}
         clickable

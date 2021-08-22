@@ -20,7 +20,7 @@ export function mapWorkspaceResponse(response: Array<WorkspaceResponse>): Array<
     // const workspaces: Array<Workspace> = [];
     const workspaces: Array<Workspace> = response.map((item) => {
         const workspace: Workspace = {
-            id: item.id,
+            id: uniqid(item.id.toString()),
             name: item.name,
             prompt: item.prompt,
             temperature: item.temperature,
@@ -38,7 +38,7 @@ export function mapWorkspaceResponse(response: Array<WorkspaceResponse>): Array<
                 {id: uniqid("input_"), text: "We all eat the fish and then made dessert.", output: "We all ate the fish and then made dessert.", isLoading: false},
                 {id: uniqid("input_"), text: "I like ski every day.", output: "I like skiing every day.", isLoading: false},
             ],
-
+            keywords: [],
             loadingVariations: false,
             variations: [],
             maxVariations: 10,

@@ -84,7 +84,7 @@ export interface SelectOption {
 export interface EditorState {
     openaiApiKey?: string;
     airtableApiKey?: string;
-    currentWorkspaceId: number;
+    currentWorkspaceId: string;
     editableWorkspaceName: string;
     workspaces: Array<Workspace>;
 
@@ -100,7 +100,7 @@ export interface CustomModel {
 }
 
 export interface Workspace {
-    id: number;
+    id: string;
     name: string;
 
     prompt: string;
@@ -117,6 +117,7 @@ export interface Workspace {
 
     showExamplePreviousOutputs: boolean;
     examples: Array<Example>;
+    keywords: string[][];
 
     loadingVariations: boolean;
     variations: Array<Variation>;

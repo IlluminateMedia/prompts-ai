@@ -36,6 +36,7 @@ export default function CodeGeneratorButton() {
     const [scroll, setScroll] = React.useState<DialogProps['scroll']>('paper');
 
     let defaultExampleId;
+
     const codeExamples = generateCodeExamples(completionParameters, tabIndex, examples);
     if (codeExamples.length === 0) {
         defaultExampleId = '';
@@ -94,7 +95,7 @@ export default function CodeGeneratorButton() {
                                 native
                                 value={selectedExample}
                                 onChange={handleSelectChange}
-                                className={classes.fullWidth}>
+                                className={classes.fullWidth}
                             >
                                 {generateCodeExamples(completionParameters, tabIndex, examples).map((codeExample) => (
                                     <option key={codeExample.id} value={codeExample.id}>{codeExample.name}</option>
