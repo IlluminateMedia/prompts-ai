@@ -50,7 +50,7 @@ function App() {
             <Switch>
                 <Route path="/signin" component={SignIn} />
                 <Route path="/signup" component={SignUp} />
-                <Route path="/rest" component={PromptEditor} />
+                <Route path="/updated" component={PromptEditor} />
                 <Route path="/">
                     <Header/>
                     <Container maxWidth={"lg"}>
