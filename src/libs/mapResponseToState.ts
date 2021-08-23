@@ -17,43 +17,43 @@ interface WorkspaceResponse {
 }
 
 export function mapWorkspaceResponse(response: Array<WorkspaceResponse>): Array<Workspace> {
-    // const workspaces: Array<Workspace> = [];
-    const workspaces: Array<Workspace> = response.map((item) => {
-        const workspace: Workspace = {
-            id: uniqid(item.id.toString()),
-            name: item.name,
-            prompt: item.prompt,
-            temperature: item.temperature,
-            maxTokens: item.max_tokens,
-            topP: item.top_p,
-            n: item.n,
-            frequencyPenalty: item.frequency_penalty,
-            presencePenalty: item.presence_penalty,
-            stopSymbols: item.stop_symbols,
-            tabIndex: 0,
-            modelName: item.custom_model.label,
-            model: item.custom_model,
-            showExamplePreviousOutputs: false,
-            examples: [
-                {id: uniqid("input_"), text: "We all eat the fish and then made dessert.", output: "We all ate the fish and then made dessert.", isLoading: false},
-                {id: uniqid("input_"), text: "I like ski every day.", output: "I like skiing every day.", isLoading: false},
-            ],
-            keywords: [],
-            loadingVariations: false,
-            variations: [],
-            maxVariations: 10,
-            showPromptForVariations: true,
+    const workspaces: Array<Workspace> = [];
+    // const workspaces: Array<Workspace> = response.map((item) => {
+    //     const workspace: Workspace = {
+    //         id: uniqid(item.id.toString()),
+    //         name: item.name,
+    //         prompt: item.prompt,
+    //         temperature: item.temperature,
+    //         maxTokens: item.max_tokens,
+    //         topP: item.top_p,
+    //         n: item.n,
+    //         frequencyPenalty: item.frequency_penalty,
+    //         presencePenalty: item.presence_penalty,
+    //         stopSymbols: item.stop_symbols,
+    //         tabIndex: 0,
+    //         modelName: item.custom_model.label,
+    //         model: item.custom_model,
+    //         showExamplePreviousOutputs: false,
+    //         examples: [
+    //             {id: uniqid("input_"), text: "We all eat the fish and then made dessert.", output: "We all ate the fish and then made dessert.", isLoading: false},
+    //             {id: uniqid("input_"), text: "I like ski every day.", output: "I like skiing every day.", isLoading: false},
+    //         ],
+    //         keywords: [],
+    //         loadingVariations: false,
+    //         variations: [],
+    //         maxVariations: 10,
+    //         showPromptForVariations: true,
 
-            conversations: [],
+    //         conversations: [],
 
-            basic: {
-                output: '',
-                loading: false,
-            },
-        };
+    //         basic: {
+    //             output: '',
+    //             loading: false,
+    //         },
+    //     };
 
-        return workspace;
-    });
+    //     return workspace;
+    // });
 
     return workspaces;
 }

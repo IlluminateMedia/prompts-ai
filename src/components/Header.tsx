@@ -7,8 +7,7 @@ import React from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import {useDispatch, useSelector} from "react-redux";
 import {
-    selectAirtableApiKey,
-    selectOpenaiApiKey,
+    selectApiKey,
     toggleApiKeyDialog,
 } from "../slices/editorSlice";
 import {ActionCreators} from "redux-undo";
@@ -26,9 +25,8 @@ export default function Header() {
     const dispatch = useDispatch();
     const classes = useStyles();
 
-    const openaiApiKey = useSelector(selectOpenaiApiKey);
-    const airtableApiKey = useSelector(selectAirtableApiKey);
-    const isEachApiKeyPresent = !!(openaiApiKey && airtableApiKey);
+    const apiKey = useSelector(selectApiKey);
+    const isEachApiKeyPresent = !!apiKey;
     const handleApiKeyDialogOpen = () => {
         dispatch(toggleApiKeyDialog(true));
     };

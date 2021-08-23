@@ -19,8 +19,7 @@ import { hasPromptVariables, variableRegExp } from "../libs/useKeyword";
 // State
 
 const initialState: EditorState = {
-    openaiApiKey: undefined,
-    airtableApiKey: undefined,
+    apiKey: undefined,
     currentWorkspaceId: 'first_workspace',
     editableWorkspaceName: 'Draft #1',
     availableModels: [],
@@ -36,10 +35,10 @@ const initialState: EditorState = {
             "Input: {example}\n" +
             "Output:",
         modelName: 'davinci',
-        model: undefined,
+        // model: undefined,
         temperature: 0.5,
         topP: 1,
-        n: 1,
+        // n: 1,
         frequencyPenalty: 0,
         presencePenalty: 0,
         stopSymbols: ["\\n"],
@@ -50,7 +49,7 @@ const initialState: EditorState = {
             {id: uniqid("input_"), text: "We all eat the fish and then made dessert.", output: "We all ate the fish and then made dessert.", isLoading: false},
             {id: uniqid("input_"), text: "I like ski every day.", output: "I like skiing every day.", isLoading: false},
         ],
-        keywords: [],
+        // keywords: [],
         loadingVariations: false,
         variations: [],
         maxVariations: 10,
@@ -329,10 +328,10 @@ const editorSlice = createSlice({
             }
             workspace.tabIndex = action.payload.tabIndex;
         },
-        loadKeywords: (state, action: PayloadAction<string>) => {
-            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
-            workspace.keywords = action.payload.split("\n").map(batch => batch.split(","));
-        },
+        // loadKeywords: (state, action: PayloadAction<string>) => {
+        //     let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
+        //     workspace.keywords = action.payload.split("\n").map(batch => batch.split(","));
+        // },
         loadTemplateFromFileData: (state, action: PayloadAction<LoadTemplateFromFileDataActionPayload>) => {
             const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
             
@@ -349,18 +348,13 @@ const editorSlice = createSlice({
             const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
             workspace.prompt = action.payload;
         },
-        editAirtableApiKey: (state, action: PayloadAction<string>) => {
-            state.airtableApiKey = action.payload;
-        },
-        editOpenaiApiKey: (state, action: PayloadAction<string>) => {
-            state.openaiApiKey = action.payload;
+        editApiKey: (state, action: PayloadAction<string>) => {
+            state.apiKey = action.payload;
         },
         editModelName: (state, action: PayloadAction<string>) => {
             const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
-            const model = state.availableModels.find(m => m.value === action.payload);
             
             workspace.modelName = action.payload;
-            workspace.model = model;
         },
         editTemperature: (state, action: PayloadAction<number>) => {
             const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
@@ -372,11 +366,11 @@ const editorSlice = createSlice({
             
             workspace.topP = action.payload;
         },
-        editN: (state, action: PayloadAction<number>) => {
-            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
+        // editN: (state, action: PayloadAction<number>) => {
+        //     const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
             
-            workspace.n = action.payload;
-        },
+        //     workspace.n = action.payload;
+        // },
         editFrequencyPenalty: (state, action: PayloadAction<number>) => {
             const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
             
@@ -413,10 +407,10 @@ const editorSlice = createSlice({
             state.editableWorkspaceName = newWorkspace.name;
         },
         createWorkspace: (state) => {
-            const currentWorkspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
+            const currentWorkspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
             const newWorkspace = {
                 ...currentWorkspace,
-                id: uniqid(`Draft #${state.workspaces.length + 1}`),
+                id: uniqid('workspace_'),
                 name: `Draft #${state.workspaces.length + 1}`
             };
             state.workspaces.push(newWorkspace);
@@ -478,7 +472,7 @@ const fetchBasicOutputAsync = (): AppThunk => (dispatch, getState) => {
     if (!workspace) {
         return;
     }
-    if (state.editor.present.openaiApiKey === undefined) {
+    if (state.editor.present.apiKey === undefined) {
         alert('Enter an Openai API key before running requests.');
         return;
     }
@@ -487,32 +481,35 @@ const fetchBasicOutputAsync = (): AppThunk => (dispatch, getState) => {
         return;
     }
 
-    if (workspace.keywords.length === 0) {
-        alert('Please upload a valid *.csv file');
-        return;
-    }
+    // if (workspace.keywords.length === 0) {
+    //     alert('Please upload a valid *.csv file');
+    //     return;
+    // }
 
     if (!hasPromptVariables(workspace.prompt)) {
         alert('Enter at least one example or please upload a valid *.csv file');
         return;
     }
+    // completionParams.map(completionParams => {
+        
+    // });
 
-    const basicCompletionParams = selectBasicCompletionParameters(state);
+    const completionParams = selectCompletionParameters(state);
     dispatch(setBasicLoading(true));
-    basicCompletionParams.map(completionParams => {
-        GptAPI.generateCompletions(completionParams.prompt, completionParams, workspace.modelName, workspace.n).then(response => {
-            console.log(response.data);
-            return { ...response.data };
-        }).then(response => {
-            const choiceResult = (response.choices.find((c: any) => c.text !== "") || response.choices[0]) as ChoiceResult;
-            dispatch(appendBasicOutput(choiceResult.text));
-        }).catch(error => {
-            alert('API returned an error. Refer to the console to inspect it.')
-            console.log(error.response);
-            dispatch(markAllExamplesAsNotLoading());
-        }).finally(() => {
-            dispatch(setBasicLoading(false));
-        });
+    GptAPI.generateCompletions(completionParams.prompt, completionParams, workspace.modelName).then(response => {
+        console.log(response.data);
+        return { ...response.data };
+    }).then(response => {
+        const choiceResult = response.choices[0] as ChoiceResult;
+        dispatch(loadBasicOutput(choiceResult.text));
+        // const choiceResult = (response.choices.find((c: any) => c.text !== "") || response.choices[0]) as ChoiceResult;
+        // dispatch(appendBasicOutput(choiceResult.text));
+    }).catch(error => {
+        alert('API returned an error. Refer to the console to inspect it.')
+        console.log(error.response);
+        dispatch(markAllExamplesAsNotLoading());
+    }).finally(() => {
+        dispatch(setBasicLoading(false));
     });
 };
 
@@ -531,12 +528,8 @@ const fetchExamplesOutputsAsync = (): AppThunk => (dispatch, getState) => {
     if (!workspace) {
         return;
     }
-    if (state.editor.present.openaiApiKey === undefined) {
+    if (state.editor.present.apiKey === undefined) {
         alert('Enter an Openai API key before running requests.');
-        return;
-    }
-    if (state.editor.present.airtableApiKey === undefined) {
-        alert('Enter an Airtable API key before running requests.');
         return;
     }
     if (workspace.prompt.length === 0) {
@@ -549,7 +542,7 @@ const fetchExamplesOutputsAsync = (): AppThunk => (dispatch, getState) => {
         return;
     }
 
-    const examples = workspace.examples.filter(example => example.text.length > 0);
+    const examples = workspace.examples.filter((example: Example) => example.text.length > 0);
     if (examples.length === 0) {
         alert('Enter at least one example');
         return;
@@ -582,7 +575,7 @@ const fetchVariationsAsync = (): AppThunk => (dispatch, getState) => {
     if (!workspace) {
         return;
     }
-    if (state.editor.present.openaiApiKey === undefined) {
+    if (state.editor.present.apiKey === undefined) {
         alert('Enter an Openai API key before running requests.');
         return;
     }
@@ -636,7 +629,7 @@ const sendMessageInConversationAsync = (conversationId: string): AppThunk => (di
     const state = getState();
     const initialPrompt = selectPrompt(state);
     const workspace = selectWorkspace(state);
-    if (state.editor.present.openaiApiKey === undefined) {
+    if (state.editor.present.apiKey === undefined) {
         alert('Enter an API key before running requests.');
         return;
     }
@@ -665,7 +658,7 @@ const sendMessageInConversationAsync = (conversationId: string): AppThunk => (di
     if (updatedConversation === undefined) {
         return;
     }
-    const completionParams = {apiKey: state.editor.present.openaiApiKey, ...updatedConversation.completionParams!};
+    const completionParams = {apiKey: state.editor.present.apiKey, ...updatedConversation.completionParams!};
     const prompt = updatedConversation.initialPrompt + updatedConversation.parts.map(p => p.text).join('');
     GptAPI.generateCompletions(prompt, completionParams, updatedWorkspace.modelName).then(response => {
         console.log(response.data);
@@ -678,70 +671,31 @@ const sendMessageInConversationAsync = (conversationId: string): AppThunk => (di
 
 }
 
-const selectOpenaiApiKey = (state: RootState) => state.editor.present.openaiApiKey;
-const selectAirtableApiKey = (state: RootState) => state.editor.present.airtableApiKey;
+const selectApiKey = (state: RootState) => state.editor.present.apiKey;
 const selectApiKeyDialogVisible = (state: RootState) => state.editor.present.showApiKeyDialog;
 const selectTemplateDialogVisible = (state: RootState) => state.editor.present.showTemplateDialog;
 const selectCurrentWorkspaceId = (state: RootState) => state.editor.present.currentWorkspaceId;
 const selectEditableWorkspaceName = (state: RootState) => state.editor.present.editableWorkspaceName;
-const selectCurrentWorkspaceName = (state: RootState) => {
-    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
-    return workspace!.name;
-};
+const selectCurrentWorkspaceName = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.name;
 const selectWorkspacesList = (state: RootState) => state.editor.present.workspaces.map(w => ({id: w.id, name: w.name}));
 
-const selectTabIndex = (state: RootState) => {
-    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
-    return workspace!.tabIndex;
-};
-const selectPrompt = (state: RootState) => {
-    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
-    return workspace!.prompt;
-};
+const selectTabIndex = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.tabIndex;
+const selectPrompt = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.prompt;
 const selectAvailableModels = (state: RootState) => state.editor.present.availableModels;
-const selectStopSymbols = (state: RootState) => {
-    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
-    return workspace!.stopSymbols;
-}
+const selectStopSymbols = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.stopSymbols;
 
 const selectWorkspace = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
-const selectModelName = (state: RootState) => {
-    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
-    return workspace!.modelName
-};
-const selectModel = (state: RootState) => {
-    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
-    return workspace!.model;
-};
-const selectTemperature = (state: RootState) => {
-    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
-    return workspace!.temperature;
-};
-const selectTopP = (state: RootState) => {
-    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
-    return workspace!.topP;
-};
-const selectN = (state: RootState) => {
-    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
-    return workspace!.n;
-};
-const selectFrequencyPenalty = (state: RootState) => {
-    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
-    return workspace!.frequencyPenalty;
-};
-const selectPresencePenalty = (state: RootState) => {
-    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
-    return workspace!.presencePenalty;
-};
-const selectMaxTokens = (state: RootState) => {
-    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
-    return workspace!.maxTokens
-};
+const selectModelName = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.modelName;
+const selectTemperature = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.temperature;
+const selectTopP = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.topP;
+const selectFrequencyPenalty = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.frequencyPenalty;
+const selectPresencePenalty = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.presencePenalty;
+const selectMaxTokens = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.maxTokens;
 const selectCompletionParameters = (state: RootState) => {
     const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
     return {
-        apiKey: state.editor.present.openaiApiKey === undefined ? '' : state.editor.present.openaiApiKey,
-        engine: workspace.model!.value,
+        apiKey: state.editor.present.apiKey === undefined ? '' : state.editor.present.apiKey,
+        engine: workspace.modelName,
         maxTokens: workspace.maxTokens,
         stop: (() => {
             if (workspace.stopSymbols.length > 0) {
@@ -760,68 +714,44 @@ const selectCompletionParameters = (state: RootState) => {
     };
 };
 
-const selectBasicCompletionParameters = (state: RootState) => {
-    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
-    const basicCompletionParameters: CompletionParameters[] = workspace.keywords.map(batch => {
-        let prompt = workspace.prompt;
-        batch.map(k => prompt = prompt.replace(variableRegExp, k));
-        return {
-            apiKey: state.editor.present.openaiApiKey === undefined ? '' : state.editor.present.openaiApiKey,
-            engine: workspace.model!.value,
-            maxTokens: workspace.maxTokens,
-            stop: (() => {
-                if (workspace.stopSymbols.length > 0) {
-                    return workspace.stopSymbols.map(symbol => {
-                        return symbol.split('\\n').join('\n');
-                    });
-                } else {
-                    return '';
-                }
-            })(),
-            prompt,
-            temperature: workspace.temperature,
-            topP: workspace.topP,
-            presencePenalty: workspace.presencePenalty,
-            frequencyPenalty: workspace.frequencyPenalty,
-        };
-    });
-    return basicCompletionParameters;
-};
+// const selectBasicCompletionParameters = (state: RootState) => {
+//     const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
+//     const basicCompletionParameters: CompletionParameters[] = workspace.keywords.map(batch => {
+//         let prompt = workspace.prompt;
+//         batch.map(k => prompt = prompt.replace(variableRegExp, k));
+//         return {
+//             apiKey: state.editor.present.openaiApiKey === undefined ? '' : state.editor.present.openaiApiKey,
+//             engine: workspace.model!.value,
+//             maxTokens: workspace.maxTokens,
+//             stop: (() => {
+//                 if (workspace.stopSymbols.length > 0) {
+//                     return workspace.stopSymbols.map(symbol => {
+//                         return symbol.split('\\n').join('\n');
+//                     });
+//                 } else {
+//                     return '';
+//                 }
+//             })(),
+//             prompt,
+//             temperature: workspace.temperature,
+//             topP: workspace.topP,
+//             presencePenalty: workspace.presencePenalty,
+//             frequencyPenalty: workspace.frequencyPenalty,
+//         };
+//     });
+//     return basicCompletionParameters;
+// };
 
-const selectExamples = (state: RootState) => {
-    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
-    return workspace!.examples
-};
-const selectExamplePreviousOutputsStatus = (state: RootState) => {
-    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
-    return workspace!.showExamplePreviousOutputs
-};
+const selectExamples = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.examples;
+const selectExamplePreviousOutputsStatus = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.showExamplePreviousOutputs;
 
-const selectBasicOutput = (state: RootState) => {
-    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
-    return workspace!.basic.output
-};
-const selectBasicLoading = (state: RootState) => {
-    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
-    return workspace!.basic.loading;
-};
+const selectBasicOutput = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.basic.output;
+const selectBasicLoading = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.basic.loading;
 
-const selectVariationsLoadingStatus = (state: RootState) => {
-    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
-    return workspace!.loadingVariations
-};
-const selectVariations = (state: RootState) => {
-    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
-    return workspace!.variations
-};
-const selectMaxVariations = (state: RootState) => {
-    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
-    return workspace!.maxVariations
-};
-const selectShowPromptForVariations = (state: RootState) => {
-    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
-    return workspace!.showPromptForVariations
-};
+const selectVariationsLoadingStatus = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.loadingVariations;
+const selectVariations = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.variations;
+const selectMaxVariations = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.maxVariations;
+const selectShowPromptForVariations = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.showPromptForVariations;
 
 // Helpers
 
@@ -860,11 +790,9 @@ export type {
 
 export {
     // Common
-    selectTabIndex, selectPrompt, selectStopSymbols, selectAirtableApiKey, selectOpenaiApiKey, selectModelName, selectModel,
-    selectTemperature, selectTopP, selectFrequencyPenalty, selectPresencePenalty,
-    selectMaxTokens, selectApiKeyDialogVisible, selectTemplateDialogVisible, selectN,
-    selectCompletionParameters, selectCurrentWorkspaceId, selectEditableWorkspaceName, selectCurrentWorkspaceName,
-    selectWorkspacesList, selectBasicCompletionParameters,
+    selectTabIndex, selectPrompt, selectStopSymbols, selectApiKey, selectModelName,
+    selectTemperature, selectTopP, selectFrequencyPenalty, selectPresencePenalty, selectMaxTokens, 
+    selectApiKeyDialogVisible, selectTemplateDialogVisible, selectCompletionParameters, selectCurrentWorkspaceId, selectEditableWorkspaceName, selectCurrentWorkspaceName, selectWorkspacesList,
 
     // Modes
     selectExamples, selectExamplePreviousOutputsStatus,
@@ -882,16 +810,11 @@ export {
 // Actions
 export const {
     updateWorkspaceId, createWorkspace, deleteCurrentWorkspace, updateCurrentWorkspaceName, updateEditableWorkspaceName,
-    editExample, loadOutputForExample, deleteExample, cleanExampleList, markExampleAsLoading, updateExamplePreviousOutputsStatus, loadBasicOutput, appendBasicOutput,
-    setBasicLoading, setAvailableModels, setWorkspaces,
-    markAllExamplesAsNotLoading,
-    addVariation, editMaxVariations, cleanVariations, updateShowPromptForVariations, updateVariationsLoadingStatus,
-    setConversationCompletionParams, normalizeConversations, updateConversationLoadingStatus, updateConversationInputValue,
-    updateConversationStartSequence, updateConversationRestartSequence, addMessageInConversation,
-    setConversationInitialPrompt, deleteConversation,
-    addStopSymbol, deleteStopSymbol,
-    editTopP, editN, editFrequencyPenalty, editPresencePenalty,
-    loadTemplate, loadTemplateFromFileData, loadKeywords,
-    editPrompt, editAirtableApiKey, editOpenaiApiKey, editModelName, editTemperature, editMaxTokens, updateTabIndex, toggleApiKeyDialog, toggleTemplateDialog } = editorSlice.actions;
+    editExample, loadOutputForExample, deleteExample, cleanExampleList, markExampleAsLoading, updateExamplePreviousOutputsStatus, loadBasicOutput,
+    appendBasicOutput, setBasicLoading, setAvailableModels, setWorkspaces, markAllExamplesAsNotLoading,addVariation, editMaxVariations, cleanVariations, 
+    updateShowPromptForVariations, updateVariationsLoadingStatus, setConversationCompletionParams, normalizeConversations, updateConversationLoadingStatus, updateConversationInputValue,
+    updateConversationStartSequence, updateConversationRestartSequence, addMessageInConversation, setConversationInitialPrompt, deleteConversation, addStopSymbol, deleteStopSymbol, editTopP, editFrequencyPenalty, editPresencePenalty, loadTemplate, loadTemplateFromFileData,
+    editPrompt, editApiKey, editModelName, editTemperature, editMaxTokens, updateTabIndex, toggleApiKeyDialog, toggleTemplateDialog 
+} = editorSlice.actions;
 
 // Action Payloads

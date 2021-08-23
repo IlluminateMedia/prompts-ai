@@ -24,15 +24,11 @@ import {
     deleteStopSymbol,
     selectTopP,
     editTopP,
-    selectN,
-    editN,
     editFrequencyPenalty,
     editPresencePenalty,
     selectFrequencyPenalty, selectPresencePenalty, 
     selectModelName, editModelName, 
-    fetchAvailableModelsAsync, selectAvailableModels, 
-    fetchWorkspacesAsync,
-    selectModel
+    fetchAvailableModelsAsync, selectAvailableModels
 } from "../slices/editorSlice";
 import {makeStyles} from "@material-ui/styles";
 import ModeTabs from "./ModeTabs";
@@ -51,18 +47,16 @@ export function PromptEditor() {
     const prompt = useSelector(selectPrompt);
     const temperature = useSelector(selectTemperature);
     const topP = useSelector(selectTopP);
-    const n = useSelector(selectN);
     const frequencyPenalty = useSelector(selectFrequencyPenalty);
     const presencePenalty = useSelector(selectPresencePenalty);
     const maxTokens = useSelector(selectMaxTokens);
     const stopSymbols = useSelector(selectStopSymbols);
     const availableModels = useSelector(selectAvailableModels);
     const modelName = useSelector(selectModelName);
-    const model = useSelector(selectModel);
 
     useEffect(() => {
         dispatch(fetchAvailableModelsAsync());
-        dispatch(fetchWorkspacesAsync());
+        // dispatch(fetchWorkspacesAsync());
     }, []);
 
     const handlePromptChange = (event: React.FormEvent<HTMLTextAreaElement | HTMLInputElement>) => {
@@ -73,9 +67,6 @@ export function PromptEditor() {
     }
     const handleTopPChange = (event: React.ChangeEvent<{}>, value: number | number[]) => {
         dispatch(editTopP(value as number));
-    }
-    const handleNChange = (event: React.FormEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-        dispatch(editN(Number(event.currentTarget.value)));
     }
     const handleFrequencyPenaltyChange = (event: React.ChangeEvent<{}>, value: number | number[]) => {
         dispatch(editFrequencyPenalty(value as number));
@@ -206,23 +197,6 @@ export function PromptEditor() {
                                 min={0}
                                 max={1}
                             />
-                            <Tooltip 
-                                title={'"Controls how many completions to generate for each prompt."'}
-                                placement="left"
-                            >
-                                <Typography id="top-p-slider" gutterBottom>
-                                    N
-                                </Typography>
-                            </Tooltip>
-                            <TextField 
-                                id="n-text"
-                                type={"number"}
-                                style={{marginBottom: '20px'}}
-                                rowsMax={100}
-                                fullWidth={true}
-                                value={n}
-                                onChange={handleNChange}
-                            />
                             <Tooltip title={'"How much to penalize new tokens based on their existing frequency in the text so far. Decreases the model\'s likelihood to repeat the same line verbatim."'} placement="left">
                                 <Typography id="frequency-penalty-slider" gutterBottom>
                                     Frequency Penalty: <strong>{frequencyPenalty}</strong>
@@ -274,7 +248,7 @@ export function PromptEditor() {
                                 native id="model-name-select"
                                 name="modelName"
                                 margin="dense"
-                                value={model?.value}
+                                value={modelName}
                                 onChange={handleModelNameChange}
                                 className={styles.fullWidth}
                             >

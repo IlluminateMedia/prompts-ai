@@ -3,10 +3,14 @@ import {PromptEditor} from './components/PromptEditor';
 import {Box, Container, createMuiTheme, CssBaseline, ThemeProvider, Typography,} from "@material-ui/core";
 import {useHotkeys} from "react-hotkeys-hook";
 import {useDispatch} from "react-redux";
+import { Switch, Route } from "react-router-dom";
+
 import {fetchForCurrentTab, updateTabIndex, normalizeConversations} from "./slices/editorSlice";
 import Header from "./components/Header";
 import TemplateDialog from "./components/dialogs/TemplateDialog";
 import ApiKeyDialog from "./components/dialogs/ApiKeyDialog";
+import SignIn from './components/auth/SignIn';
+import SignUp from './components/auth/SignUp';
 
 function App() {
     const dispatch = useDispatch();
@@ -43,20 +47,24 @@ function App() {
             <ApiKeyDialog/>
             <TemplateDialog/>
 
-            <Header/>
-
-            <Container maxWidth={"lg"}>
-                <Box mt={2}>
-                    <PromptEditor/>
-                </Box>
-                {/*<Box mt={2}>
-                    <ModeTabs/>
-                </Box>*/}
-                <Box mt={2}>
-                    <Typography>
-                        Not affiliated with OpenAI. Feedback: seva@zhidkoff.com.</Typography>
-                </Box>
-            </Container>
+            <Switch>
+                <Route path="/signin" component={SignIn} />
+                <Route path="/signup" component={SignUp} />
+                <Route path="/rest" component={PromptEditor} />
+                <Route path="/">
+                    <Header/>
+                    <Container maxWidth={"lg"}>
+                        <Box mt={2}>
+                            <PromptEditor/>
+                        </Box>
+                        <Box mt={2}>
+                            <Typography>
+                                Not affiliated with OpenAI. Feedback: seva@zhidkoff.com.
+                            </Typography>
+                        </Box>
+                    </Container>
+                </Route>
+            </Switch>
         </ThemeProvider>
     );
 }

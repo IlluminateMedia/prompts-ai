@@ -9,10 +9,8 @@ import {
 } from "@material-ui/core";
 import React from "react";
 import {
-    editAirtableApiKey,
-    selectAirtableApiKey,
-    editOpenaiApiKey, 
-    selectOpenaiApiKey, 
+    editApiKey, 
+    selectApiKey,
     selectApiKeyDialogVisible, 
     toggleApiKeyDialog 
 } from "../../slices/editorSlice";
@@ -28,8 +26,7 @@ const useStyles = makeStyles({
 export default function ApiKeyDialog() {
     const dispatch = useDispatch();
 
-    const openaiApiKey = useSelector(selectOpenaiApiKey);
-    const airtableApiKey = useSelector(selectAirtableApiKey);
+    const apiKey = useSelector(selectApiKey);
     const apiKeyDialogOpen = useSelector(selectApiKeyDialogVisible);
     const handleApiKeyDialogClose = () => {
         dispatch(toggleApiKeyDialog(false));
@@ -55,22 +52,10 @@ export default function ApiKeyDialog() {
                     id="open-api-key"
                     label="Open AI API Key"
                     type="text"
-                    value={openaiApiKey}
+                    value={apiKey}
                     fullWidth
                     onChange={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-                        dispatch(editOpenaiApiKey(event.currentTarget.value));
-                    }}
-                />
-                <TextField
-                    className={classes.apiKeyInput}
-                    margin="dense"
-                    id="airtable-api-key"
-                    label="Airtable API Key"
-                    type="text"
-                    value={airtableApiKey}
-                    fullWidth
-                    onChange={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-                        dispatch(editAirtableApiKey(event.currentTarget.value));
+                        dispatch(editApiKey(event.currentTarget.value));
                     }}
                 />
             </DialogContent>
