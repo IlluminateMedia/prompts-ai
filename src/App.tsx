@@ -3,6 +3,7 @@ import {PromptEditor} from './components/PromptEditor';
 import {Box, Container, createMuiTheme, CssBaseline, ThemeProvider, Typography,} from "@material-ui/core";
 import {useHotkeys} from "react-hotkeys-hook";
 import {useDispatch} from "react-redux";
+import { Switch, Route } from "react-router-dom";
 import {fetchForCurrentTab, updateTabIndex, normalizeConversations} from "./slices/editorSlice";
 import Header from "./components/Header";
 import TemplateDialog from "./components/dialogs/TemplateDialog";
@@ -44,17 +45,20 @@ function App() {
             <TemplateDialog/>
 
             <Header/>
-
             <Container maxWidth={"lg"}>
                 <Box mt={2}>
-                    <PromptEditor/>
+                <Switch>
+                    <Route path="/" component={PromptEditor} />
+                    <Route path="/rest" component={PromptEditor} />
+                </Switch>
                 </Box>
                 {/*<Box mt={2}>
                     <ModeTabs/>
                 </Box>*/}
                 <Box mt={2}>
                     <Typography>
-                        Not affiliated with OpenAI. Feedback: seva@zhidkoff.com.</Typography>
+                        Not affiliated with OpenAI. Feedback: seva@zhidkoff.com.
+                    </Typography>
                 </Box>
             </Container>
         </ThemeProvider>

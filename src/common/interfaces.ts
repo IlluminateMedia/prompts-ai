@@ -82,8 +82,7 @@ export interface SelectOption {
 }
 
 export interface EditorState {
-    openaiApiKey?: string;
-    airtableApiKey?: string;
+    apiKey?: string;
     currentWorkspaceId: string;
     editableWorkspaceName: string;
     workspaces: Array<Workspace>;
@@ -105,10 +104,10 @@ export interface Workspace {
 
     prompt: string;
     modelName: string;
-    model?: CustomModel;
+    // model?: CustomModel;
     temperature: number;
     topP: number;
-    n: number;
+    // n: number;
     frequencyPenalty: number;
     presencePenalty: number;
     stopSymbols: Array<string>;
@@ -117,7 +116,7 @@ export interface Workspace {
 
     showExamplePreviousOutputs: boolean;
     examples: Array<Example>;
-    keywords: string[][];
+    // keywords: string[][];
 
     loadingVariations: boolean;
     variations: Array<Variation>;
