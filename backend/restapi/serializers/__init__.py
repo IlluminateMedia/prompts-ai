@@ -2,3 +2,4 @@ from .custom_model_serializer import CustomModelSerializer
 from .workspace_read_serializer import WorkspaceReadSerializer
 from .workspace_write_serializer import WorkspaceWriteSerializer
 from .user_serializer import UserSerializer
+from .airtable_serializer import AirtableSerializer

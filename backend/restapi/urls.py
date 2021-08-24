@@ -8,6 +8,7 @@ from .jwt import JWTTokenObtainPairView
 from . import views
 
 router = routers.DefaultRouter()
+router.register(r'airtable', views.AirtableViewSet)
 router.register(r'models', views.CustomModelViewSet)
 router.register(r'workspace', views.WorkspaceViewSet)
 router.register(r'user', views.UserViewSet)

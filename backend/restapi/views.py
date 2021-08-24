@@ -1,10 +1,11 @@
 from django.contrib.auth.models import User
 from rest_framework import viewsets
+from rest_framework.response import Response
+from django.http import Http404
 
-from .serializers import CustomModelSerializer, WorkspaceReadSerializer, WorkspaceWriteSerializer, UserSerializer
+from .serializers import CustomModelSerializer, WorkspaceReadSerializer, WorkspaceWriteSerializer, UserSerializer, AirtableSerializer
 
-from .models import CustomModel, Workspace
-from django.contrib.auth.models import User
+from .models import CustomModel, Workspace, Airtable
 
 
 class CustomModelViewSet(viewsets.ReadOnlyModelViewSet):
@@ -19,6 +20,17 @@ class WorkspaceViewSet(viewsets.ModelViewSet):
             return WorkspaceWriteSerializer
 
         return WorkspaceReadSerializer
+
+class AirtableViewSet(viewsets.ModelViewSet):
+    queryset = Airtable.objects.all()
+    serializer_class = AirtableSerializer
+
+    def list(self, request):
+        airtable = Airtable.objects.first()
+        if not airtable :
+            raise Http404
+        serializer = AirtableSerializer(airtable)
+        return Response(serializer.data)
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()

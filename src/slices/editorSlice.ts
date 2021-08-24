@@ -327,10 +327,6 @@ const editorSlice = createSlice({
             }
             workspace.tabIndex = action.payload.tabIndex;
         },
-        // loadKeywords: (state, action: PayloadAction<string>) => {
-        //     let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
-        //     workspace.keywords = action.payload.split("\n").map(batch => batch.split(","));
-        // },
         loadTemplateFromFileData: (state, action: PayloadAction<LoadTemplateFromFileDataActionPayload>) => {
             const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
             
@@ -480,15 +476,6 @@ const fetchBasicOutputAsync = (): AppThunk => (dispatch, getState) => {
         return;
     }
 
-    // if (workspace.keywords.length === 0) {
-    //     alert('Please upload a valid *.csv file');
-    //     return;
-    // }
-
-    if (!hasPromptVariables(workspace.prompt)) {
-        alert('Enter at least one example or please upload a valid *.csv file');
-        return;
-    }
     // completionParams.map(completionParams => {
         
     // });
@@ -699,34 +686,6 @@ const selectCompletionParameters = (state: RootState) => {
         frequencyPenalty: workspace.frequencyPenalty,
     };
 };
-
-// const selectBasicCompletionParameters = (state: RootState) => {
-//     const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
-//     const basicCompletionParameters: CompletionParameters[] = workspace.keywords.map(batch => {
-//         let prompt = workspace.prompt;
-//         batch.map(k => prompt = prompt.replace(variableRegExp, k));
-//         return {
-//             apiKey: state.editor.present.openaiApiKey === undefined ? '' : state.editor.present.openaiApiKey,
-//             engine: workspace.model!.value,
-//             maxTokens: workspace.maxTokens,
-//             stop: (() => {
-//                 if (workspace.stopSymbols.length > 0) {
-//                     return workspace.stopSymbols.map(symbol => {
-//                         return symbol.split('\\n').join('\n');
-//                     });
-//                 } else {
-//                     return '';
-//                 }
-//             })(),
-//             prompt,
-//             temperature: workspace.temperature,
-//             topP: workspace.topP,
-//             presencePenalty: workspace.presencePenalty,
-//             frequencyPenalty: workspace.frequencyPenalty,
-//         };
-//     });
-//     return basicCompletionParameters;
-// };
 
 const selectExamples = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.examples;
 const selectExamplePreviousOutputsStatus = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.showExamplePreviousOutputs;
