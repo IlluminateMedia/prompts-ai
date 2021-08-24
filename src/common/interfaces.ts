@@ -110,7 +110,7 @@ export interface EditorState {
 }
 
 export interface NewEditorState {
-    airtableApiKey?: string;
+    airtable?: Airtable;
     currentWorkspaceId?: number;
     workspaces: Array<NewWorkspace>;
 }
@@ -123,6 +123,13 @@ export interface CustomModel {
     id: number;
     label: string;
     value: string;
+}
+
+export interface Airtable {
+    base: string;
+    table: string;
+    category: string;
+    apiKey: string;
 }
 
 export interface Workspace {

@@ -6,11 +6,13 @@ import { hasPromptVariables, variableRegExp } from "../libs/useKeyword";
 import GptAPI, { ChoiceResult } from "../services/GptAPI";
 import RestAPI from "../services/RestAPI";
 import {
-    NewEditorState, NewWorkspace, CompletionParameters
+    Airtable,
+    CompletionParameters,
+    NewWorkspace, NewEditorState
 } from "../common/interfaces";
 
 const initialState: NewEditorState = {
-    airtableApiKey: undefined,
+    airtable: undefined,
     currentWorkspaceId: undefined,
     workspaces: []
 }
@@ -19,8 +21,8 @@ const newEditorSlice = createSlice({
     name: 'newEditor',
     initialState,
     reducers: {
-        setAirtableApiKey: (state, action: PayloadAction<string>) => {
-            state.airtableApiKey = action.payload;
+        setAirtable: (state, action: PayloadAction<Airtable>) => {
+            state.airtable = action.payload;
         },
         updateWorkspaceId: (state, action: PayloadAction<number>) => {
             state.currentWorkspaceId = action.payload;
@@ -37,6 +39,10 @@ const newEditorSlice = createSlice({
         },
     }
 });
+
+const fetchAirtableAsync = (): AppThunk => (dispatch, getState) => {
+
+};
 
 const fetchWorkspacesAsync = (): AppThunk => (dispatch, getState) => {
     RestAPI.getWorkspaces().then(response => {
@@ -97,7 +103,7 @@ const fetchBasicOutputAsync = (): AppThunk => (dispatch, getState) => {
     });
 };
 
-const selectAirtableApiKey = (state: RootState) => state.newEditor.airtableApiKey;
+const selectAirtable = (state: RootState) => state.newEditor.airtable;
 const selectCurrentWorkspaceId = (state: RootState) => state.newEditor.currentWorkspaceId;
 const selectWorkspace = (state: RootState) => state.newEditor.workspaces.find(w => w.id === state.newEditor.currentWorkspaceId);
 const selectWorkspaces = (state: RootState) => state.newEditor.workspaces;
@@ -137,17 +143,17 @@ export { newEditorSlice };
 // Selectors
 
 export {
-    selectAirtableApiKey, selectCurrentWorkspaceId, selectWorkspace, selectWorkspaces, selectCompletionParameters
+    selectAirtable, selectCurrentWorkspaceId, selectWorkspace, selectWorkspaces, selectCompletionParameters
 }
 
 // Async Actions
 
 export {
-    fetchWorkspacesAsync, fetchBasicOutputAsync
+    fetchAirtableAsync, fetchWorkspacesAsync, fetchBasicOutputAsync
 }
 
 // Actions
 
 export const {
-    setAirtableApiKey, updateWorkspaceId, setWorkspaces, loadKeywords
+    setAirtable, updateWorkspaceId, setWorkspaces, loadKeywords
 } = newEditorSlice.actions;
