@@ -1,16 +1,18 @@
-import React, {useEffect} from 'react';
-import {PromptEditor} from './components/PromptEditor';
-import {Box, Container, createMuiTheme, CssBaseline, ThemeProvider, Typography,} from "@material-ui/core";
-import {useHotkeys} from "react-hotkeys-hook";
-import {useDispatch} from "react-redux";
+import React, { useEffect } from 'react';
+import { PromptEditor } from './components/PromptEditor';
+import { Box, Container, createMuiTheme, CssBaseline, ThemeProvider, Typography,} from "@material-ui/core";
+import { useHotkeys } from "react-hotkeys-hook";
+import { useDispatch, useSelector } from "react-redux";
 import { Switch, Route } from "react-router-dom";
 
-import {fetchForCurrentTab, updateTabIndex, normalizeConversations} from "./slices/editorSlice";
+import { fetchForCurrentTab, updateTabIndex, normalizeConversations } from "./slices/editorSlice";
+import { selectAccessToken } from "./slices/authSlice";
+import ProtectedRoute from "./components/ProtectedRoute";
 import Header from "./components/Header";
 import TemplateDialog from "./components/dialogs/TemplateDialog";
 import ApiKeyDialog from "./components/dialogs/ApiKeyDialog";
-import SignIn from './components/auth/SignIn';
-import SignUp from './components/auth/SignUp';
+import SignIn from "./components/auth/SignIn";
+import SignUp from "./components/auth/SignUp";
 
 function App() {
     const dispatch = useDispatch();
@@ -19,6 +21,7 @@ function App() {
             type: "dark"
         }
     });
+    const accessToken = useSelector(selectAccessToken);
 
     useEffect(() => {
         dispatch(normalizeConversations());
@@ -50,7 +53,12 @@ function App() {
             <Switch>
                 <Route path="/signin" component={SignIn} />
                 <Route path="/signup" component={SignUp} />
-                <Route path="/updated" component={PromptEditor} />
+                <ProtectedRoute 
+                    isAuthenticated={!!accessToken}
+                    authenticationPath="/signin" 
+                    path="/new-editor"
+                    component={PromptEditor}
+                />
                 <Route path="/">
                     <Header/>
                     <Container maxWidth={"lg"}>

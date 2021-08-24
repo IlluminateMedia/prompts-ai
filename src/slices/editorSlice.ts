@@ -684,7 +684,7 @@ const selectPrompt = (state: RootState) => state.editor.present.workspaces.find(
 const selectAvailableModels = (state: RootState) => state.editor.present.availableModels;
 const selectStopSymbols = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.stopSymbols;
 
-const selectWorkspace = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
+const selectWorkspace = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!;
 const selectModelName = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.modelName;
 const selectTemperature = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.temperature;
 const selectTopP = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.topP;
@@ -692,7 +692,7 @@ const selectFrequencyPenalty = (state: RootState) => state.editor.present.worksp
 const selectPresencePenalty = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.presencePenalty;
 const selectMaxTokens = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.maxTokens;
 const selectCompletionParameters = (state: RootState) => {
-    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId) || state.editor.present.workspaces[0];
+    const workspace = state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!;
     return {
         apiKey: state.editor.present.apiKey === undefined ? '' : state.editor.present.apiKey,
         engine: workspace.modelName,

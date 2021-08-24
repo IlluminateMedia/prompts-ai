@@ -1,3 +1,10 @@
+import { RouteProps } from "react-router-dom";
+
+export interface ProtectedRouteProps extends RouteProps {
+    isAuthenticated: boolean;
+    authenticationPath: string;
+}
+
 export interface Example {
     id: string;
     text: string;
@@ -16,6 +23,16 @@ export interface CompletionParameters {
     topP: number;
     presencePenalty: number;
     frequencyPenalty: number;
+}
+
+export interface JWTTokens {
+    access: string;
+    refresh: string;
+}
+
+export interface SignInParameters {
+    username: string;
+    password: string;
 }
 
 export enum TabIndex {
@@ -90,6 +107,10 @@ export interface EditorState {
     showApiKeyDialog: boolean;
     showTemplateDialog: boolean;
     availableModels: Array<SelectOption>;
+}
+
+export interface AuthState {
+    jwtTokens?: JWTTokens
 }
 
 export interface CustomModel {

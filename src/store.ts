@@ -5,7 +5,8 @@ import { PERSIST, PURGE, REHYDRATE } from 'redux-persist/es/constants';
 import { createStateSyncMiddleware, initMessageListener } from 'redux-state-sync';
 import undoable from 'redux-undo';
 import {migrations, currentVersion} from './migrations';
-import editorReducer from './slices/editorSlice';
+import editorReducer from "./slices/editorSlice";
+import authReducer from "./slices/authSlice";
 
 const filteredActions = ['editor/addStopSymbol', 'editor/deleteStopSymbol',
     'editor/editTopP', 'editor/editFrequencyPenalty', 'editor/editPresencePenalty',
@@ -21,7 +22,8 @@ const reducers = combineReducers(
               return filteredActions.includes(action.type);
           },
           groupBy: (action) => filteredActions.includes(action.type) ? `${action.type}_${Math.floor(Date.now() / 1000 / 10)}` : null,
-      })
+      }),
+      auth: authReducer
     }
 );
 
