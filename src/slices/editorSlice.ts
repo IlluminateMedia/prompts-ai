@@ -5,13 +5,12 @@ import GptAPI, {ChoiceResult} from "../services/GptAPI";
 import RestAPI from "../services/RestAPI";
 import {
     Example, CompletionParameters, TabIndex, Variation, Basic, ConversationPartSource,
-    CustomModel, ConversationPart, ConversationCompletionParameters, Conversation, SelectOption, EditorState, Workspace,
+    ConversationPart, ConversationCompletionParameters, Conversation, SelectOption, EditorState, Workspace,
     EditExampleActionPayload, LoadExampleOutputActionPayload, AddVariationActionPayload, SetConversationCompletionParametersActionPayload,
     SetConversationInitialPromptActionPayload, UpdateConversationLoadingStatusActionPayload, UpdateConversationInputValueActionPayload,
     UpdateConversationStartSequenceActionPayload, UpdateConversationRestartSequenceActionPayload, AddMessageToConversationFromUserActionPayload,
     AddMessageToConversationFromGptActionPayload, LoadTemplateFromFileDataActionPayload, LoadTemplateActionExample, LoadTemplateActionPayload
 } from "../common/interfaces";
-import { mapWorkspaceResponse } from "../libs/mapResponseToState";
 import { hasPromptVariables, variableRegExp } from "../libs/useKeyword";
 
 // TODO: This file grew too fast. It needs to be split into separate slices for different modes.
@@ -71,7 +70,7 @@ const editorSlice = createSlice({
     initialState,
     reducers: {
         editExample: (state, action: PayloadAction<EditExampleActionPayload>) => {
-            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!;
             workspace.examples = workspace.examples.map(value => {
                 if (value.id === action.payload.id) {
                     value.text = action.payload.text;
@@ -80,7 +79,7 @@ const editorSlice = createSlice({
             });
         },
         cleanExampleList: (state) => {
-            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!;
             // Always add an empty example for user to fill out
             if (workspace.examples.length < 1 || workspace.examples[workspace.examples.length - 1].text.length) {
                 workspace.examples.push({id: uniqid("input_"), text: "", output: undefined, isLoading: false});
@@ -94,7 +93,7 @@ const editorSlice = createSlice({
             });
         },
         markExampleAsLoading: (state, action: PayloadAction<string>) => {
-            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
             workspace.examples = workspace.examples.map(value => {
                 if (value.id === action.payload) {
                     value.isLoading = true;
@@ -103,14 +102,14 @@ const editorSlice = createSlice({
             });
         },
         markAllExamplesAsNotLoading: (state) => {
-            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!;
             workspace.examples = workspace.examples.map(value => {
                 value.isLoading = false;
                 return value;
             });
         },
         loadOutputForExample: (state, action: PayloadAction<LoadExampleOutputActionPayload>) => {
-            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!;
             workspace.examples = workspace.examples.map(value => {
                 if (value.id === action.payload.id) {
                     value.previousOutput = value.output;
@@ -121,23 +120,23 @@ const editorSlice = createSlice({
             });
         },
         deleteExample: (state, action: PayloadAction<string>) => {
-            let workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
             workspace.examples = workspace.examples.filter(example => example.id !== action.payload);
         },
         updateExamplePreviousOutputsStatus: (state, action: PayloadAction<boolean>) => {
-            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
             workspace.showExamplePreviousOutputs = action.payload;
         },
         loadBasicOutput: (state, action: PayloadAction<string>) => {
-            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
             workspace.basic.output = action.payload;
         },
         appendBasicOutput: (state, action: PayloadAction<string>) => {
-            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
             workspace.basic.output += `${action.payload}\n`;
         },
         setBasicLoading: (state, action: PayloadAction<boolean>) => {
-            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
             workspace.basic.loading = action.payload;
         },
         setAvailableModels: (state, action: PayloadAction<Array<SelectOption>>) => {
@@ -151,7 +150,7 @@ const editorSlice = createSlice({
             workspace.loadingVariations = action.payload;
         },
         addVariation: (state, action: PayloadAction<AddVariationActionPayload>) => {
-            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!;
             workspace.variations.push({
                 id: uniqid('variation_'),
                 output: action.payload.output,
@@ -165,20 +164,20 @@ const editorSlice = createSlice({
             });
         },
         editMaxVariations: (state, action: PayloadAction<number>) => {
-            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
             workspace.maxVariations = action.payload;
         },
         cleanVariations: (state) => {
-            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
             workspace.variations = [];
         },
         updateShowPromptForVariations: (state, action: PayloadAction<boolean>) => {
-            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
             workspace.showPromptForVariations = action.payload;
         },
 
         normalizeConversations: (state) => {
-            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
                 // Always add an empty conversation for user to start
             if (workspace.conversations.length < 1 || workspace.conversations[0].parts.length > 1) {
                 let startSequence = "\nAI:";
@@ -201,7 +200,7 @@ const editorSlice = createSlice({
         },
         setConversationCompletionParams: (state,
                                           action: PayloadAction<SetConversationCompletionParametersActionPayload>) => {
-            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
             workspace.conversations = workspace.conversations.map(conversation => {
                 if (conversation.id === action.payload.conversationId) {
                     conversation.completionParams = action.payload.parameters;
@@ -210,7 +209,7 @@ const editorSlice = createSlice({
             });
         },
         setConversationInitialPrompt: (state, action: PayloadAction<SetConversationInitialPromptActionPayload>) => {
-            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
             workspace.conversations = workspace.conversations.map(conversation => {
                 if (conversation.id === action.payload.conversationId) {
                     conversation.initialPrompt = action.payload.initialPrompt;
@@ -219,7 +218,7 @@ const editorSlice = createSlice({
             });
         },
         updateConversationLoadingStatus: (state, action: PayloadAction<UpdateConversationLoadingStatusActionPayload>) => {
-            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
             workspace.conversations = workspace.conversations.map(conversation => {
                 if (conversation.id === action.payload.conversationId) {
                     conversation.isLoading = action.payload.status;
@@ -228,7 +227,7 @@ const editorSlice = createSlice({
             });
         },
         updateConversationInputValue: (state, action: PayloadAction<UpdateConversationInputValueActionPayload>) => {
-            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
             
             workspace.conversations = workspace.conversations.map(conversation => {
                 if (conversation.id === action.payload.conversationId) {
@@ -238,7 +237,7 @@ const editorSlice = createSlice({
             });
         },
         updateConversationStartSequence: (state, action: PayloadAction<UpdateConversationStartSequenceActionPayload>) => {
-            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
             workspace.conversations = workspace.conversations.map(conversation => {
                 if (conversation.id === action.payload.conversationId) {
                     conversation.startSequence = action.payload.startSequence;
@@ -247,7 +246,7 @@ const editorSlice = createSlice({
             });
         },
         updateConversationRestartSequence: (state, action: PayloadAction<UpdateConversationRestartSequenceActionPayload>) => {
-            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
             workspace.conversations = workspace.conversations.map(conversation => {
                 if (conversation.id === action.payload.conversationId) {
                     conversation.restartSequence = action.payload.restartSequence;
@@ -256,7 +255,7 @@ const editorSlice = createSlice({
             });
         },
         addMessageInConversation: (state, action: PayloadAction<AddMessageToConversationFromUserActionPayload | AddMessageToConversationFromGptActionPayload>) => {
-            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
             
             workspace.conversations = workspace.conversations.map(conversation => {
                 if (conversation.id !== action.payload.conversationId) {
@@ -303,14 +302,14 @@ const editorSlice = createSlice({
             });
         },
         deleteConversation: (state, action: PayloadAction<string>) => {
-            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
             if (workspace) {
                 workspace.conversations = workspace.conversations.filter(c => c.id !== action.payload);
             }
         },
 
         loadTemplate: (state, action: PayloadAction<LoadTemplateActionPayload>) => {
-            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
 
             workspace.prompt = action.payload.prompt;
             workspace.examples = action.payload.examples.map((example) => {
@@ -333,7 +332,7 @@ const editorSlice = createSlice({
         //     workspace.keywords = action.payload.split("\n").map(batch => batch.split(","));
         // },
         loadTemplateFromFileData: (state, action: PayloadAction<LoadTemplateFromFileDataActionPayload>) => {
-            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
             
             workspace.prompt = action.payload.prompt;
             workspace.temperature = action.payload.temperature;
@@ -345,24 +344,24 @@ const editorSlice = createSlice({
             workspace.modelName = action.payload.modelName;
         },
         editPrompt: (state, action: PayloadAction<string>) => {
-            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
             workspace.prompt = action.payload;
         },
         editApiKey: (state, action: PayloadAction<string>) => {
             state.apiKey = action.payload;
         },
         editModelName: (state, action: PayloadAction<string>) => {
-            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
             
             workspace.modelName = action.payload;
         },
         editTemperature: (state, action: PayloadAction<number>) => {
-            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
             
             workspace.temperature = action.payload;
         },
         editTopP: (state, action: PayloadAction<number>) => {
-            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
             
             workspace.topP = action.payload;
         },
@@ -372,28 +371,28 @@ const editorSlice = createSlice({
         //     workspace.n = action.payload;
         // },
         editFrequencyPenalty: (state, action: PayloadAction<number>) => {
-            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
             
             workspace.frequencyPenalty = action.payload;
         },
         editPresencePenalty: (state, action: PayloadAction<number>) => {
-            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
             workspace.presencePenalty = action.payload;
         },
         addStopSymbol: (state, action: PayloadAction<string>) => {
-            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
             workspace.stopSymbols.push(action.payload);
         },
         deleteStopSymbol: (state, action: PayloadAction<string>) => {
-            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
             workspace.stopSymbols = workspace.stopSymbols.filter((symbol) => symbol !== action.payload);
         },
         editMaxTokens: (state, action: PayloadAction<number>) => {
-            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
             workspace.maxTokens = action.payload;
         },
         updateTabIndex: (state, action: PayloadAction<number>) => {
-            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
             
             workspace.tabIndex = action.payload;
         },
@@ -418,7 +417,7 @@ const editorSlice = createSlice({
             state.editableWorkspaceName = newWorkspace.name;
         },
         updateCurrentWorkspaceName: (state) => {
-            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId) || state.workspaces[0];
+            const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
             
             workspace.name = state.editableWorkspaceName;
         },
@@ -612,19 +611,6 @@ const fetchVariationsAsync = (): AppThunk => (dispatch, getState) => {
     });
 }
 
-const fetchWorkspacesAsync = (): AppThunk => (dispatch, getState) => {
-    RestAPI.getWorkspaces().then(response => {
-        const workspaces = mapWorkspaceResponse(response.data);
-        if (workspaces.length > 0) {
-            dispatch(setWorkspaces(workspaces));
-            dispatch(updateWorkspaceId(workspaces[0].id));
-        }
-    }).catch(error => {
-        alert('API returned an error. Refer to the console to inspect it.')
-        console.log(error.response);
-    });
-}
-
 const sendMessageInConversationAsync = (conversationId: string): AppThunk => (dispatch, getState) => {
     const state = getState();
     const initialPrompt = selectPrompt(state);
@@ -803,8 +789,8 @@ export {
 // Async Actions
 
 export {
-    fetchForCurrentTab, fetchExamplesOutputsAsync, fetchBasicOutputAsync, fetchAvailableModelsAsync,
-    fetchVariationsAsync, fetchWorkspacesAsync, sendMessageInConversationAsync
+    fetchForCurrentTab, fetchExamplesOutputsAsync, fetchBasicOutputAsync,
+    fetchAvailableModelsAsync, fetchVariationsAsync, sendMessageInConversationAsync
 };
 
 // Actions

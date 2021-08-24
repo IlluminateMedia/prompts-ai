@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import {AppThunk, RootState} from "../store";
+import { AppThunk, RootState } from "../store";
 
 import RestAPI from "../services/RestAPI";
 import {
@@ -13,7 +13,7 @@ const initialState: AuthState = {
 };
 
 const authSlice = createSlice({
-    name: 'editor',
+    name: 'auth',
     initialState,
     reducers: {
         setJwtTokens: (state, action: PayloadAction<JWTTokens | undefined>) => {

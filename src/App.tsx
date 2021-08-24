@@ -13,6 +13,7 @@ import TemplateDialog from "./components/dialogs/TemplateDialog";
 import ApiKeyDialog from "./components/dialogs/ApiKeyDialog";
 import SignIn from "./components/auth/SignIn";
 import SignUp from "./components/auth/SignUp";
+import NewPromptEditor from "./components/NewPromptEditor";
 
 function App() {
     const dispatch = useDispatch();
@@ -57,7 +58,7 @@ function App() {
                     isAuthenticated={!!accessToken}
                     authenticationPath="/signin" 
                     path="/new-editor"
-                    component={PromptEditor}
+                    component={NewPromptEditor}
                 />
                 <Route path="/">
                     <Header/>

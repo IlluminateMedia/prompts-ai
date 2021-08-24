@@ -56,7 +56,6 @@ export function PromptEditor() {
 
     useEffect(() => {
         dispatch(fetchAvailableModelsAsync());
-        // dispatch(fetchWorkspacesAsync());
     }, []);
 
     const handlePromptChange = (event: React.FormEvent<HTMLTextAreaElement | HTMLInputElement>) => {

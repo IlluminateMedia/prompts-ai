@@ -109,6 +109,12 @@ export interface EditorState {
     availableModels: Array<SelectOption>;
 }
 
+export interface NewEditorState {
+    airtableApiKey?: string;
+    currentWorkspaceId?: number;
+    workspaces: Array<NewWorkspace>;
+}
+
 export interface AuthState {
     jwtTokens?: JWTTokens
 }
@@ -125,10 +131,8 @@ export interface Workspace {
 
     prompt: string;
     modelName: string;
-    // model?: CustomModel;
     temperature: number;
     topP: number;
-    // n: number;
     frequencyPenalty: number;
     presencePenalty: number;
     stopSymbols: Array<string>;
@@ -137,8 +141,6 @@ export interface Workspace {
 
     showExamplePreviousOutputs: boolean;
     examples: Array<Example>;
-    // keywords: string[][];
-
     loadingVariations: boolean;
     variations: Array<Variation>;
     maxVariations: number;
@@ -147,6 +149,21 @@ export interface Workspace {
     basic: Basic;
 
     conversations: Array<Conversation>;
+}
+
+export interface NewWorkspace {
+    id: number;
+    name: string;
+    prompt: string;
+    model: CustomModel;
+    temperature: number;
+    topP: number;
+    n: number;
+    frequencyPenalty: number;
+    presencePenalty: number;
+    stopSymbols: Array<string>;
+    maxTokens: number;
+    keywords: string[][];
 }
 
 // Action Payloads: Examples

@@ -7,6 +7,7 @@ import undoable from 'redux-undo';
 import {migrations, currentVersion} from './migrations';
 import editorReducer from "./slices/editorSlice";
 import authReducer from "./slices/authSlice";
+import newEditorSlice from "./slices/newEditorSlice";
 
 const filteredActions = ['editor/addStopSymbol', 'editor/deleteStopSymbol',
     'editor/editTopP', 'editor/editFrequencyPenalty', 'editor/editPresencePenalty',
@@ -23,7 +24,8 @@ const reducers = combineReducers(
           },
           groupBy: (action) => filteredActions.includes(action.type) ? `${action.type}_${Math.floor(Date.now() / 1000 / 10)}` : null,
       }),
-      auth: authReducer
+      auth: authReducer,
+      newEditor: newEditorSlice
     }
 );
 
