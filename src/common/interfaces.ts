@@ -1,3 +1,10 @@
+import { RouteProps } from "react-router-dom";
+
+export interface ProtectedRouteProps extends RouteProps {
+    isAuthenticated: boolean;
+    authenticationPath: string;
+}
+
 export interface Example {
     id: string;
     text: string;
@@ -16,6 +23,16 @@ export interface CompletionParameters {
     topP: number;
     presencePenalty: number;
     frequencyPenalty: number;
+}
+
+export interface JWTTokens {
+    access: string;
+    refresh: string;
+}
+
+export interface SignInParameters {
+    username: string;
+    password: string;
 }
 
 export enum TabIndex {
@@ -92,6 +109,16 @@ export interface EditorState {
     availableModels: Array<SelectOption>;
 }
 
+export interface NewEditorState {
+    airtableApiKey?: string;
+    currentWorkspaceId?: number;
+    workspaces: Array<NewWorkspace>;
+}
+
+export interface AuthState {
+    jwtTokens?: JWTTokens
+}
+
 export interface CustomModel {
     id: number;
     label: string;
@@ -104,10 +131,8 @@ export interface Workspace {
 
     prompt: string;
     modelName: string;
-    // model?: CustomModel;
     temperature: number;
     topP: number;
-    // n: number;
     frequencyPenalty: number;
     presencePenalty: number;
     stopSymbols: Array<string>;
@@ -116,8 +141,6 @@ export interface Workspace {
 
     showExamplePreviousOutputs: boolean;
     examples: Array<Example>;
-    // keywords: string[][];
-
     loadingVariations: boolean;
     variations: Array<Variation>;
     maxVariations: number;
@@ -126,6 +149,21 @@ export interface Workspace {
     basic: Basic;
 
     conversations: Array<Conversation>;
+}
+
+export interface NewWorkspace {
+    id: number;
+    name: string;
+    prompt: string;
+    model: CustomModel;
+    temperature: number;
+    topP: number;
+    n: number;
+    frequencyPenalty: number;
+    presencePenalty: number;
+    stopSymbols: Array<string>;
+    maxTokens: number;
+    keywords: string[][];
 }
 
 // Action Payloads: Examples

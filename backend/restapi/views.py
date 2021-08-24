@@ -1,7 +1,10 @@
+from django.contrib.auth.models import User
 from rest_framework import viewsets
 
-from .serializers import CustomModelSerializer, WorkspaceReadSerializer, WorkspaceWriteSerializer
+from .serializers import CustomModelSerializer, WorkspaceReadSerializer, WorkspaceWriteSerializer, UserSerializer
+
 from .models import CustomModel, Workspace
+from django.contrib.auth.models import User
 
 
 class CustomModelViewSet(viewsets.ReadOnlyModelViewSet):
@@ -17,3 +20,6 @@ class WorkspaceViewSet(viewsets.ModelViewSet):
 
         return WorkspaceReadSerializer
 
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer

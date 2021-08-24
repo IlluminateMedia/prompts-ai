@@ -1,12 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Select, Grid } from "@material-ui/core";
-import {makeStyles} from "@material-ui/core/styles";
-import CreateButton from './CreateButton';
-import EditButton from "./EditButton";
-import DeleteButton from "./DeleteButton";
-import {selectWorkspacesList, selectCurrentWorkspaceId, updateWorkspaceId} from "../../slices/editorSlice";
-import {useDispatch, useSelector} from 'react-redux';
-import { ActionCreators } from 'redux-undo';
+import { makeStyles } from "@material-ui/core/styles";
+import { useDispatch, useSelector } from "react-redux";
+
+import {
+    selectCurrentWorkspaceId, selectWorkspaces, updateWorkspaceId
+} from "../../slices/newEditorSlice";
 
 const useStyles = makeStyles({
     selectGridItem: {
@@ -14,23 +13,23 @@ const useStyles = makeStyles({
     },
 });
 
-export default function WorkspaceSelector() {
+export default function NewWorkspaceSelector() {
     const styles = useStyles();
     const dispatch = useDispatch();
     const currentWorkspaceId = useSelector(selectCurrentWorkspaceId);
-    const workspaces = useSelector(selectWorkspacesList);
+    const workspaces = useSelector(selectWorkspaces);
 
     const handleSelectChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-        dispatch(updateWorkspaceId(event.target.value as string));
-        dispatch(ActionCreators.clearHistory());
+        dispatch(updateWorkspaceId(event.target.value as number));
     }
+
     return (
         <Grid container alignItems={'center'} spacing={1}>
             <Grid item className={styles.selectGridItem}>
                 <Select
                     native
-                    value={currentWorkspaceId}
                     fullWidth={true}
+                    value={currentWorkspaceId}
                     onChange={handleSelectChange}
                 >
                     {
@@ -44,15 +43,6 @@ export default function WorkspaceSelector() {
                         ))
                     }
                 </Select>
-            </Grid>
-            <Grid item>
-                <CreateButton/>
-            </Grid>
-            <Grid item>
-                <EditButton/>
-            </Grid>
-            <Grid item>
-                <DeleteButton/>
             </Grid>
         </Grid>
     );

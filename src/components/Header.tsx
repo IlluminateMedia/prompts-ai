@@ -12,6 +12,10 @@ import {
 } from "../slices/editorSlice";
 import {ActionCreators} from "redux-undo";
 
+interface Props {
+    isUndoAndRedoShown?: boolean
+}
+
 const useStyles = makeStyles((theme: Theme) => ({
     buttonGroup: {
         marginRight: theme.spacing(2),
@@ -21,7 +25,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
 }));
 
-export default function Header() {
+export default function Header({ isUndoAndRedoShown = true }: Props) {
     const dispatch = useDispatch();
     const classes = useStyles();
 
@@ -48,10 +52,12 @@ export default function Header() {
                 <div className={classes.buttonGroup}>
                     <IconButton onClick={handleApiKeyDialogOpen}><VpnKeyIcon color={isEachApiKeyPresent ? "action" : "error"}/></IconButton>
                 </div>
-                <div className={classes.buttonGroup}>
-                    <IconButton onClick={handleUndoClick}><UndoIcon/></IconButton>
-                    <IconButton onClick={handleRedoClick}><RedoIcon/></IconButton>
-                </div>
+                { isUndoAndRedoShown &&
+                    <div className={classes.buttonGroup}>
+                        <IconButton onClick={handleUndoClick}><UndoIcon/></IconButton>
+                        <IconButton onClick={handleRedoClick}><RedoIcon/></IconButton>
+                    </div>
+                }
                 <div className={classes.buttonGroup}>
                     <IconButton aria-label="GitHib" onClick={() => window.open('https://github.com/sevazhidkov/prompts-ai', '_blank')}>
                         <GitHubIcon fontSize={'small'}/>
