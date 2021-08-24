@@ -10,4 +10,4 @@ class Airtable(models.Model):
         app_label = "restapi"
 
     def __str__(self):
-        return self.label
+        return self.table
