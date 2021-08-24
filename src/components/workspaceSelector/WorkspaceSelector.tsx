@@ -5,7 +5,7 @@ import CreateButton from './CreateButton';
 import EditButton from "./EditButton";
 import DeleteButton from "./DeleteButton";
 import {selectWorkspacesList, selectCurrentWorkspaceId, updateWorkspaceId} from "../../slices/editorSlice";
-import {useDispatch, useSelector} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { ActionCreators } from 'redux-undo';
 
 const useStyles = makeStyles({

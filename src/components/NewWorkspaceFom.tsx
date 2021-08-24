@@ -8,6 +8,9 @@ import {
 
 import NewUploadButton from "./fileExport/NewUploadButton";
 import NewWorkspaceSelector from "./workspaceSelector/NewWorkspaceSelector";
+import {
+    fetchBasicOutputAsync
+} from "../slices/newEditorSlice";
 
 const useStyles = makeStyles({
     fileExportButton: {
@@ -20,6 +23,11 @@ const useStyles = makeStyles({
 
 export default function NewWorkspaceForm () {
     const styles = useStyles();
+    const dispatch = useDispatch();
+
+    const fetchOutputs = () => {
+        dispatch(fetchBasicOutputAsync());
+    };
 
     return (
         <Grid container direction={'column'} spacing={2}>
@@ -36,6 +44,7 @@ export default function NewWorkspaceForm () {
                     variant="contained"
                     size="large"
                     color="primary"
+                    onClick={fetchOutputs}
                 >
                     {'Run'}
                 </Button>

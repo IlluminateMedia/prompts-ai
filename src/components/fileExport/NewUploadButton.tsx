@@ -5,6 +5,10 @@ import { Button } from "@material-ui/core";
 import { useDispatch } from "react-redux";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 
+import {
+    loadKeywords
+} from "../../slices/newEditorSlice";
+
 interface Props {
     className: string;
 }
@@ -20,7 +24,7 @@ export default function NewUploadButton(props: Props) {
         if (event.target!.result === undefined) {
             return;
         }
-        // dispatch(loadKeywords(event.target!.result as string));
+        dispatch(loadKeywords(event.target!.result as string));
     };
     return (
         <Files
@@ -29,7 +33,7 @@ export default function NewUploadButton(props: Props) {
                 fileReader.readAsText(file[0]);
             }}
             onError={(err: any) => console.log(err)}
-            accepts={['.json']}
+            accepts={['.csv']}
             maxFileSize={10000000}
             minFileSize={0}
             clickable
