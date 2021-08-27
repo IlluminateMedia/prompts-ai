@@ -16,13 +16,29 @@ export interface Example {
 export interface CompletionParameters {
     apiKey: string;
     engine: string;
-    maxTokens: number;
+    maxTokens: number | string;
     stop: string | Array<string>;
     prompt: string;
-    temperature: number;
-    topP: number;
-    presencePenalty: number;
-    frequencyPenalty: number;
+    temperature: number | string;
+    topP: number | string;
+    presencePenalty: number | string;
+    frequencyPenalty: number | string;
+}
+
+export interface NewCompletionParameters {
+    apiKey: string;
+    engine: string;
+    maxTokens: number | string;
+    stop: string | Array<string>;
+    prompt: string;
+    temperature: number | string;
+    topP: number | string;
+    presencePenalty: number | string;
+    frequencyPenalty: number | string;
+    airtableApiKey: string;
+    airtableBase: string;
+    airtableTable: string;
+    category: string;
 }
 
 export interface JWTTokens {
@@ -110,9 +126,9 @@ export interface EditorState {
 }
 
 export interface NewEditorState {
-    airtable?: Airtable;
     currentWorkspaceId?: number;
     workspaces: Array<NewWorkspace>;
+    choiceResults: ChoiceResult[][];
 }
 
 export interface AuthState {
@@ -158,19 +174,24 @@ export interface Workspace {
     conversations: Array<Conversation>;
 }
 
-export interface NewWorkspace {
+export interface NewWorkspace extends Record<string, any> {
     id: number;
     name: string;
     prompt: string;
     model: CustomModel;
-    temperature: number;
-    topP: number;
-    n: number;
-    frequencyPenalty: number;
-    presencePenalty: number;
+    temperature: string;
+    topP: string;
+    n: string;
+    frequencyPenalty: string;
+    presencePenalty: string;
     stopSymbols: Array<string>;
-    maxTokens: number;
+    maxTokens: string;
     keywords: string[][];
+    loading: boolean;
+    airtableBase: string;
+    airtableTable: string;
+    category: string;
+    airtableApiKey: string;
 }
 
 // Action Payloads: Examples
@@ -183,6 +204,12 @@ export interface EditExampleActionPayload {
 export interface LoadExampleOutputActionPayload {
     id: string;
     output: string;
+}
+
+export interface ChoiceResult {
+    finish_reason: string;
+    index: number;
+    text: string;
 }
 
 // Action Payloads: Variations

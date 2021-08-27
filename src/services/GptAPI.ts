@@ -2,12 +2,6 @@ import axios from "axios";
 import {AxiosPromise} from "axios";
 import {CompletionParameters} from "../slices/editorSlice";
 
-export interface ChoiceResult {
-    finish_reason: string;
-    index: number;
-    text: string;
-}
-
 const defaultModels = ["davinci", "davinci-instruct-beta", "curie", "curie-instruct-beta", "babbage", "ada"];
 
 class GptAPI {

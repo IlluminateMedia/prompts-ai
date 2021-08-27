@@ -1,10 +1,10 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import uniqid from "uniqid";
 import {AppThunk, RootState} from "../store";
-import GptAPI, {ChoiceResult} from "../services/GptAPI";
+import GptAPI from "../services/GptAPI";
 import RestAPI from "../services/RestAPI";
 import {
-    Example, CompletionParameters, TabIndex, Variation, Basic, ConversationPartSource,
+    Example, CompletionParameters, TabIndex, Variation, Basic, ConversationPartSource, ChoiceResult,
     ConversationPart, ConversationCompletionParameters, Conversation, SelectOption, EditorState, Workspace,
     EditExampleActionPayload, LoadExampleOutputActionPayload, AddVariationActionPayload, SetConversationCompletionParametersActionPayload,
     SetConversationInitialPromptActionPayload, UpdateConversationLoadingStatusActionPayload, UpdateConversationInputValueActionPayload,

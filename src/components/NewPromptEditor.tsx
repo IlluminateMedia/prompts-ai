@@ -8,7 +8,6 @@ import {
     Container,
     Box
 } from "@material-ui/core";
-import {makeStyles} from "@material-ui/styles";
 
 import Header from "./Header";
 import NewWorkspaceForm from "./NewWorkspaceFom";
@@ -16,12 +15,6 @@ import NewWorkspaceForm from "./NewWorkspaceFom";
 import {
     fetchWorkspacesAsync
 } from "../slices/newEditorSlice";
-
-const useStyles = makeStyles({
-    fileExportButton: {
-        width: '125px',
-    }
-});
 
 export default function NewPromptEditor() {
     const dispatch = useDispatch();
