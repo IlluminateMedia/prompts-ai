@@ -56,7 +56,7 @@ export function PromptEditor() {
 
     useEffect(() => {
         dispatch(fetchAvailableModelsAsync());
-    }, []);
+    }, [dispatch]);
 
     const handlePromptChange = (event: React.FormEvent<HTMLTextAreaElement | HTMLInputElement>) => {
         dispatch(editPrompt(event.currentTarget.value));
@@ -146,7 +146,7 @@ export function PromptEditor() {
                                     label: '1500',
                                 }]}
                                 min={1}
-                                max={512}
+                                max={1500}
                             />
 
                             <Tooltip 
