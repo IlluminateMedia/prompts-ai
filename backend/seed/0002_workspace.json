@@ -13,7 +13,7 @@
             "max_tokens": 30,
             "custom_model": 1,
             "airtable_api_key": "keyDyO2hVA4ECe6Lq",
-            "airtable_base": "Assembly Line",
+            "airtable_base": "appHzVVGiKtfK2aN5",
             "airtable_table": "Description Main Selection",
             "category": "{{variable2}}"
         }
@@ -32,7 +32,7 @@
             "max_tokens": 30,
             "custom_model": 2,
             "airtable_api_key": "keyDyO2hVA4ECe6Lq",
-            "airtable_base": "Assembly Line",
+            "airtable_base": "appHzVVGiKtfK2aN5",
             "airtable_table": "Description Main Selection",
             "category": "{{variable2}}"
         }
