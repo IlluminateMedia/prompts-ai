@@ -3,7 +3,7 @@
         "model": "restapi.Workspace",
         "fields": {
             "name": "Draft #1",
-            "prompt": "Input: Anna and Mike is going skiing.\nOutput: Anna and Mike are going skiing.\nInput: Anna and Pat are married; he has been together for 20 years.\nOutput: Anna and Pat are married; they have been together for 20 years.\nInput: I walk to the store and I bought milk.\nOutput: I walked to the store and I bought milk.\nInput: {example}\nOutput:",
+            "prompt": "Input: Anna and Mike is going skiing.\nOutput: Anna and Mike are going skiing.\nInput: Anna and Pat are married; he has been together for 20 years.\nOutput: Anna and Pat are married; they have been together for 20 years.\nInput: I walk to the store and I bought milk.\nOutput: I walked to the store and I bought milk.\nInput: {{variable1}}\nOutput:",
             "temperature": 0.5,
             "top_p": 1,
             "n": 1,
@@ -11,14 +11,18 @@
             "presence_penalty": 0,
             "stop_symbols": ["\\n"],
             "max_tokens": 30,
-            "custom_model": 1    
+            "custom_model": 1,
+            "airtable_api_key": "keyDyO2hVA4ECe6Lq",
+            "airtable_base": "Assembly Line",
+            "airtable_table": "Description Main Selection",
+            "category": "{{variable2}}"
         }
     },
     {
         "model": "restapi.Workspace",
         "fields": {
             "name": "Draft #2",
-            "prompt": "Input: Anna and Mike is going skiing.\nOutput: Anna and Mike are going skiing.\nInput: Anna and Pat are married; he has been together for 20 years.\nOutput: Anna and Pat are married; they have been together for 20 years.\nInput: I walk to the store and I bought milk.\nOutput: I walked to the store and I bought milk.\nInput: {example}\nOutput:",
+            "prompt": "Input: Anna and Mike is going skiing.\nOutput: Anna and Mike are going skiing.\nInput: Anna and Pat are married; he has been together for 20 years.\nOutput: Anna and Pat are married; they have been together for 20 years.\nInput: I walk to the store and I bought milk.\nOutput: I walked to the store and I bought milk.\nInput: {{variable1}}\nOutput:",
             "temperature": 0.5,
             "top_p": 1,
             "n": 1,
@@ -26,7 +30,11 @@
             "presence_penalty": 0,
             "stop_symbols": ["\\n"],
             "max_tokens": 30,
-            "custom_model": 2
+            "custom_model": 2,
+            "airtable_api_key": "keyDyO2hVA4ECe6Lq",
+            "airtable_base": "Assembly Line",
+            "airtable_table": "Description Main Selection",
+            "category": "{{variable2}}"
         }
     }
 ]

@@ -14,7 +14,10 @@ class Workspace(models.Model):
     frequency_penalty = models.CharField(max_length=255, blank=False)
     stop_symbols = models.JSONField(default=dict)
     prompt = models.TextField(blank=True, null=True)
-
+    airtable_base = models.CharField(max_length=255, blank=False, default="")
+    airtable_table = models.CharField(max_length=255, blank=False, default="")
+    category = models.CharField(max_length=255, blank=False, default="")
+    airtable_api_key = models.CharField(max_length=255, blank=False, default="")
 
     class Meta:
         app_label = "restapi"

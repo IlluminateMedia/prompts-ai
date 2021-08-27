@@ -1,17 +1,14 @@
 import axios from "axios";
 import {AxiosPromise} from "axios";
-import {CompletionParameters} from "../slices/editorSlice";
-
-export interface ChoiceResult {
-    finish_reason: string;
-    index: number;
-    text: string;
-}
+import {
+    CompletionParameters,
+    NewCompletionParameters
+} from "../common/interfaces";
 
 const defaultModels = ["davinci", "davinci-instruct-beta", "curie", "curie-instruct-beta", "babbage", "ada"];
 
 class GptAPI {
-    static generateCompletions(prompt: string | Array<string>, completionParams: CompletionParameters, modelName: string,
+    static generateCompletions(prompt: string | Array<string>, completionParams: CompletionParameters | NewCompletionParameters, modelName: string,
                                n: number = 1): AxiosPromise {
         
         let data: any = {
@@ -24,7 +21,7 @@ class GptAPI {
             "presence_penalty": completionParams.presencePenalty,
             "frequency_penalty": completionParams.frequencyPenalty
         }
-        let url = `https://api.openai.com/v1/engines/${completionParams.engine}/completions`;
+        let url = `https://api.openai.com/v1/engines/davinci/completions`; //${completionParams.engine}
         if (!defaultModels.includes(modelName)) {
             url = 'https://api.openai.com/v1/completions';
             data = {

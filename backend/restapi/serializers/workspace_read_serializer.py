@@ -19,5 +19,9 @@ class WorkspaceReadSerializer(serializers.ModelSerializer):
             "frequency_penalty",
             "stop_symbols",
             "prompt",
+            "airtable_api_key",
+            "airtable_base",
+            "airtable_table",
+            "category",
             "custom_model"
         )

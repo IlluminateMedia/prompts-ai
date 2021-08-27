@@ -37,6 +37,16 @@ class RestAPI {
             data: signInParams
         });
     }
+
+    static getAirtable(): AxiosPromise {
+        return axios({
+            method: "GET",
+            url: `${baseUrl}airtable/`,
+            headers: {
+                "Content-Type": "application/json",
+            }
+        });
+    }
 }
 
 export default RestAPI;
