@@ -3,7 +3,7 @@
         "model": "restapi.Workspace",
         "fields": {
             "name": "Draft #1",
-            "prompt": "Input: Anna and Mike is going skiing.\nOutput: Anna and Mike are going skiing.\nInput: Anna and Pat are married; he has been together for 20 years.\nOutput: Anna and Pat are married; they have been together for 20 years.\nInput: I walk to the store and I bought milk.\nOutput: I walked to the store and I bought milk.\nInput: {example}\nOutput:",
+            "prompt": "Input: Anna and Mike is going skiing.\nOutput: Anna and Mike are going skiing.\nInput: Anna and Pat are married; he has been together for 20 years.\nOutput: Anna and Pat are married; they have been together for 20 years.\nInput: I walk to the store and I bought milk.\nOutput: I walked to the store and I bought milk.\nInput: {example1}\nOutput:\nInput: {example2}\nOutput:",
             "temperature": 0.5,
             "top_p": 1,
             "n": 1,
