@@ -1,5 +1,9 @@
 import Airtable, { Base, Record, Table } from "airtable";
 
+import {
+    ChoiceResult
+} from "../common/interfaces";
+
 interface AirtableConfiguration {
     apiKey: string;
     baseName: string;
@@ -11,16 +15,23 @@ class AirtableAPI {
 
     static configure({apiKey, baseName, tableName}: AirtableConfiguration) {
         Airtable.configure({ apiKey });
-        const base = new Airtable({ apiKey }).base("applFaVKPfNHHvf1f");
+        const base = new Airtable({ apiKey }).base(baseName);
         this._tableInstance = base(tableName);
     }
 
-    static create(): Promise<Record<any>> {
+    static create(choiceResults: Array<ChoiceResult>, category: string, variableName: string): Promise<Record<any>> {
         console.log(this._tableInstance);
-        return this._tableInstance.create({
-            "Title": "Tutorial: create a Spreadsheet using React",
-            "Link": "https://flaviocopes.com/react-spreadsheet/",
-        })
+        let data: { [key: string]: any } = {};
+        choiceResults.map((c, i) => {
+            data[`Article ${i + 1}`] = c.text;
+        });
+        data = {
+            ...data,
+            Category: category,
+            Name: variableName
+        }
+
+        return this._tableInstance.create(data);
     }
 }
 

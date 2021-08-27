@@ -3,14 +3,13 @@ import { AppThunk, RootState } from "../store";
 
 import { mapWorkspaceResponse, mapAirtableResponse } from "../libs/mapResponseToState";
 import { hasPromptVariables, makeKeywordPattern, variableRegExp, splitRegExp } from "../libs/useKeyword";
-import { Record } from 'airtable';
+import Airtable, { Record } from 'airtable';
 import AirtableError from 'airtable/lib/airtable_error';
 
 import GptAPI from "../services/GptAPI";
 import RestAPI from "../services/RestAPI";
 import AirtableAPI from "../services/AirtableAPI";
 import {
-    Airtable,
     NewCompletionParameters,
     ChoiceResult,
     NewWorkspace,
@@ -84,18 +83,17 @@ const fetchWorkspacesAsync = (): AppThunk => (dispatch, getState) => {
     });
 };
 
-// const storeAirtableAsync = (): AppThunk => (dispatch, getState) => {
-//     console.log("storeAirtableAsync");
-//     const state = getState();
-//     const airtable = selectAirtable(state);
-//     if (airtable) {
-//         AirtableAPI.create().then((record: Record<any>) => {
-//             console.log(record.id);
-//         }).catch((error: AirtableError) => {
-//             console.log(error);
-//         })
-//     }
-// };
+const storeAirtableAsync = (
+        choiceResults: Array<ChoiceResult>,
+        category: string, 
+        variableName: string
+    ): AppThunk => (dispatch, getState) => {
+        AirtableAPI.create(choiceResults, category, variableName).then((record: Record<any>) => {
+            console.log(record.id);
+        }).catch((error: AirtableError) => {
+            console.log(error);
+        });
+};
 
 const fetchBasicOutputAsync = (): AppThunk => (dispatch, getState) => {
     const state = getState();
@@ -128,26 +126,31 @@ const fetchBasicOutputAsync = (): AppThunk => (dispatch, getState) => {
 
     const completionParams = selectCompletionParameters(state);
     console.log(completionParams);
-    // dispatch(setChoiceResults([]));
-    // dispatch(setLoading(false));
+    dispatch(setChoiceResults([]));
+    dispatch(setLoading(false));
 
-    // completionParams.map(completionParam => {
-    //     GptAPI.generateCompletions(completionParam.prompt, completionParam, workspace.model.value, 10).then(response => {
-    //         console.log(response.data);
-    //         return { ...response.data };
-    //     }).then(response => {
-    //         console.log(response.choices);
-    //         dispatch(appendChoiceResults(response.choices));
-    //         // dispatch(storeAirtableAsync());
-    //     }).catch(error => {
-    //         alert("API returned an error. Refer to the console to inspect it.");
-    //         console.log(error.response);
-    //     }).finally(() => {
-    //         if (workspace.keywords.length === choiceResults.length) {
-    //             dispatch(setLoading(true));
-    //         }
-    //     });
-    // });
+    completionParams.map(completionParam => {
+        GptAPI.generateCompletions(completionParam.prompt, completionParam, workspace.model.value, completionParam.n).then(response => {
+            console.log(response.data);
+            return { ...response.data };
+        }).then(response => {
+            console.log(response.choices);
+            AirtableAPI.configure({
+                apiKey: completionParam.airtableApiKey,
+                baseName: completionParam.airtableBase,
+                tableName: completionParam.airtableTable
+            });
+            dispatch(appendChoiceResults(response.choices));
+            dispatch(storeAirtableAsync(response.choices, completionParam.category, completionParam.variableName || 'Variable Name'));
+        }).catch(error => {
+            alert("API returned an error. Refer to the console to inspect it.");
+            console.log(error.response);
+        }).finally(() => {
+            if (workspace.keywords.length === choiceResults.length) {
+                dispatch(setLoading(true));
+            }
+        });
+    });
 };
 
 const selectCurrentWorkspaceId = (state: RootState) => state.newEditor.currentWorkspaceId;
@@ -156,45 +159,61 @@ const selectWorkspaces = (state: RootState) => state.newEditor.workspaces;
 const selectChoiceResults = (state: RootState) => state.newEditor.choiceResults;
 const selectCompletionParameters = (state: RootState) => {
     const workspace = state.newEditor.workspaces.find(w => w.id === state.newEditor.currentWorkspaceId)!;
-    const _workspace: {[key: string]: any} = {};
-    const completionParameters: NewCompletionParameters[] = workspace.keywords.map(batch => {
-        batch.forEach((keyword, i) => {
-            Object.keys(workspace).map(property => {
+    const variablesBatch: { [key: string]: any }[] = [];
+    workspace.keywords.map(batch => {
+        const variables: { [key: string]: any } = {};
+            batch.forEach((keyword, i) => {
                 const keywordRegExp = new RegExp(makeKeywordPattern(i + 1), "i");
-                _workspace[property] = workspace[property];
-                if (typeof workspace[property] === "string" &&
-                    keywordRegExp.test(workspace[property])) {
-                        console.log(workspace[property].replace(keywordRegExp, keyword));
-                        _workspace[property] = workspace[property].replace(keywordRegExp, keyword);
-                }
+                Object.keys(workspace).map(property => {
+                    if (typeof workspace[property] === "string" &&
+                        keywordRegExp.test(workspace[property])) {
+                            console.log(keywordRegExp);
+                            console.log(keyword);
+                            variables[property] = workspace[property].replace(keywordRegExp, keyword);
+                        
+                        if (property === "prompt") {
+                            variables["variableName"] = keyword;
+                        }
+                    }
+                });
             });
-        });
-        console.log(_workspace);
-
-        return {
-            apiKey: state.editor.present.apiKey === undefined ? '' : state.editor.present.apiKey,
-            engine: _workspace.model.value,
-            maxTokens: _workspace.maxTokens,
-            stop: (() => {
-                if (_workspace.stopSymbols.length > 0) {
-                    return _workspace.stopSymbols.map((symbol: string) => {
-                        return symbol.split('\\n').join('\n');
-                    });
-                } else {
-                    return '';
-                }
-            })(),
-            prompt: _workspace.prompt,
-            temperature: _workspace.temperature,
-            topP: _workspace.topP,
-            presencePenalty: _workspace.presencePenalty,
-            frequencyPenalty: _workspace.frequencyPenalty,
-            airtableApiKey: _workspace.airtableApiKey,
-            airtableBase: _workspace.airtableBase,
-            airtableTable: _workspace.airtableTable,
-            category: _workspace.category,
-        };
+        variablesBatch.push(variables);
     });
+    let updatedWorkspaces: NewWorkspace[] = variablesBatch.map(variables => {
+        return {
+            ...workspace,
+            ...variables
+        }
+    });
+
+    const completionParameters: NewCompletionParameters[] = updatedWorkspaces.map(workspace => {
+        return {
+                apiKey: state.editor.present.apiKey === undefined ? '' : state.editor.present.apiKey,
+                engine: workspace.model.value,
+                maxTokens: Number(workspace.maxTokens),
+                stop: (() => {
+                    if (workspace.stopSymbols.length > 0) {
+                        return workspace.stopSymbols.map((symbol: string) => {
+                            return symbol.split('\\n').join('\n');
+                        });
+                    } else {
+                        return '';
+                    }
+                })(),
+                n: Number(workspace.n),
+                prompt: workspace.prompt,
+                temperature: Number(workspace.temperature),
+                topP: Number(workspace.topP),
+                presencePenalty: Number(workspace.presencePenalty),
+                frequencyPenalty: Number(workspace.frequencyPenalty),
+                airtableApiKey: workspace.airtableApiKey,
+                airtableBase: workspace.airtableBase,
+                airtableTable: workspace.airtableTable,
+                variableName: workspace.variableName,
+                category: workspace.category,
+        }
+    });
+
     return completionParameters;
 };
 

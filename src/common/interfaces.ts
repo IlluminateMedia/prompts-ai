@@ -19,10 +19,10 @@ export interface CompletionParameters {
     maxTokens: number | string;
     stop: string | Array<string>;
     prompt: string;
-    temperature: number | string;
-    topP: number | string;
-    presencePenalty: number | string;
-    frequencyPenalty: number | string;
+    temperature: number;
+    topP: number;
+    presencePenalty: number;
+    frequencyPenalty: number;
 }
 
 export interface NewCompletionParameters {
@@ -33,12 +33,14 @@ export interface NewCompletionParameters {
     prompt: string;
     temperature: number | string;
     topP: number | string;
+    n: number;
     presencePenalty: number | string;
     frequencyPenalty: number | string;
     airtableApiKey: string;
     airtableBase: string;
     airtableTable: string;
     category: string;
+    variableName?: string;
 }
 
 export interface JWTTokens {
@@ -188,6 +190,7 @@ export interface NewWorkspace extends Record<string, any> {
     maxTokens: string;
     keywords: string[][];
     loading: boolean;
+    variableName?: string;
     airtableBase: string;
     airtableTable: string;
     category: string;
