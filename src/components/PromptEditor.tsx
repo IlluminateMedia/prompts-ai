@@ -142,8 +142,8 @@ export function PromptEditor() {
                                     value: 1,
                                     label: '1',
                                 }, {
-                                    value: 512,
-                                    label: '512',
+                                    value: 1500,
+                                    label: '1500',
                                 }]}
                                 min={1}
                                 max={512}
