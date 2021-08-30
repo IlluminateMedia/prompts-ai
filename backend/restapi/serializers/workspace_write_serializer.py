@@ -20,5 +20,10 @@ class WorkspaceWriteSerializer(serializers.ModelSerializer):
             "frequency_penalty",
             "stop_symbols",
             "prompt",
+            "airtable_api_key",
+            "airtable_base",
+            "airtable_table",
+            "airtable_name",
+            "category",
             "custom_model"
         )
