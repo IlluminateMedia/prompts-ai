@@ -39,8 +39,8 @@ export interface NewCompletionParameters {
     airtableApiKey: string;
     airtableBase: string;
     airtableTable: string;
+    airtableName: string;
     category: string;
-    variableName?: string;
 }
 
 export interface JWTTokens {
@@ -190,9 +190,9 @@ export interface NewWorkspace extends Record<string, any> {
     maxTokens: string;
     keywords: string[][];
     loading: boolean;
-    variableName?: string;
     airtableBase: string;
     airtableTable: string;
+    airtableName: string;
     category: string;
     airtableApiKey: string;
 }

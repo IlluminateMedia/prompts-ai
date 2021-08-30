@@ -15,6 +15,7 @@ interface WorkspaceResponse {
     category: string;
     airtable_base: string;
     airtable_table: string;
+    airtable_name: string;
     airtable_api_key: string;
 }
 
@@ -44,7 +45,8 @@ export function mapWorkspaceResponse(response: Array<WorkspaceResponse>): Array<
             category: item.category,
             airtableApiKey: item.airtable_api_key,
             airtableBase: item.airtable_base,
-            airtableTable: item.airtable_table
+            airtableTable: item.airtable_table,
+            airtableName: item.airtable_name
         };
 
         return workspace;

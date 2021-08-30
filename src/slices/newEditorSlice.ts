@@ -86,9 +86,9 @@ const fetchWorkspacesAsync = (): AppThunk => (dispatch, getState) => {
 const storeAirtableAsync = (
         choiceResults: Array<ChoiceResult>,
         category: string, 
-        variableName: string
+        airtableName: string
     ): AppThunk => (dispatch, getState) => {
-        AirtableAPI.create(choiceResults, category, variableName).then((record: Record<any>) => {
+        AirtableAPI.create(choiceResults, category, airtableName).then((record: Record<any>) => {
             console.log(record.id);
         }).catch((error: AirtableError) => {
             console.log(error);
@@ -141,7 +141,7 @@ const fetchBasicOutputAsync = (): AppThunk => (dispatch, getState) => {
                 tableName: completionParam.airtableTable
             });
             dispatch(appendChoiceResults(response.choices));
-            dispatch(storeAirtableAsync(response.choices, completionParam.category, completionParam.variableName || 'Variable Name'));
+            dispatch(storeAirtableAsync(response.choices, completionParam.category, completionParam.airtableName || 'Variable Name'));
         }).catch(error => {
             alert("API returned an error. Refer to the console to inspect it.");
             console.log(error.response);
@@ -168,12 +168,7 @@ const selectCompletionParameters = (state: RootState) => {
                     if (typeof workspace[property] === "string" &&
                         keywordRegExp.test(workspace[property])) {
                             console.log(keywordRegExp);
-                            console.log(keyword);
                             variables[property] = workspace[property].replace(keywordRegExp, keyword);
-                        
-                        if (property === "prompt") {
-                            variables["variableName"] = keyword;
-                        }
                     }
                 });
             });
@@ -183,7 +178,7 @@ const selectCompletionParameters = (state: RootState) => {
         return {
             ...workspace,
             ...variables
-        }
+        };
     });
 
     const completionParameters: NewCompletionParameters[] = updatedWorkspaces.map(workspace => {
@@ -209,7 +204,7 @@ const selectCompletionParameters = (state: RootState) => {
                 airtableApiKey: workspace.airtableApiKey,
                 airtableBase: workspace.airtableBase,
                 airtableTable: workspace.airtableTable,
-                variableName: workspace.variableName,
+                airtableName: workspace.airtableName,
                 category: workspace.category,
         }
     });
