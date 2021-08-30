@@ -15,6 +15,7 @@
             "airtable_api_key": "keyDyO2hVA4ECe6Lq",
             "airtable_base": "appHzVVGiKtfK2aN5",
             "airtable_table": "Description Main Selection",
+            "airtable_name": "chemist",
             "category": "{{variable2}}"
         }
     },
@@ -34,6 +35,7 @@
             "airtable_api_key": "keyDyO2hVA4ECe6Lq",
             "airtable_base": "appHzVVGiKtfK2aN5",
             "airtable_table": "Description Main Selection",
+            "airtable_name": "chemist",
             "category": "{{variable2}}"
         }
     }

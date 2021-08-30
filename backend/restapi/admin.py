@@ -13,7 +13,7 @@ class SharedPromptAdmin(admin.ModelAdmin):
 class WorkspaceAdmin(admin.ModelAdmin):
     list_display = (
         'id', 'name', 'temperature', 'top_p', 'n', 'presence_penalty', 'frequency_penalty', 'stop_symbols', 'prompt', 'custom_model',
-        'airtable_base', 'airtable_table', 'category', 'airtable_api_key'
+        'airtable_base', 'airtable_table', 'airtable_name', 'category', 'airtable_api_key'
     )
     search_fields = ('name', 'temperature', 'top_p', 'n', 'presence_penalty', 'frequency_penalty', 'stop_symbols', 'prompt', 'custom_model')
 

@@ -19,7 +19,7 @@ class AirtableAPI {
         this._tableInstance = base(tableName);
     }
 
-    static create(choiceResults: Array<ChoiceResult>, category: string, variableName: string): Promise<Record<any>> {
+    static create(choiceResults: Array<ChoiceResult>, category: string, airtableName: string): Promise<Record<any>> {
         console.log(this._tableInstance);
         let data: { [key: string]: any } = {};
         choiceResults.map((c, i) => {
@@ -28,7 +28,7 @@ class AirtableAPI {
         data = {
             ...data,
             Category: category,
-            Name: variableName
+            Name: airtableName
         }
 
         return this._tableInstance.create(data);

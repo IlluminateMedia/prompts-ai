@@ -22,6 +22,7 @@ class WorkspaceReadSerializer(serializers.ModelSerializer):
             "airtable_api_key",
             "airtable_base",
             "airtable_table",
+            "airtable_name",
             "category",
             "custom_model"
         )
