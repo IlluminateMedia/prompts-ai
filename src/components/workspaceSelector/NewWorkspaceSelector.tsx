@@ -20,7 +20,7 @@ export default function NewWorkspaceSelector() {
     const workspaces = useSelector(selectWorkspaces);
 
     const handleSelectChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-        dispatch(updateWorkspaceId(event.target.value as number));
+        dispatch(updateWorkspaceId(Number(event.target.value)));
     }
 
     return (
