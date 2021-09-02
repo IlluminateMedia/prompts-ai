@@ -21,6 +21,10 @@ class AirtableAdmin(admin.ModelAdmin):
     list_display = ('id', 'base', 'table', 'api_key')
     search_fields = ('base', 'table', 'api_key')
 
+class AirtableWorkspaceAdmin(admin.ModelAdmin):
+    list_display = ('id', 'api_key', 'source_base', 'source_table', 'destination_base', 'destination_table')
+    search_fields = ('source_base', 'source_table', 'destination_base', 'destination_table')
+
 admin.site.register(CustomModel, CustomModelAdmin)
 admin.site.register(SharedPrompt, SharedPromptAdmin)
 admin.site.register(Workspace, WorkspaceAdmin)
