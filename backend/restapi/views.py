@@ -3,9 +3,9 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from django.http import Http404
 
-from .serializers import CustomModelSerializer, WorkspaceReadSerializer, WorkspaceWriteSerializer, UserSerializer, AirtableSerializer
+from .serializers import CustomModelSerializer, WorkspaceReadSerializer, WorkspaceWriteSerializer, UserSerializer, AirtableSerializer, AirtableWorkspaceSerializer
 
-from .models import CustomModel, Workspace, Airtable
+from .models import CustomModel, Workspace, Airtable, AirtableWorkspace
 
 
 class CustomModelViewSet(viewsets.ReadOnlyModelViewSet):
@@ -31,6 +31,10 @@ class AirtableViewSet(viewsets.ModelViewSet):
             raise Http404
         serializer = AirtableSerializer(airtable)
         return Response(serializer.data)
+
+class AirtableWorkspaceViewSet(viewsets.ModelViewSet):
+    queryset = AirtableWorkspace.objects.all()
+    serializer_class = AirtableWorkspaceSerializer
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()

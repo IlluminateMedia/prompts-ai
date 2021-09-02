@@ -1,6 +1,6 @@
 # Register your models here.
 from django.contrib import admin
-from .models import CustomModel, SharedPrompt, Workspace, Airtable
+from .models import CustomModel, SharedPrompt, Workspace, Airtable, AirtableWorkspace, AirtableWorkspace
 
 class CustomModelAdmin(admin.ModelAdmin):
     list_display = ('id', 'label', 'value')
@@ -29,3 +29,4 @@ admin.site.register(CustomModel, CustomModelAdmin)
 admin.site.register(SharedPrompt, SharedPromptAdmin)
 admin.site.register(Workspace, WorkspaceAdmin)
 admin.site.register(Airtable, AirtableAdmin)
+admin.site.register(AirtableWorkspace, AirtableWorkspaceAdmin)
