@@ -2,8 +2,8 @@ import axios, { AxiosPromise } from "axios";
 
 import { SignInParameters } from "../common/interfaces";
 
-// const baseUrl = "http://localhost:8000/be/api/v1/";
-const baseUrl = "/be/api/v1/";
+const baseUrl = "http://localhost:8000/be/api/v1/";
+// const baseUrl = "/be/api/v1/";
 
 class RestAPI {
 
@@ -42,6 +42,16 @@ class RestAPI {
         return axios({
             method: "GET",
             url: `${baseUrl}airtable/`,
+            headers: {
+                "Content-Type": "application/json",
+            }
+        });
+    }
+
+    static getAirtableWorkspaces(): AxiosPromise {
+        return axios({
+            method: "GET",
+            url: `${baseUrl}airtable_workspaces/`,
             headers: {
                 "Content-Type": "application/json",
             }

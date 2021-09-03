@@ -133,6 +133,11 @@ export interface NewEditorState {
     choiceResults: ChoiceResult[][];
 }
 
+export interface AirtableWorkspaceEditorState {
+    currentAirtableWorkspaceId?: number;
+    airtableWorkspaces: Array<AirtableWorkspace>;
+}
+
 export interface AuthState {
     jwtTokens?: JWTTokens
 }
@@ -148,6 +153,15 @@ export interface Airtable {
     table: string;
     category: string;
     apiKey: string;
+}
+
+export interface AirtableWorkspace {
+    id: number;
+    apiKey: string;
+    sourceBase: string;
+    sourceTable: string;
+    destinationBase: string;
+    destinationTable: string;
 }
 
 export interface Workspace {

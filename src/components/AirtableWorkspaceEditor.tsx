@@ -13,6 +13,9 @@ import { makeStyles } from "@material-ui/core/styles";
 import AirtableWorkspaceSelector from "./airtableWorkspaces/AirtableWorkspaceSelector";
 import AirtableField from "./airtableWorkspaces/AirtableField";
 import FinalSelectionForm from "./airtableWorkspaces/FinalSelectionForm";
+import {
+    fetchAirtableWorkspacesAsync
+} from "../slices/airtableWorkspaceEditorSlice"
 
 const useStyles = makeStyles((theme) => ({
     container: {
@@ -25,6 +28,10 @@ const useStyles = makeStyles((theme) => ({
 
 export default function AirtableWorkspaceEditor() {
     const classes = useStyles();
+    const dispatch = useDispatch();
+    useEffect(() => {
+
+    }, []);
 
     return (
         <Grid 
@@ -35,9 +42,14 @@ export default function AirtableWorkspaceEditor() {
             <Grid
                 container
                 direction="row"
+                xs={10}
+                sm={3}
                 className={classes.header}
             >
-                <Box mb={1}>
+                <Box
+                    mb={1}
+                    width={1}
+                >
                     <Card>
                         <CardContent>
                             <Typography gutterBottom>

@@ -9,8 +9,8 @@ class AirtableWorkspaceSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "api_key",
-            "src_base",
-            "src_table",
-            "dest_base",
-            "dest_table"
+            "source_base",
+            "source_table",
+            "destination_base",
+            "destination_table"
         )

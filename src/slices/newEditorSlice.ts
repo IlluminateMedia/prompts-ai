@@ -3,8 +3,8 @@ import { AppThunk, RootState } from "../store";
 
 import { mapWorkspaceResponse, mapAirtableResponse } from "../libs/mapResponseToState";
 import { hasPromptVariables, makeKeywordPattern, variableRegExp, splitRegExp } from "../libs/useKeyword";
-import Airtable, { Record } from 'airtable';
-import AirtableError from 'airtable/lib/airtable_error';
+import { Record } from "airtable";
+import AirtableError from "airtable/lib/airtable_error";
 
 import GptAPI from "../services/GptAPI";
 import RestAPI from "../services/RestAPI";
@@ -23,7 +23,7 @@ const initialState: NewEditorState = {
 }
 
 const newEditorSlice = createSlice({
-    name: 'newEditor',
+    name: "newEditor",
     initialState,
     reducers: {
         // setAirtable: (state, action: PayloadAction<Airtable>) => {
