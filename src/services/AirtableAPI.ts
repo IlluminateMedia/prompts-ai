@@ -20,7 +20,6 @@ class AirtableAPI {
     }
 
     static create(choiceResults: Array<ChoiceResult>, category: string, airtableName: string): Promise<Record<any>> {
-        console.log(this._tableInstance);
         let data: { [key: string]: any } = {};
         choiceResults.map((c, i) => {
             data[`Article ${i + 1}`] = c.text;
@@ -32,6 +31,12 @@ class AirtableAPI {
         }
 
         return this._tableInstance.create(data);
+    }
+
+    static fetch(view?: string): Promise<ReadonlyArray<Record<any>>> {
+        return this._tableInstance.select({
+            view: view ?? "Grid view"
+        }).firstPage();
     }
 }
 

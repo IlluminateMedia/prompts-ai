@@ -1,4 +1,5 @@
 import { RouteProps } from "react-router-dom";
+import { Record as OriginalAirtableRecord } from "airtable";
 
 export interface ProtectedRouteProps extends RouteProps {
     isAuthenticated: boolean;
@@ -136,6 +137,8 @@ export interface NewEditorState {
 export interface AirtableWorkspaceEditorState {
     currentAirtableWorkspaceId?: number;
     airtableWorkspaces: Array<AirtableWorkspace>;
+    dicOfAirtableWorkspaceIdToRecordId: Array<PairOfAirtableWorkspaceIdAndRecordId>;
+    loadedAirtableData: Array<LoadedAirtableData>;
 }
 
 export interface AuthState {
@@ -146,6 +149,26 @@ export interface CustomModel {
     id: number;
     label: string;
     value: string;
+}
+
+export interface PairOfAirtableWorkspaceIdAndRecordId {
+    airtableWorkspaceId: number;
+    recordId: string;
+}
+
+export interface LoadedAirtableData {
+    airtableWorkspaceId: number;
+    records: Array<AirtableRecord>;
+}
+
+export interface AirtableRecord {
+    id: string;
+    name?: string;
+    category?: string;
+    table4: string;
+    title?: string;
+    description: Array<string>;
+    articles: Array<string>;
 }
 
 export interface Airtable {
@@ -210,6 +233,8 @@ export interface NewWorkspace extends Record<string, any> {
     category: string;
     airtableApiKey: string;
 }
+
+// export interface Airtable
 
 // Action Payloads: Examples
 

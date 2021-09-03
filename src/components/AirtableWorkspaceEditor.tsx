@@ -40,10 +40,9 @@ export default function AirtableWorkspaceEditor() {
             direction="column"
         >
             <Grid
-                container
-                direction="row"
+                item
                 xs={10}
-                sm={3}
+                sm={6}
                 className={classes.header}
             >
                 <Box
