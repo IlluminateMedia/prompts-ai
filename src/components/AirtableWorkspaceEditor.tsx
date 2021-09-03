@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
     Card,
@@ -14,7 +14,7 @@ import AirtableWorkspaceSelector from "./airtableWorkspaces/AirtableWorkspaceSel
 import AirtableField from "./airtableWorkspaces/AirtableField";
 import FinalSelectionForm from "./airtableWorkspaces/FinalSelectionForm";
 import {
-    fetchAirtableWorkspacesAsync
+    fetchAirtableWorkspacesAsync, selectAirtableRecord, updateFinalArticle
 } from "../slices/airtableWorkspaceEditorSlice"
 
 const useStyles = makeStyles((theme) => ({
@@ -29,6 +29,13 @@ const useStyles = makeStyles((theme) => ({
 export default function AirtableWorkspaceEditor() {
     const classes = useStyles();
     const dispatch = useDispatch();
+
+    const airtableRecord = useSelector(selectAirtableRecord);
+
+    const handleClickAirtableField = useCallback((text: string) => {
+        dispatch(updateFinalArticle(text));
+    }, []);
+
     useEffect(() => {
 
     }, []);
@@ -64,11 +71,26 @@ export default function AirtableWorkspaceEditor() {
                 direction="row"
                 spacing={6}
             >
-                <Grid item xs={11} sm={6} md={6}>
-                    <AirtableField/>
+                <Grid
+                    item xs={11} 
+                    sm={6} 
+                    md={6}
+                >
+                    {
+                        airtableRecord?.articles.map((article, i) => (
+                            <AirtableField 
+                                text={article}
+                                onClick={handleClickAirtableField}
+                                key={i}
+                            />
+                        ))
+                    }
                 </Grid>
                 <Grid item xs={11} sm={5} md={5}>
-                    <FinalSelectionForm/>
+                    <FinalSelectionForm 
+                        title={airtableRecord?.title}
+                        category={airtableRecord?.category}
+                    />
                 </Grid>
             </Grid>
         </Grid>

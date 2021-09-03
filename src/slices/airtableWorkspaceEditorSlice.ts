@@ -15,7 +15,8 @@ const initialState: AirtableWorkspaceEditorState = {
     currentAirtableWorkspaceId: undefined,
     airtableWorkspaces: [],
     dicOfAirtableWorkspaceIdToRecordId: [],
-    loadedAirtableData: []
+    loadedAirtableData: [],
+    finalArticles: []
 };
 
 const airtableWorkspaceEditorSlice = createSlice({
@@ -28,12 +29,33 @@ const airtableWorkspaceEditorSlice = createSlice({
         setCurrentAirtableWorkspaceId: (state, action: PayloadAction<number>) => {
             state.currentAirtableWorkspaceId = action.payload;
         },
+        updateFinalArticle: (state, action: PayloadAction<string>) => {
+            const currentAirtableWorkspaceId = state.currentAirtableWorkspaceId;
+            const index = state.finalArticles.findIndex((item) => item.airtableWorkspaceId === currentAirtableWorkspaceId);
+            if (index !== -1) {
+                state.finalArticles[index] = {
+                    airtableWorkspaceId: currentAirtableWorkspaceId!,
+                    article: action.payload
+                };
+            } else if (currentAirtableWorkspaceId) {
+                state.finalArticles = [
+                    ...state.finalArticles,
+                    {
+                        airtableWorkspaceId: currentAirtableWorkspaceId,
+                        article: action.payload
+                    }
+                ];
+            }
+        },
         updateDicOfAirtableWorkspaceIdToRecordId: (state, action: PayloadAction<PairOfAirtableWorkspaceIdAndRecordId>) => {
             const index = state.dicOfAirtableWorkspaceIdToRecordId.findIndex((item) => item.airtableWorkspaceId === action.payload.airtableWorkspaceId);
             if (index !== -1) {
                 state.dicOfAirtableWorkspaceIdToRecordId[index] = action.payload;
             } else {
-                state.dicOfAirtableWorkspaceIdToRecordId.push(action.payload);
+                state.dicOfAirtableWorkspaceIdToRecordId = [
+                    ...state.dicOfAirtableWorkspaceIdToRecordId,
+                    action.payload
+                ];
             }
         },
         updateLoadedAirtableData: (state, action: PayloadAction<LoadedAirtableData>) => {
@@ -97,19 +119,18 @@ const fetchAirtableDataAsync = (airtableWorkspace: AirtableWorkspace): AppThunk 
 };
 
 const selectAirtableRecords = (state: RootState) => state.airtableWorkspace.loadedAirtableData.find(item => item.airtableWorkspaceId === state.airtableWorkspace.currentAirtableWorkspaceId)?.records || [];
-const selectAirtableFields = (state: RootState) => {
+const selectAirtableRecord = (state: RootState) => {
     const currentAirtableWorkspaceId = state.airtableWorkspace.currentAirtableWorkspaceId;
     const records = state.airtableWorkspace.loadedAirtableData.find((item) => item.airtableWorkspaceId === currentAirtableWorkspaceId)?.records || [];
     const selectRecordId = state.airtableWorkspace.dicOfAirtableWorkspaceIdToRecordId.find(item => item.airtableWorkspaceId === currentAirtableWorkspaceId)?.recordId
     const selectRecord = records.find(r => r.id === selectRecordId);
-    if (selectRecord) {
-
-    }
+    
     return selectRecord;
 }
 const selectAirtableWorkspaces = (state: RootState) => state.airtableWorkspace.airtableWorkspaces;
 const selectCurrentAirtableWorkspaceId = (state: RootState) => state.airtableWorkspace.currentAirtableWorkspaceId;
 const selectCurrentAirtableWorkspace = (state: RootState) => state.airtableWorkspace.airtableWorkspaces.find(item => item.id === state.airtableWorkspace.currentAirtableWorkspaceId);
+const selectFinalArticle = (state: RootState) => state.airtableWorkspace.finalArticles.find(a => a.airtableWorkspaceId === state.airtableWorkspace.currentAirtableWorkspaceId);
 
 // Exports
 
@@ -117,7 +138,10 @@ export default airtableWorkspaceEditorSlice.reducer;
 export { airtableWorkspaceEditorSlice };
 
 // Selectors
-export { selectAirtableWorkspaces, selectCurrentAirtableWorkspace, selectCurrentAirtableWorkspaceId };
+export {
+    selectAirtableWorkspaces, selectCurrentAirtableWorkspace, selectCurrentAirtableWorkspaceId,
+    selectAirtableRecord, selectAirtableRecords, selectFinalArticle
+};
 
 // Async Actions
 export { fetchAirtableWorkspacesAsync, fetchAirtableDataAsync };
@@ -125,5 +149,6 @@ export { fetchAirtableWorkspacesAsync, fetchAirtableDataAsync };
 // Actions
 
 export const {
-    setAirtableWorkspaces, setCurrentAirtableWorkspaceId, updateLoadedAirtableData, updateDicOfAirtableWorkspaceIdToRecordId
+    setAirtableWorkspaces, setCurrentAirtableWorkspaceId, updateLoadedAirtableData, updateDicOfAirtableWorkspaceIdToRecordId,
+    updateFinalArticle
 } = airtableWorkspaceEditorSlice.actions;

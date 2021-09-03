@@ -8,6 +8,7 @@ import { makeStyles } from "@material-ui/core/styles";
 
 import {
     fetchAirtableWorkspacesAsync,
+    setCurrentAirtableWorkspaceId,
     selectAirtableWorkspaces,
     selectCurrentAirtableWorkspaceId
 } from "../../slices/airtableWorkspaceEditorSlice";
@@ -23,6 +24,10 @@ export default function AirtableWorkspaceSelector() {
     const airtableWorkspaces = useSelector(selectAirtableWorkspaces);
     const currentAirtableWorkspaceId = useSelector(selectCurrentAirtableWorkspaceId);
 
+    const handleSelectChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+        dispatch(setCurrentAirtableWorkspaceId(Number(event.target.value)));
+    };
+
     useEffect(() => {
         dispatch(fetchAirtableWorkspacesAsync());
     }, []);
@@ -33,6 +38,7 @@ export default function AirtableWorkspaceSelector() {
                 native
                 value={currentAirtableWorkspaceId}
                 fullWidth={true}
+                onChange={handleSelectChange}
                 autoWidth={true}
             >
                 {

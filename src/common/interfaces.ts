@@ -139,6 +139,7 @@ export interface AirtableWorkspaceEditorState {
     airtableWorkspaces: Array<AirtableWorkspace>;
     dicOfAirtableWorkspaceIdToRecordId: Array<PairOfAirtableWorkspaceIdAndRecordId>;
     loadedAirtableData: Array<LoadedAirtableData>;
+    finalArticles: Array<FinalArticle>;
 }
 
 export interface AuthState {
@@ -154,6 +155,11 @@ export interface CustomModel {
 export interface PairOfAirtableWorkspaceIdAndRecordId {
     airtableWorkspaceId: number;
     recordId: string;
+}
+
+export interface FinalArticle {
+    airtableWorkspaceId: number;
+    article: string;
 }
 
 export interface LoadedAirtableData {

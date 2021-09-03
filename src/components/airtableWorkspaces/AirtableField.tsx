@@ -12,16 +12,18 @@ import {
 import { ArrowForward } from "@material-ui/icons";
 
 interface Props {
-
+    text: string;
+    onClick: (text: string) => void;
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
     card: {
         backgroundColor: theme.palette.background.default,
+        marginBottom: theme.spacing(2)
     }
 }));
 
-export default function AirtableField () {
+export default function AirtableField ({ text, onClick }: Props) {
     const styles = useStyles();
 
     return (
@@ -41,13 +43,14 @@ export default function AirtableField () {
                                 type={'text'}
                                 fullWidth={true}
                                 variant="outlined"
+                                value={text}
                                 disabled
                             />
                         </Box>
                     </Grid>
                     <Grid item xs={1} md={1}>
                         <Box>
-                            <IconButton onClick={() => {}}>
+                            <IconButton onClick={() => {onClick(text)}}>
                                 <ArrowForward />
                             </IconButton>
                         </Box>
