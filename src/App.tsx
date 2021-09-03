@@ -14,6 +14,7 @@ import ApiKeyDialog from "./components/dialogs/ApiKeyDialog";
 import SignIn from "./components/auth/SignIn";
 import SignUp from "./components/auth/SignUp";
 import NewPromptEditor from "./components/NewPromptEditor";
+import AirtableWorkspaceEditor from "./components/AirtableWorkspaceEditor";
 
 function App() {
     const dispatch = useDispatch();
@@ -57,8 +58,14 @@ function App() {
                 <ProtectedRoute 
                     isAuthenticated={!!accessToken}
                     authenticationPath="/signin" 
-                    path="/new-editor"
+                    path="/new_editor"
                     component={NewPromptEditor}
+                />
+                <ProtectedRoute
+                    isAuthenticated={!!accessToken}
+                    authenticationPath="/signin"
+                    path="/airtable_workspace_editor"
+                    component={AirtableWorkspaceEditor}
                 />
                 <Route path="/">
                     <Header/>
