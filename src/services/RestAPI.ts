@@ -47,6 +47,16 @@ class RestAPI {
             }
         });
     }
+
+    static getAirtableWorkspaces(): AxiosPromise {
+        return axios({
+            method: "GET",
+            url: `${baseUrl}airtable_workspaces/`,
+            headers: {
+                "Content-Type": "application/json",
+            }
+        });
+    }
 }
 
 export default RestAPI;

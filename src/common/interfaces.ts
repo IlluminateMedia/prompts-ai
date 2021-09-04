@@ -1,4 +1,5 @@
 import { RouteProps } from "react-router-dom";
+import { Record as OriginalAirtableRecord } from "airtable";
 
 export interface ProtectedRouteProps extends RouteProps {
     isAuthenticated: boolean;
@@ -133,6 +134,14 @@ export interface NewEditorState {
     choiceResults: ChoiceResult[][];
 }
 
+export interface AirtableWorkspaceEditorState {
+    currentAirtableWorkspaceId?: number;
+    airtableWorkspaces: Array<AirtableWorkspace>;
+    dicOfAirtableWorkspaceIdToRecordId: Array<PairOfAirtableWorkspaceIdAndRecordId>;
+    loadedAirtableData: Array<LoadedAirtableData>;
+    finalArticles: Array<FinalArticle>;
+}
+
 export interface AuthState {
     jwtTokens?: JWTTokens
 }
@@ -143,11 +152,45 @@ export interface CustomModel {
     value: string;
 }
 
+export interface PairOfAirtableWorkspaceIdAndRecordId {
+    airtableWorkspaceId: number;
+    recordId: string;
+}
+
+export interface FinalArticle {
+    airtableWorkspaceId: number;
+    article: string;
+}
+
+export interface LoadedAirtableData {
+    airtableWorkspaceId: number;
+    records: Array<AirtableRecord>;
+}
+
+export interface AirtableRecord {
+    id: string;
+    name?: string;
+    category?: string;
+    table4: string;
+    title?: string;
+    description: Array<string>;
+    articles: Array<string>;
+}
+
 export interface Airtable {
     base: string;
     table: string;
     category: string;
     apiKey: string;
+}
+
+export interface AirtableWorkspace {
+    id: number;
+    apiKey: string;
+    sourceBase: string;
+    sourceTable: string;
+    destinationBase: string;
+    destinationTable: string;
 }
 
 export interface Workspace {
@@ -196,6 +239,8 @@ export interface NewWorkspace extends Record<string, any> {
     category: string;
     airtableApiKey: string;
 }
+
+// export interface Airtable
 
 // Action Payloads: Examples
 

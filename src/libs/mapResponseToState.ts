@@ -1,4 +1,10 @@
-import { Airtable, CustomModel, NewWorkspace } from "../common/interfaces";
+import {
+    Airtable,
+    AirtableRecord,
+    AirtableWorkspace,
+    CustomModel,
+    NewWorkspace
+} from "../common/interfaces";
 
 interface WorkspaceResponse {
     id: number;
@@ -24,6 +30,23 @@ interface AirtableResponse {
     base: string;
     category: string;
     table: string;
+}
+
+interface AirtableWorkspaceResponse {
+    id: number;
+    api_key: string;
+    source_base: string;
+    source_table: string;
+    destination_base: string;
+    destination_table: string;
+}
+
+interface OrigainalAirtableRecord extends Record<string, string | Array<string> | undefined> {
+    id: string;
+    Name?: string;
+    Title?: string;
+    Desription: Array<string>;
+    Category: string;
 }
 
 export function mapWorkspaceResponse(response: Array<WorkspaceResponse>): Array<NewWorkspace> {
@@ -64,4 +87,44 @@ export function mapAirtableResponse(response: AirtableResponse): Airtable {
     };
 
     return airtable;
+}
+
+export function mapAirtableWorkspaceResponse(response: Array<AirtableWorkspaceResponse>): Array<AirtableWorkspace> {
+    const airtableWorkspaces = response.map((aw) => {
+        const airtableWorkspace: AirtableWorkspace = {
+            id: aw.id,
+            apiKey: aw.api_key,
+            sourceBase: aw.source_base,
+            sourceTable: aw.source_table,
+            destinationBase: aw.destination_base,
+            destinationTable: aw.destination_table
+        };
+        return airtableWorkspace
+    });
+
+    return airtableWorkspaces;
+}
+
+export default function mapLoadedAirtableRecords(originalRecords: Array<OrigainalAirtableRecord>): Array<AirtableRecord> {
+    const regExp = new RegExp(`Article\\s*\\d{1,2}`);
+    const records = originalRecords.map(r => {
+        const articles: Array<string> = [];
+        const articleKeys = Object.keys(r).filter(k => regExp.test(k));
+        articleKeys.forEach(k => {
+            articles.push(r[k] as string);
+        });
+        const record: AirtableRecord = {
+            id: r.id,
+            name: r.Name,
+            category: r.Category,
+            table4: r["Table 4"]! as string,
+            title: r.Title,
+            description: r.Desription,
+            articles
+        };
+
+        return record;
+    });
+
+    return records;
 }
