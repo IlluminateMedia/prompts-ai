@@ -1,6 +1,7 @@
 import Airtable, { Base, Record, Table } from "airtable";
 
 import {
+    AirtableWorkspace,
     ChoiceResult
 } from "../common/interfaces";
 
@@ -37,6 +38,18 @@ class AirtableAPI {
         return this._tableInstance.select({
             view: view ?? "Grid view"
         }).firstPage();
+    }
+
+    static storeFinalSelection(article: string, airtableWorkspace: AirtableWorkspace): Promise<Record<any>> {
+        this.configure({
+            apiKey: airtableWorkspace.apiKey,
+            baseName: airtableWorkspace.destinationBase,
+            tableName: airtableWorkspace.destinationTable
+        });
+
+        return this._tableInstance.create({
+            Article: article
+        });
     }
 }
 

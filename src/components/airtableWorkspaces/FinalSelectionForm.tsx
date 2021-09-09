@@ -12,7 +12,9 @@ import {
 
 import {
     selectFinalArticle,
-    updateFinalArticle
+    selectIsRunning,
+    updateFinalArticle,
+    storeFinalSelectionAsync
 } from "../../slices/airtableWorkspaceEditorSlice";
 
 interface Props {
@@ -23,10 +25,15 @@ interface Props {
 
 export default function FinalSelectionForm({ title, subtext, category }: Props) {
     const finalArticle = useSelector(selectFinalArticle);
+    const isRunning = useSelector(selectIsRunning);
     const dispatch = useDispatch();
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         dispatch(updateFinalArticle(event.target.value));
+    };
+
+    const storeFinalSelection = () => {
+        dispatch(storeFinalSelectionAsync());
     };
 
     return (
@@ -57,7 +64,9 @@ export default function FinalSelectionForm({ title, subtext, category }: Props) 
                         variant="contained"
                         size="large"
                         color="primary"
-                    >Submit
+                        disabled={isRunning}
+                        onClick={storeFinalSelection}
+                    >{isRunning ? "Processing" : "Submit"}
                     </Button>
                 </CardContent>
             </Card>

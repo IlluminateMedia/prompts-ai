@@ -140,6 +140,7 @@ export interface AirtableWorkspaceEditorState {
     dicOfAirtableWorkspaceIdToRecordId: Array<PairOfAirtableWorkspaceIdAndRecordId>;
     loadedAirtableData: Array<LoadedAirtableData>;
     finalArticles: Array<FinalArticle>;
+    airtableSubmitStatus: Array<AirtableSubmitStatus>;
 }
 
 export interface AuthState {
@@ -159,12 +160,17 @@ export interface PairOfAirtableWorkspaceIdAndRecordId {
 
 export interface FinalArticle {
     airtableWorkspaceId: number;
-    article: string;
+    article?: string;
 }
 
 export interface LoadedAirtableData {
     airtableWorkspaceId: number;
     records: Array<AirtableRecord>;
+}
+
+export interface AirtableSubmitStatus {
+    airtableWorkspaceId: number;
+    isRunning: boolean;
 }
 
 export interface AirtableRecord {
