@@ -23,6 +23,16 @@ const useStyles = makeStyles((theme) => ({
     },
     header: {
         marginTop: theme.spacing(3),
+    },
+    fixed: {
+        position: "fixed",
+        top: "30px",
+        right: "10px",
+        width: "inherit",
+        maxWidth: "41.666667%",
+        [theme.breakpoints.down('md')]: {
+            backgroundColor: 'red',
+        },
     }
 }));
 
@@ -71,11 +81,7 @@ export default function AirtableWorkspaceEditor() {
                 direction="row"
                 spacing={6}
             >
-                <Grid
-                    item xs={11} 
-                    sm={6} 
-                    md={6}
-                >
+                <Grid item xs={12} lg={6}>
                     {
                         airtableRecord?.articles.map((article, i) => (
                             <AirtableField 
@@ -86,12 +92,12 @@ export default function AirtableWorkspaceEditor() {
                         ))
                     }
                 </Grid>
-                <Grid item xs={11} sm={5} md={5}>
+                <div className={classes.fixed}>
                     <FinalSelectionForm 
                         title={airtableRecord?.title}
                         category={airtableRecord?.category}
                     />
-                </Grid>
+                </div>
             </Grid>
         </Grid>
     );
