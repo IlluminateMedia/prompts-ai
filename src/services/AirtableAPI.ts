@@ -11,6 +11,13 @@ interface AirtableConfiguration {
     tableName: string;
 }
 
+interface storeFinalSelectionParams {
+    article: string
+    articleGroup: string;
+    section: string;
+    selectorUser: string;
+}
+
 class AirtableAPI {
     private static _tableInstance: Table<any>;
 
