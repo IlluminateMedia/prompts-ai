@@ -11,10 +11,10 @@ interface AirtableConfiguration {
     tableName: string;
 }
 
-interface storeFinalSelectionParams {
+interface StoreFinalSelectionParams {
     article: string
-    articleGroup: string;
-    section: string;
+    articleGroup?: string;
+    section?: string;
     selectorUser: string;
 }
 
@@ -47,7 +47,7 @@ class AirtableAPI {
         }).firstPage();
     }
 
-    static storeFinalSelection(article: string, airtableWorkspace: AirtableWorkspace): Promise<Record<any>> {
+    static storeFinalSelection({article, articleGroup, section, selectorUser}: StoreFinalSelectionParams, airtableWorkspace: AirtableWorkspace): Promise<Record<any>> {
         this.configure({
             apiKey: airtableWorkspace.apiKey,
             baseName: airtableWorkspace.destinationBase,
@@ -55,7 +55,34 @@ class AirtableAPI {
         });
 
         return this._tableInstance.create({
-            Article: article
+            "Article": article,
+            "Article Group": articleGroup,
+            "Section": section,
+            "Selector User": selectorUser
+        });
+    }
+
+    static updateSubmitField(recordId: string, airtableWorkspace: AirtableWorkspace): Promise<Record<any>> {
+        this.configure({
+            apiKey: airtableWorkspace.apiKey,
+            baseName: airtableWorkspace.sourceBase,
+            tableName: airtableWorkspace.sourceTable
+        });
+
+        return this._tableInstance.update(recordId, {
+            "Submitted": true
+        });
+    }
+
+    static updateReviewField(recordId: string, airtableWorkspace: AirtableWorkspace): Promise<Record<any>> {
+        this.configure({
+            apiKey: airtableWorkspace.apiKey,
+            baseName: airtableWorkspace.sourceBase,
+            tableName: airtableWorkspace.sourceTable
+        });
+
+        return this._tableInstance.update(recordId, {
+            "In Review": true
         });
     }
 }

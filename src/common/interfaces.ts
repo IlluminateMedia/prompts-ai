@@ -144,7 +144,13 @@ export interface AirtableWorkspaceEditorState {
 }
 
 export interface AuthState {
-    jwtTokens?: JWTTokens
+    jwtTokens?: JWTTokens;
+    user?: User;
+}
+
+export interface User {
+    name: string;
+    email: string;
 }
 
 export interface CustomModel {

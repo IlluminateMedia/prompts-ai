@@ -135,6 +135,7 @@ const fetchAirtableDataAsync = (airtableWorkspace: AirtableWorkspace): AppThunk 
                     recordId: loadedRecords[0].id
                 })
             );
+            dispatch(updateReviewAsync(loadedRecords[0].id));
         }
     })
     .catch(err => {
@@ -142,15 +143,49 @@ const fetchAirtableDataAsync = (airtableWorkspace: AirtableWorkspace): AppThunk 
     })
 };
 
+const updateReviewAsync = (recordId: string): AppThunk => (dispatch, getState) => {
+    const state = getState();
+    const currentAirtableWorkspace = selectCurrentAirtableWorkspace(state);
+    if (!currentAirtableWorkspace) {
+        alert("Something went wrong!");
+        return;
+    }
+    AirtableAPI.updateReviewField(recordId, currentAirtableWorkspace)
+    .then(response => {
+        console.log(`Review ${response.id}`);
+    }).catch(error => {
+        alert('Airtable API returned an error. Refer to the console to inspect it.')
+        console.log(error);
+    });
+}
+
+const updateSubmitAsync = (recordId: string): AppThunk => (dispatch, getState) => {
+    const state = getState();
+    const currentAirtableWorkspace = selectCurrentAirtableWorkspace(state);
+    if (!currentAirtableWorkspace) {
+        alert("Something went wrong!");
+        return;
+    }
+    AirtableAPI.updateSubmitField(recordId, currentAirtableWorkspace)
+    .then(response => {
+        console.log(`Submit ${response.id}`);
+    }).catch(error => {
+        alert('Airtable API returned an error. Refer to the console to inspect it.')
+        console.log(error);
+    });
+}
+
 const storeFinalSelectionAsync = (): AppThunk => (dispatch, getState) => {
     const state = getState();
+    const user = state.auth.user;
     const finalArticle = selectFinalArticle(state);
     const currentAirtableWorkspace = selectCurrentAirtableWorkspace(state);
     const currentAirtableWorkspaceId = selectCurrentAirtableWorkspaceId(state);
     const airtableRecords = selectAirtableRecords(state);
+    const airtableRecord = selectAirtableRecord(state);
     const airtableRecordId = selectAirtableRecordId(state);
 
-    if (!(finalArticle && currentAirtableWorkspace && currentAirtableWorkspaceId)) {
+    if (!(finalArticle && currentAirtableWorkspace && currentAirtableWorkspaceId && airtableRecord)) {
         alert("Something went wrong!");
         return;
     }
@@ -162,9 +197,16 @@ const storeFinalSelectionAsync = (): AppThunk => (dispatch, getState) => {
         airtableWorkspaceId: currentAirtableWorkspaceId,
         isRunning: true
     }));
-    AirtableAPI.storeFinalSelection(finalArticle.article!, currentAirtableWorkspace)
+    
+    AirtableAPI.storeFinalSelection({
+        articleGroup: airtableRecord.name,
+        section: airtableRecord.category,
+        article: finalArticle.article!,
+        selectorUser: user!.name
+    }, currentAirtableWorkspace)
     .then(record => {
         console.log(record.id);
+        dispatch(updateSubmitAsync(airtableRecordId!));
     }).catch(error => {
         alert('API returned an error. Refer to the console to inspect it.')
         console.log(error);
@@ -180,6 +222,7 @@ const storeFinalSelectionAsync = (): AppThunk => (dispatch, getState) => {
                 airtableWorkspaceId: currentAirtableWorkspaceId,
                 recordId: newRecord.id
             }));
+            dispatch(updateReviewAsync(newRecord.id));
             dispatch(updateFinalArticle(undefined));
         }
     })
@@ -213,7 +256,7 @@ export {
 };
 
 // Async Actions
-export { fetchAirtableWorkspacesAsync, fetchAirtableDataAsync, storeFinalSelectionAsync };
+export { fetchAirtableWorkspacesAsync, fetchAirtableDataAsync, storeFinalSelectionAsync, updateSubmitAsync };
 
 // Actions
 

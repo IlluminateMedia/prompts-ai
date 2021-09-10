@@ -3,7 +3,8 @@ import {
     AirtableRecord,
     AirtableWorkspace,
     CustomModel,
-    NewWorkspace
+    NewWorkspace,
+    User
 } from "../common/interfaces";
 
 interface WorkspaceResponse {
@@ -47,6 +48,11 @@ interface OrigainalAirtableRecord extends Record<string, string | Array<string> 
     Title?: string;
     Description: Array<string>;
     Category: string;
+}
+
+interface UserResponse {
+    username: string;
+    email: string;
 }
 
 export function mapWorkspaceResponse(response: Array<WorkspaceResponse>): Array<NewWorkspace> {
@@ -131,4 +137,11 @@ export default function mapLoadedAirtableRecords(originalRecords: Array<Origaina
     });
 
     return records;
+}
+
+export function mapUser(originalUser: UserResponse): User {
+    return {
+        name: originalUser.username,
+        email: originalUser.email
+    };
 }
