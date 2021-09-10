@@ -123,19 +123,22 @@ const fetchAirtableDataAsync = (airtableWorkspace: AirtableWorkspace): AppThunk 
             };
         });
         if (loadedRecords.length > 0) {
-            dispatch(
-                updateLoadedAirtableData({
-                    airtableWorkspaceId: airtableWorkspace.id,
-                    records: mapLoadedAirtableRecords(loadedRecords)
-                })
-            );
-            dispatch(
-                updateDicOfAirtableWorkspaceIdToRecordId({
-                    airtableWorkspaceId: airtableWorkspace.id,
-                    recordId: loadedRecords[0].id
-                })
-            );
-            dispatch(updateReviewAsync(loadedRecords[0].id));
+            const records = mapLoadedAirtableRecords(loadedRecords);
+            if (records.length > 0) {
+                dispatch(
+                    updateLoadedAirtableData({
+                        airtableWorkspaceId: airtableWorkspace.id,
+                        records
+                    })
+                );
+                dispatch(
+                    updateDicOfAirtableWorkspaceIdToRecordId({
+                        airtableWorkspaceId: airtableWorkspace.id,
+                        recordId: records[0].id
+                    })
+                );
+                dispatch(updateReviewAsync(records[0].id));
+            }
         }
     })
     .catch(err => {
@@ -235,6 +238,9 @@ const selectAirtableRecord = (state: RootState) => {
     const records = state.airtableWorkspace.loadedAirtableData.find((item) => item.airtableWorkspaceId === currentAirtableWorkspaceId)?.records || [];
     const selectRecordId = state.airtableWorkspace.dicOfAirtableWorkspaceIdToRecordId.find(item => item.airtableWorkspaceId === currentAirtableWorkspaceId)?.recordId
     const selectRecord = records.find(r => r.id === selectRecordId);
+    // console.log(records);
+    // console.log(selectRecordId);
+    // console.log(selectRecord);
     
     return selectRecord;
 }
