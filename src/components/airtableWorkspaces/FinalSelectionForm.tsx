@@ -21,9 +21,10 @@ interface Props {
     title?: string;
     subtext?: string;
     category?: string;
+    description?: string;
 }
 
-export default function FinalSelectionForm({ title, subtext, category }: Props) {
+export default function FinalSelectionForm({ title, subtext, category, description }: Props) {
     const finalArticle = useSelector(selectFinalArticle);
     const isRunning = useSelector(selectIsRunning);
     const dispatch = useDispatch();
@@ -45,6 +46,9 @@ export default function FinalSelectionForm({ title, subtext, category }: Props) 
                     </Typography>
                     <Typography gutterBottom>
                         Category: <strong>{category ?? ""}</strong>
+                    </Typography>
+                    <Typography gutterBottom>
+                        Description: <strong>{description ?? ""}</strong>
                     </Typography>
                     <TextField
                         id="final-selection-text"

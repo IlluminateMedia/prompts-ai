@@ -179,7 +179,7 @@ export interface AirtableRecord {
     category?: string;
     table4: string;
     title?: string;
-    description: Array<string>;
+    description?: string;
     articles: Array<string>;
 }
 

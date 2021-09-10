@@ -29,10 +29,7 @@ const useStyles = makeStyles((theme) => ({
         top: "30px",
         right: "10px",
         width: "inherit",
-        maxWidth: "41.666667%",
-        [theme.breakpoints.down('md')]: {
-            backgroundColor: 'red',
-        },
+        maxWidth: "41.666667%"
     }
 }));
 
@@ -96,6 +93,7 @@ export default function AirtableWorkspaceEditor() {
                     <FinalSelectionForm 
                         title={airtableRecord?.title}
                         category={airtableRecord?.category}
+                        description={airtableRecord?.description}
                     />
                 </div>
             </Grid>

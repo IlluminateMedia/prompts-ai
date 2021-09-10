@@ -45,7 +45,7 @@ interface OrigainalAirtableRecord extends Record<string, string | Array<string> 
     id: string;
     Name?: string;
     Title?: string;
-    Desription: Array<string>;
+    Description: Array<string>;
     Category: string;
 }
 
@@ -113,13 +113,17 @@ export default function mapLoadedAirtableRecords(originalRecords: Array<Origaina
         articleKeys.forEach(k => {
             articles.push(r[k] as string);
         });
+        let description = undefined;
+        if (r.Description && r.Description.length > 0) {
+            description = r.Description[0];
+        }
         const record: AirtableRecord = {
             id: r.id,
             name: r.Name,
             category: r.Category,
             table4: r["Table 4"]! as string,
             title: r.Title,
-            description: r.Desription,
+            description,
             articles
         };
 
