@@ -1,6 +1,8 @@
 from django.contrib.auth.models import User
 from rest_framework import viewsets
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 from django.http import Http404
 
 from .serializers import CustomModelSerializer, WorkspaceReadSerializer, WorkspaceWriteSerializer, UserSerializer, AirtableSerializer, AirtableWorkspaceSerializer
@@ -39,3 +41,10 @@ class AirtableWorkspaceViewSet(viewsets.ModelViewSet):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+class UserViews(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, format=None):
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data)

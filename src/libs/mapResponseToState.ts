@@ -3,7 +3,8 @@ import {
     AirtableRecord,
     AirtableWorkspace,
     CustomModel,
-    NewWorkspace
+    NewWorkspace,
+    User
 } from "../common/interfaces";
 
 interface WorkspaceResponse {
@@ -41,12 +42,17 @@ interface AirtableWorkspaceResponse {
     destination_table: string;
 }
 
-interface OrigainalAirtableRecord extends Record<string, string | Array<string> | undefined> {
+interface OrigainalAirtableRecord extends Record<string, string | Array<string> | boolean | undefined> {
     id: string;
     Name?: string;
     Title?: string;
-    Desription: Array<string>;
+    Description: Array<string>;
     Category: string;
+}
+
+interface UserResponse {
+    username: string;
+    email: string;
 }
 
 export function mapWorkspaceResponse(response: Array<WorkspaceResponse>): Array<NewWorkspace> {
@@ -113,18 +119,37 @@ export default function mapLoadedAirtableRecords(originalRecords: Array<Origaina
         articleKeys.forEach(k => {
             articles.push(r[k] as string);
         });
-        const record: AirtableRecord = {
-            id: r.id,
-            name: r.Name,
-            category: r.Category,
-            table4: r["Table 4"]! as string,
-            title: r.Title,
-            description: r.Desription,
-            articles
-        };
+        let description = undefined;
+        if (r.Description && r.Description.length > 0) {
+            description = r.Description[0];
+        }
+        const isInReview = r["In Review"] as boolean;
+        const isSubmitted = r.Submitted as boolean;
+        if (!(isSubmitted || isInReview)) {
+            const record: AirtableRecord = {
+                id: r.id,
+                name: r.Name,
+                category: r.Category,
+                table4: r["Table 4"]! as string,
+                title: r.Title,
+                description,
+                articles
+            };
 
-        return record;
+            return record;
+        }
     });
+    const filteredRecords = records.filter((record): record is AirtableRecord => !!record);
+    // console.log(records);
+    // console.log(filteredRecords);
+    return filteredRecords;
+    // console.log(filteredRecords);
+    // return filteredRecords;
+}
 
-    return records;
+export function mapUser(originalUser: UserResponse): User {
+    return {
+        name: originalUser.username,
+        email: originalUser.email
+    };
 }

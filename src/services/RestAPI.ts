@@ -57,6 +57,17 @@ class RestAPI {
             }
         });
     }
+
+    static getUser(access: string): AxiosPromise {
+        return axios({
+            method: "GET",
+            url: `${baseUrl}user/`,
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${access}`
+            }
+        });
+    }
 }
 
 export default RestAPI;

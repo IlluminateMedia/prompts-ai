@@ -55,19 +55,7 @@ function App() {
             <Switch>
                 <Route path="/signin" component={SignIn} />
                 <Route path="/signup" component={SignUp} />
-                <ProtectedRoute 
-                    isAuthenticated={!!accessToken}
-                    authenticationPath="/signin" 
-                    path="/new_editor"
-                    component={NewPromptEditor}
-                />
-                <ProtectedRoute
-                    isAuthenticated={!!accessToken}
-                    authenticationPath="/signin"
-                    path="/airtable_workspace_editor"
-                    component={AirtableWorkspaceEditor}
-                />
-                <Route path="/">
+                <Route path="/prompts">
                     <Header/>
                     <Container maxWidth={"lg"}>
                         <Box mt={2}>
@@ -80,6 +68,18 @@ function App() {
                         </Box>
                     </Container>
                 </Route>
+                <ProtectedRoute 
+                    isAuthenticated={!!accessToken}
+                    authenticationPath="/signin" 
+                    path="/new_editor"
+                    component={NewPromptEditor}
+                />
+                <ProtectedRoute
+                    isAuthenticated={!!accessToken}
+                    authenticationPath="/signin"
+                    path="/"
+                    component={AirtableWorkspaceEditor}
+                />
             </Switch>
         </ThemeProvider>
     );

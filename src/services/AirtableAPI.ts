@@ -1,6 +1,7 @@
 import Airtable, { Base, Record, Table } from "airtable";
 
 import {
+    AirtableWorkspace,
     ChoiceResult
 } from "../common/interfaces";
 
@@ -8,6 +9,13 @@ interface AirtableConfiguration {
     apiKey: string;
     baseName: string;
     tableName: string;
+}
+
+interface StoreFinalSelectionParams {
+    article: string
+    articleGroup?: string;
+    section?: string;
+    selectorUser: string;
 }
 
 class AirtableAPI {
@@ -37,6 +45,45 @@ class AirtableAPI {
         return this._tableInstance.select({
             view: view ?? "Grid view"
         }).firstPage();
+    }
+
+    static storeFinalSelection({article, articleGroup, section, selectorUser}: StoreFinalSelectionParams, airtableWorkspace: AirtableWorkspace): Promise<Record<any>> {
+        this.configure({
+            apiKey: airtableWorkspace.apiKey,
+            baseName: airtableWorkspace.destinationBase,
+            tableName: airtableWorkspace.destinationTable
+        });
+
+        return this._tableInstance.create({
+            "Article": article,
+            "Article Group": articleGroup,
+            "Section": section,
+            "Selector User": selectorUser
+        });
+    }
+
+    static updateSubmitField(recordId: string, airtableWorkspace: AirtableWorkspace): Promise<Record<any>> {
+        this.configure({
+            apiKey: airtableWorkspace.apiKey,
+            baseName: airtableWorkspace.sourceBase,
+            tableName: airtableWorkspace.sourceTable
+        });
+
+        return this._tableInstance.update(recordId, {
+            "Submitted": true
+        });
+    }
+
+    static updateReviewField(recordId: string, airtableWorkspace: AirtableWorkspace): Promise<Record<any>> {
+        this.configure({
+            apiKey: airtableWorkspace.apiKey,
+            baseName: airtableWorkspace.sourceBase,
+            tableName: airtableWorkspace.sourceTable
+        });
+
+        return this._tableInstance.update(recordId, {
+            "In Review": true
+        });
     }
 }
 
