@@ -22,17 +22,17 @@ class Migration(migrations.Migration):
                 ('api_key', models.CharField(max_length=255)),
             ],
         ),
-        migrations.CreateModel(
-            name='AirtableWorkspace',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('api_key', models.CharField(default='', max_length=255)),
-                ('source_base', models.CharField(default='', max_length=255)),
-                ('source_table', models.CharField(default='', max_length=255)),
-                ('destination_base', models.CharField(default='', max_length=255)),
-                ('destination_table', models.CharField(default='', max_length=255)),
-            ],
-        ),
+        # migrations.CreateModel(
+        #     name='AirtableWorkspace',
+        #     fields=[
+        #         ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+        #         ('api_key', models.CharField(default='', max_length=255)),
+        #         ('source_base', models.CharField(default='', max_length=255)),
+        #         ('source_table', models.CharField(default='', max_length=255)),
+        #         ('destination_base', models.CharField(default='', max_length=255)),
+        #         ('destination_table', models.CharField(default='', max_length=255)),
+        #     ],
+        # ),
         migrations.CreateModel(
             name='CustomModel',
             fields=[

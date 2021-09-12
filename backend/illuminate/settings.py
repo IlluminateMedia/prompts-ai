@@ -34,7 +34,7 @@ environ.Env.read_env(f'{BASE_DIR}/.env')
 
 DEBUG = env('DEBUG')
 SECRET_KEY = env('SECRET_KEY')
-ALLOWED_HOSTS = ["147.182.204.83", "illuminatenetwork.org", "localhost"]
+ALLOWED_HOSTS = ["illuminatecontent.org", "illuminatenetwork.org", "localhost"]
 
 
 # Application definition
