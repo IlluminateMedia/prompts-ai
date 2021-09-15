@@ -1,8 +1,10 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { readString } from "react-papaparse";
 import { AppThunk, RootState } from "../store";
 
 import { mapWorkspaceResponse, mapAirtableResponse } from "../libs/mapResponseToState";
-import { hasPromptVariables, makeKeywordPattern, variableRegExp, splitRegExp } from "../libs/useKeyword";
+import { sleep } from "../libs/useSleep";
+import { hasPromptVariables, makeKeywordPattern, splitRegExp } from "../libs/useKeyword";
 import { Record } from "airtable";
 import AirtableError from "airtable/lib/airtable_error";
 
@@ -48,8 +50,9 @@ const newEditorSlice = createSlice({
         },
         loadKeywords: (state, action: PayloadAction<string>) => {
             const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
-            if (workspace) {
-                workspace.keywords = action.payload.split("\n").map(batch => batch.split(splitRegExp).filter(w => w !== ""));
+            const parsedResult = readString(action.payload);
+            if (workspace && parsedResult.errors.length === 0) {
+                workspace.keywords = parsedResult.data as string[][];
             }
             console.log(state.workspaces[0].keywords);
         },
@@ -129,27 +132,32 @@ const fetchBasicOutputAsync = (): AppThunk => (dispatch, getState) => {
     dispatch(setChoiceResults([]));
     dispatch(setLoading(false));
 
-    completionParams.map(completionParam => {
-        GptAPI.generateCompletions(completionParam.prompt, completionParam, workspace.model.value, completionParam.n).then(response => {
-            console.log(response.data);
-            return { ...response.data };
-        }).then(response => {
-            console.log(response.choices);
-            AirtableAPI.configure({
-                apiKey: completionParam.airtableApiKey,
-                baseName: completionParam.airtableBase,
-                tableName: completionParam.airtableTable
-            });
-            dispatch(appendChoiceResults(response.choices));
-            dispatch(storeAirtableAsync(response.choices, completionParam.category, completionParam.airtableName || 'Variable Name'));
-        }).catch(error => {
-            alert("API returned an error. Refer to the console to inspect it.");
-            console.log(error.response);
-        }).finally(() => {
-            if (workspace.keywords.length === choiceResults.length) {
-                dispatch(setLoading(true));
-            }
-        });
+    completionParams.forEach((completionParam, i) => {
+        (function() {
+            setTimeout(() => {
+                console.log('sleep');
+                GptAPI.generateCompletions(completionParam.prompt, completionParam, workspace.model.value, completionParam.n).then(response => {
+                    console.log(response.data);
+                    return { ...response.data };
+                }).then(response => {
+                    console.log(response.choices);
+                    AirtableAPI.configure({
+                        apiKey: completionParam.airtableApiKey,
+                        baseName: completionParam.airtableBase,
+                        tableName: completionParam.airtableTable
+                    });
+                    dispatch(appendChoiceResults(response.choices));
+                    dispatch(storeAirtableAsync(response.choices, completionParam.category, completionParam.airtableName || 'Variable Name'));
+                }).catch(error => {
+                    alert("API returned an error. Refer to the console to inspect it.");
+                    console.log(error.response);
+                }).finally(() => {
+                    if (workspace.keywords.length === choiceResults.length) {
+                        dispatch(setLoading(true));
+                    }
+                });
+            }, 1000 * i);
+        }())
     });
 };
 
