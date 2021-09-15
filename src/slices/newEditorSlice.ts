@@ -54,7 +54,6 @@ const newEditorSlice = createSlice({
             if (workspace && parsedResult.errors.length === 0) {
                 workspace.keywords = parsedResult.data as string[][];
             }
-            console.log(state.workspaces[0].keywords);
         },
         setLoading: (state, action: PayloadAction<boolean>) => {
             const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId)!
@@ -63,19 +62,9 @@ const newEditorSlice = createSlice({
     }
 });
 
-// const fetchAirtableAsync = (): AppThunk => (dispatch, getState) => {
-//     RestAPI.getAirtable().then(response => {
-//         dispatch(setAirtable(mapAirtableResponse(response.data)));
-//     }).catch(error => {
-//         alert("API returned an error. Refer to the console to inspect it.");
-//         console.log(error.response);
-//     })
-// };
-
 const fetchWorkspacesAsync = (): AppThunk => (dispatch, getState) => {
     RestAPI.getWorkspaces().then(response => {
         const workspaces = mapWorkspaceResponse(response.data);
-        console.log(workspaces);
         if (workspaces.length > 0) {
             dispatch(setWorkspaces(workspaces));
             dispatch(updateWorkspaceId(workspaces[0].id));
@@ -128,19 +117,16 @@ const fetchBasicOutputAsync = (): AppThunk => (dispatch, getState) => {
     }
 
     const completionParams = selectCompletionParameters(state);
-    console.log(completionParams);
     dispatch(setChoiceResults([]));
     dispatch(setLoading(false));
 
     completionParams.forEach((completionParam, i) => {
         (function() {
             setTimeout(() => {
-                console.log('sleep');
                 GptAPI.generateCompletions(completionParam.prompt, completionParam, workspace.model.value, completionParam.n).then(response => {
                     console.log(response.data);
                     return { ...response.data };
                 }).then(response => {
-                    console.log(response.choices);
                     AirtableAPI.configure({
                         apiKey: completionParam.airtableApiKey,
                         baseName: completionParam.airtableBase,
@@ -175,7 +161,6 @@ const selectCompletionParameters = (state: RootState) => {
                 Object.keys(workspace).map(property => {
                     if (typeof workspace[property] === "string" &&
                         keywordRegExp.test(workspace[property])) {
-                            console.log(keywordRegExp);
                             variables[property] = workspace[property].replace(keywordRegExp, keyword);
                     }
                 });

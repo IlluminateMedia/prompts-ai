@@ -37,7 +37,6 @@ class AirtableAPI {
             Category: category,
             Name: airtableName
         };
-        console.log(data);
 
         return this._tableInstance.create(data);
     }
