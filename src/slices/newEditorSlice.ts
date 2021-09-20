@@ -167,12 +167,13 @@ const selectCompletionParameters = (state: RootState) => {
             });
         variablesBatch.push(variables);
     });
-    let updatedWorkspaces: NewWorkspace[] = variablesBatch.map(variables => {
+    const updatedWorkspaces: NewWorkspace[] = variablesBatch.map(variables => {
         return {
             ...workspace,
             ...variables
         };
     });
+    console.log(updatedWorkspaces);
 
     const completionParameters: NewCompletionParameters[] = updatedWorkspaces.map(workspace => {
         return {
@@ -201,6 +202,7 @@ const selectCompletionParameters = (state: RootState) => {
                 category: workspace.category,
         }
     });
+    console.log(completionParameters);
 
     return completionParameters;
 };

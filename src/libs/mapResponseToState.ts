@@ -60,7 +60,7 @@ export function mapWorkspaceResponse(response: Array<WorkspaceResponse>): Array<
         const workspace: NewWorkspace = {
             id: item.id,
             name: item.name,
-            prompt: item.prompt,
+            prompt: item.prompt.replace(/\r/g, "\n"),
             temperature: item.temperature,
             maxTokens: item.max_tokens,
             topP: item.top_p,
