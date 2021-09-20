@@ -29,7 +29,9 @@ const useStyles = makeStyles((theme) => ({
         top: "30px",
         right: "10px",
         width: "inherit",
-        maxWidth: "41.666667%"
+        maxWidth: "41.666667%",
+        maxHeight: "95%",
+        overflow: "auto"
     }
 }));
 
