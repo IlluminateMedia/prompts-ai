@@ -68,6 +68,7 @@ const fetchWorkspacesAsync = (): AppThunk => (dispatch, getState) => {
         if (workspaces.length > 0) {
             dispatch(setWorkspaces(workspaces));
             dispatch(updateWorkspaceId(workspaces[0].id));
+            console.log(workspaces);
         }
     }).catch(error => {
         alert("API returned an error. Refer to the console to inspect it.")
@@ -142,7 +143,7 @@ const fetchBasicOutputAsync = (): AppThunk => (dispatch, getState) => {
                         dispatch(setLoading(true));
                     }
                 });
-            }, 1000 * i);
+            }, 5000 * (i + 1));
         }())
     });
 };
