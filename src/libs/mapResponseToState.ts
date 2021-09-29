@@ -111,37 +111,39 @@ export function mapAirtableWorkspaceResponse(response: Array<AirtableWorkspaceRe
     return airtableWorkspaces;
 }
 
-export default function mapLoadedAirtableRecords(originalRecords: Array<OrigainalAirtableRecord>): Array<AirtableRecord> {
+export function mapLoadedAirtableRecords(originalRecords: Array<OrigainalAirtableRecord>): Array<AirtableRecord> {
     const regExp = new RegExp(`Article\\s*\\d{1,2}`);
-    const records = originalRecords.map(r => {
-        const articles: Array<string> = [];
-        const articleKeys = Object.keys(r).filter(k => regExp.test(k));
-        articleKeys.forEach(k => {
-            articles.push(r[k] as string);
-        });
-        let description = undefined;
-        if (r.Description && r.Description.length > 0) {
-            description = r.Description[0];
-        }
-        // const isInReview = r["In Review"] as boolean;
-        // const isSubmitted = r.Submitted as boolean;
-        // if (!(isSubmitted || isInReview)) {
-        const record: AirtableRecord = {
-            id: r.id,
-            name: r.Name,
-            category: r.Category,
-            table4: r["Table 4"]! as string,
-            title: r.Title,
-            description,
-            articles
-        };
-
-        return record;
-        // }
-    });
+    const records = originalRecords.map(r => mapLoadedAirtableRecord(r));
     // const filteredRecords = records.filter((record): record is AirtableRecord => !!record);
 
     return records;
+}
+
+export function mapLoadedAirtableRecord(originalRecord: OrigainalAirtableRecord): AirtableRecord {
+    const regExp = new RegExp(`Article\\s*\\d{1,2}`);
+    const articles: Array<string> = [];
+    const articleKeys = Object.keys(originalRecord).filter(k => regExp.test(k));
+    articleKeys.forEach(k => {
+        articles.push(originalRecord[k] as string);
+    });
+    let description = undefined;
+    if (originalRecord.Description && originalRecord.Description.length > 0) {
+        description = originalRecord.Description[0];
+    }
+    // const isInReview = r["In Review"] as boolean;
+    // const isSubmitted = r.Submitted as boolean;
+    // if (!(isSubmitted || isInReview)) {
+    const record: AirtableRecord = {
+        id: originalRecord.id,
+        name: originalRecord.Name,
+        category: originalRecord.Category,
+        table4: originalRecord["Table 4"]! as string,
+        title: originalRecord.Title,
+        description,
+        articles
+    };
+
+    return record;
 }
 
 export function mapUser(originalUser: UserResponse): User {

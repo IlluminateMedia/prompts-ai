@@ -137,7 +137,6 @@ export interface NewEditorState {
 export interface AirtableWorkspaceEditorState {
     currentAirtableWorkspaceId?: number;
     airtableWorkspaces: Array<AirtableWorkspace>;
-    dicOfAirtableWorkspaceIdToRecordId: Array<PairOfAirtableWorkspaceIdAndRecordId>;
     loadedAirtableData: Array<LoadedAirtableData>;
     finalArticles: Array<FinalArticle>;
     airtableSubmitStatus: Array<AirtableSubmitStatus>;
@@ -159,11 +158,6 @@ export interface CustomModel {
     value: string;
 }
 
-export interface PairOfAirtableWorkspaceIdAndRecordId {
-    airtableWorkspaceId: number;
-    recordId: string;
-}
-
 export interface FinalArticle {
     airtableWorkspaceId: number;
     article?: string;
@@ -171,7 +165,7 @@ export interface FinalArticle {
 
 export interface LoadedAirtableData {
     airtableWorkspaceId: number;
-    records: Array<AirtableRecord>;
+    record: AirtableRecord;
 }
 
 export interface AirtableSubmitStatus {

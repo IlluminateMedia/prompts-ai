@@ -6,17 +6,15 @@ import {
     AirtableWorkspaceEditorState,
     AirtableSubmitStatus,
     LoadedAirtableData,
-    PairOfAirtableWorkspaceIdAndRecordId,
     AirtableRecord
 } from "../common/interfaces";
 import RestAPI from "../services/RestAPI";
-import mapLoadedAirtableRecords, { mapAirtableWorkspaceResponse } from "../libs/mapResponseToState";
+import { mapLoadedAirtableRecord, mapLoadedAirtableRecords, mapAirtableWorkspaceResponse } from "../libs/mapResponseToState";
 import AirtableAPI from "../services/AirtableAPI";
 
 const initialState: AirtableWorkspaceEditorState = {
     currentAirtableWorkspaceId: undefined,
     airtableWorkspaces: [],
-    dicOfAirtableWorkspaceIdToRecordId: [],
     loadedAirtableData: [],
     finalArticles: [],
     airtableSubmitStatus: []
@@ -51,17 +49,6 @@ const airtableWorkspaceEditorSlice = createSlice({
                         airtableWorkspaceId: currentAirtableWorkspaceId,
                         article: action.payload
                     }
-                ];
-            }
-        },
-        updateDicOfAirtableWorkspaceIdToRecordId: (state, action: PayloadAction<PairOfAirtableWorkspaceIdAndRecordId>) => {
-            const index = state.dicOfAirtableWorkspaceIdToRecordId.findIndex((item) => item.airtableWorkspaceId === action.payload.airtableWorkspaceId);
-            if (index !== -1) {
-                state.dicOfAirtableWorkspaceIdToRecordId[index] = action.payload;
-            } else {
-                state.dicOfAirtableWorkspaceIdToRecordId = [
-                    ...state.dicOfAirtableWorkspaceIdToRecordId,
-                    action.payload
                 ];
             }
         },
@@ -112,8 +99,6 @@ const fetchAirtableWorkspacesAsync = (): AppThunk => (dispatch, getState) => {
 };
 
 const fetchAirtableDataAsync = (airtableWorkspace: AirtableWorkspace): AppThunk => (dispatch, getState) => {
-    const state = getState();
-    let finalUpdatedRecords: Array<AirtableRecord> = [];
     AirtableAPI.configure({
         apiKey: airtableWorkspace.apiKey,
         baseName: airtableWorkspace.sourceBase,
@@ -121,7 +106,7 @@ const fetchAirtableDataAsync = (airtableWorkspace: AirtableWorkspace): AppThunk 
     });
     AirtableAPI.tableInstance.select({
         filterByFormula: "AND({In Review} = 0, {Submitted} = 0)",
-        pageSize: 100,
+        maxRecords: 1,
         view: "Grid view"
     }).eachPage((records, fetchNextPage) => {
         console.log(records.length);
@@ -132,65 +117,24 @@ const fetchAirtableDataAsync = (airtableWorkspace: AirtableWorkspace): AppThunk 
             };
         });
         if (loadedRecords.length > 0) {
-            const updatedRecords = mapLoadedAirtableRecords(loadedRecords);
-            finalUpdatedRecords = [
-                ...finalUpdatedRecords,
-                ...updatedRecords
-            ];
+            const loadedRecord = loadedRecords[0];
+            const record = mapLoadedAirtableRecord(loadedRecord);
+            dispatch(
+                updateLoadedAirtableData({
+                    airtableWorkspaceId: airtableWorkspace.id,
+                    record
+                })
+            );
+            dispatch(updateReviewAsync(record.id));
+            dispatch(updateFinalArticle(undefined));
         }
-        fetchNextPage();
+        // fetchNextPage();
     }, (err) => {
         console.log("done");
         if (err) {
             console.log(err);
-        } else {
-            if (finalUpdatedRecords.length > 0) {
-                dispatch(
-                    updateLoadedAirtableData({
-                        airtableWorkspaceId: airtableWorkspace.id,
-                        records: finalUpdatedRecords
-                    })
-                );
-                dispatch(
-                    updateDicOfAirtableWorkspaceIdToRecordId({
-                        airtableWorkspaceId: airtableWorkspace.id,
-                        recordId: finalUpdatedRecords[0].id
-                    })
-                );
-                dispatch(updateReviewAsync(finalUpdatedRecords[0].id));
-            }
         }
     });
-
-    // AirtableAPI.fetch().then(records => {
-    //     const loadedRecords = records.map((record) => {
-    //         return {
-    //             id: record.id,
-    //             ...record.fields
-    //         };
-    //     });
-    //     if (loadedRecords.length > 0) {
-    //         const records = mapLoadedAirtableRecords(loadedRecords);
-    //         if (records.length > 0) {
-    //             dispatch(
-    //                 updateLoadedAirtableData({
-    //                     airtableWorkspaceId: airtableWorkspace.id,
-    //                     records
-    //                 })
-    //             );
-    //             dispatch(
-    //                 updateDicOfAirtableWorkspaceIdToRecordId({
-    //                     airtableWorkspaceId: airtableWorkspace.id,
-    //                     recordId: records[0].id
-    //                 })
-    //             );
-    //             dispatch(updateReviewAsync(records[0].id));
-    //         }
-    //     }
-    // })
-    // .catch(err => {
-    //     console.log(err);
-    // });
 };
 
 const updateReviewAsync = (recordId: string): AppThunk => (dispatch, getState) => {
@@ -231,7 +175,6 @@ const storeFinalSelectionAsync = (): AppThunk => (dispatch, getState) => {
     const finalArticle = selectFinalArticle(state);
     const currentAirtableWorkspace = selectCurrentAirtableWorkspace(state);
     const currentAirtableWorkspaceId = selectCurrentAirtableWorkspaceId(state);
-    const airtableRecords = selectAirtableRecords(state);
     const airtableRecord = selectAirtableRecord(state);
     const airtableRecordId = selectAirtableRecordId(state);
 
@@ -265,28 +208,26 @@ const storeFinalSelectionAsync = (): AppThunk => (dispatch, getState) => {
                 airtableWorkspaceId: currentAirtableWorkspaceId,
                 isRunning: false
             }));
-            const currentRecordIndex = airtableRecords.findIndex(record => record.id === airtableRecordId);
-            if (currentRecordIndex >= 0 && currentRecordIndex < airtableRecords.length - 1) {
-                const newRecord = airtableRecords[currentRecordIndex + 1];
-                dispatch(updateDicOfAirtableWorkspaceIdToRecordId({
-                    airtableWorkspaceId: currentAirtableWorkspaceId,
-                    recordId: newRecord.id
-                }));
-                dispatch(updateReviewAsync(newRecord.id));
-                dispatch(updateFinalArticle(undefined));
-            }
-        })
+            dispatch(fetchAirtableDataAsync(currentAirtableWorkspace));
+            // const currentRecordIndex = airtableRecords.findIndex(record => record.id === airtableRecordId);
+            // if (currentRecordIndex >= 0 && currentRecordIndex < airtableRecords.length - 1) {
+            //     const newRecord = airtableRecords[currentRecordIndex + 1];
+            //     dispatch(updateDicOfAirtableWorkspaceIdToRecordId({
+            //         airtableWorkspaceId: currentAirtableWorkspaceId,
+            //         recordId: newRecord.id
+            //     }));
+            //     dispatch(updateReviewAsync(newRecord.id));
+            //     dispatch(updateFinalArticle(undefined));
+            // }
+        });
 };
 
-const selectAirtableRecords = (state: RootState) => state.airtableWorkspace.loadedAirtableData.find(item => item.airtableWorkspaceId === state.airtableWorkspace.currentAirtableWorkspaceId)?.records || [];
-const selectAirtableRecordId = (state: RootState) => state.airtableWorkspace.dicOfAirtableWorkspaceIdToRecordId.find(item => item.airtableWorkspaceId === state.airtableWorkspace.currentAirtableWorkspaceId)?.recordId;
+const selectAirtableRecordId = (state: RootState) => state.airtableWorkspace.loadedAirtableData.find(item => item.airtableWorkspaceId === state.airtableWorkspace.currentAirtableWorkspaceId)?.record.id;
 const selectAirtableRecord = (state: RootState) => {
     const currentAirtableWorkspaceId = state.airtableWorkspace.currentAirtableWorkspaceId;
-    const records = state.airtableWorkspace.loadedAirtableData.find((item) => item.airtableWorkspaceId === currentAirtableWorkspaceId)?.records || [];
-    const selectRecordId = state.airtableWorkspace.dicOfAirtableWorkspaceIdToRecordId.find(item => item.airtableWorkspaceId === currentAirtableWorkspaceId)?.recordId
-    const selectRecord = records.find(r => r.id === selectRecordId);
+    const record = state.airtableWorkspace.loadedAirtableData.find((item) => item.airtableWorkspaceId === currentAirtableWorkspaceId)?.record;
 
-    return selectRecord;
+    return record;
 }
 const selectAirtableWorkspaces = (state: RootState) => state.airtableWorkspace.airtableWorkspaces;
 const selectCurrentAirtableWorkspaceId = (state: RootState) => state.airtableWorkspace.currentAirtableWorkspaceId;
@@ -302,7 +243,7 @@ export { airtableWorkspaceEditorSlice };
 // Selectors
 export {
     selectAirtableWorkspaces, selectCurrentAirtableWorkspace, selectCurrentAirtableWorkspaceId,
-    selectAirtableRecord, selectAirtableRecords, selectFinalArticle, selectIsRunning
+    selectAirtableRecord, selectFinalArticle, selectIsRunning
 };
 
 // Async Actions
@@ -311,6 +252,6 @@ export { fetchAirtableWorkspacesAsync, fetchAirtableDataAsync, storeFinalSelecti
 // Actions
 
 export const {
-    setAirtableWorkspaces, setAirtableSumbitStatus, setCurrentAirtableWorkspaceId, updateLoadedAirtableData, updateDicOfAirtableWorkspaceIdToRecordId,
+    setAirtableWorkspaces, setAirtableSumbitStatus, setCurrentAirtableWorkspaceId, updateLoadedAirtableData,
     updateFinalArticle, updateAirtableSubmitStatus
 } = airtableWorkspaceEditorSlice.actions;
