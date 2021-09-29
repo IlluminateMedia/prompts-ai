@@ -123,28 +123,25 @@ export default function mapLoadedAirtableRecords(originalRecords: Array<Origaina
         if (r.Description && r.Description.length > 0) {
             description = r.Description[0];
         }
-        const isInReview = r["In Review"] as boolean;
-        const isSubmitted = r.Submitted as boolean;
-        if (!(isSubmitted || isInReview)) {
-            const record: AirtableRecord = {
-                id: r.id,
-                name: r.Name,
-                category: r.Category,
-                table4: r["Table 4"]! as string,
-                title: r.Title,
-                description,
-                articles
-            };
+        // const isInReview = r["In Review"] as boolean;
+        // const isSubmitted = r.Submitted as boolean;
+        // if (!(isSubmitted || isInReview)) {
+        const record: AirtableRecord = {
+            id: r.id,
+            name: r.Name,
+            category: r.Category,
+            table4: r["Table 4"]! as string,
+            title: r.Title,
+            description,
+            articles
+        };
 
-            return record;
-        }
+        return record;
+        // }
     });
-    const filteredRecords = records.filter((record): record is AirtableRecord => !!record);
-    // console.log(records);
-    // console.log(filteredRecords);
-    return filteredRecords;
-    // console.log(filteredRecords);
-    // return filteredRecords;
+    // const filteredRecords = records.filter((record): record is AirtableRecord => !!record);
+
+    return records;
 }
 
 export function mapUser(originalUser: UserResponse): User {

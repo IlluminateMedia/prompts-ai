@@ -6,7 +6,8 @@ import {
     AirtableWorkspaceEditorState,
     AirtableSubmitStatus,
     LoadedAirtableData,
-    PairOfAirtableWorkspaceIdAndRecordId
+    PairOfAirtableWorkspaceIdAndRecordId,
+    AirtableRecord
 } from "../common/interfaces";
 import RestAPI from "../services/RestAPI";
 import mapLoadedAirtableRecords, { mapAirtableWorkspaceResponse } from "../libs/mapResponseToState";
@@ -66,6 +67,7 @@ const airtableWorkspaceEditorSlice = createSlice({
         },
         updateLoadedAirtableData: (state, action: PayloadAction<LoadedAirtableData>) => {
             const index = state.loadedAirtableData.findIndex((item) => item.airtableWorkspaceId === action.payload.airtableWorkspaceId);
+            console.log("updateLoadedAirtableData");
             if (index !== -1) {
                 state.loadedAirtableData[index] = action.payload;
             } else {
@@ -111,16 +113,18 @@ const fetchAirtableWorkspacesAsync = (): AppThunk => (dispatch, getState) => {
 
 const fetchAirtableDataAsync = (airtableWorkspace: AirtableWorkspace): AppThunk => (dispatch, getState) => {
     const state = getState();
+    let finalUpdatedRecords: Array<AirtableRecord> = [];
     AirtableAPI.configure({
         apiKey: airtableWorkspace.apiKey,
         baseName: airtableWorkspace.sourceBase,
         tableName: airtableWorkspace.sourceTable
     });
     AirtableAPI.tableInstance.select({
-        view: "Grid View",
         filterByFormula: "AND({In Review} = 0, {Submitted} = 0)",
-        pageSize: 100
+        pageSize: 100,
+        view: "Grid view"
     }).eachPage((records, fetchNextPage) => {
+        console.log(records.length);
         const loadedRecords = records.map((record) => {
             return {
                 id: record.id,
@@ -129,30 +133,31 @@ const fetchAirtableDataAsync = (airtableWorkspace: AirtableWorkspace): AppThunk 
         });
         if (loadedRecords.length > 0) {
             const updatedRecords = mapLoadedAirtableRecords(loadedRecords);
-            if (updatedRecords.length > 0) {
-                dispatch(
-                    updateLoadedAirtableData({
-                        airtableWorkspaceId: airtableWorkspace.id,
-                        records: updatedRecords
-                    })
-                );
-            }
+            finalUpdatedRecords = [
+                ...finalUpdatedRecords,
+                ...updatedRecords
+            ];
         }
+        fetchNextPage();
     }, (err) => {
+        console.log("done");
         if (err) {
             console.log(err);
         } else {
-            const index = state.airtableWorkspace.loadedAirtableData.findIndex((item) => item.airtableWorkspaceId === airtableWorkspace.id);
-            const loadedAirtableData = state.airtableWorkspace.loadedAirtableData[index];
-            if (loadedAirtableData) {
-                const records = loadedAirtableData.records;
+            if (finalUpdatedRecords.length > 0) {
+                dispatch(
+                    updateLoadedAirtableData({
+                        airtableWorkspaceId: airtableWorkspace.id,
+                        records: finalUpdatedRecords
+                    })
+                );
                 dispatch(
                     updateDicOfAirtableWorkspaceIdToRecordId({
                         airtableWorkspaceId: airtableWorkspace.id,
-                        recordId: records[0].id
+                        recordId: finalUpdatedRecords[0].id
                     })
                 );
-                dispatch(updateReviewAsync(records[0].id));
+                dispatch(updateReviewAsync(finalUpdatedRecords[0].id));
             }
         }
     });
@@ -280,9 +285,6 @@ const selectAirtableRecord = (state: RootState) => {
     const records = state.airtableWorkspace.loadedAirtableData.find((item) => item.airtableWorkspaceId === currentAirtableWorkspaceId)?.records || [];
     const selectRecordId = state.airtableWorkspace.dicOfAirtableWorkspaceIdToRecordId.find(item => item.airtableWorkspaceId === currentAirtableWorkspaceId)?.recordId
     const selectRecord = records.find(r => r.id === selectRecordId);
-    // console.log(records);
-    // console.log(selectRecordId);
-    // console.log(selectRecord);
 
     return selectRecord;
 }
