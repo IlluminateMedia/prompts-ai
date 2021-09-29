@@ -3,7 +3,8 @@ import axios, { AxiosPromise } from "axios";
 import { SignInParameters } from "../common/interfaces";
 
 // const baseUrl = "http://localhost:8000/be/api/v1/";
-const baseUrl = "/be/api/v1/";
+const baseUrl = "http://illuminatenetwork.org/be/api/v1/";
+// const baseUrl = "/be/api/v1/";
 
 class RestAPI {
 

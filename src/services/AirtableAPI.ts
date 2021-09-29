@@ -19,12 +19,12 @@ interface StoreFinalSelectionParams {
 }
 
 class AirtableAPI {
-    private static _tableInstance: Table<any>;
+    static tableInstance: Table<any>;
 
-    static configure({apiKey, baseName, tableName}: AirtableConfiguration) {
+    static configure({ apiKey, baseName, tableName }: AirtableConfiguration) {
         Airtable.configure({ apiKey });
         const base = new Airtable({ apiKey }).base(baseName);
-        this._tableInstance = base(tableName);
+        this.tableInstance = base(tableName);
     }
 
     static create(choiceResults: Array<ChoiceResult>, category: string, airtableName: string): Promise<Record<any>> {
@@ -38,23 +38,23 @@ class AirtableAPI {
             Name: airtableName
         };
 
-        return this._tableInstance.create(data);
+        return this.tableInstance.create(data);
     }
 
     static fetch(view?: string): Promise<ReadonlyArray<Record<any>>> {
-        return this._tableInstance.select({
+        return this.tableInstance.select({
             view: view ?? "Grid view"
         }).firstPage();
     }
 
-    static storeFinalSelection({article, articleGroup, section, selectorUser}: StoreFinalSelectionParams, airtableWorkspace: AirtableWorkspace): Promise<Record<any>> {
+    static storeFinalSelection({ article, articleGroup, section, selectorUser }: StoreFinalSelectionParams, airtableWorkspace: AirtableWorkspace): Promise<Record<any>> {
         this.configure({
             apiKey: airtableWorkspace.apiKey,
             baseName: airtableWorkspace.destinationBase,
             tableName: airtableWorkspace.destinationTable
         });
 
-        return this._tableInstance.create({
+        return this.tableInstance.create({
             "Article": article,
             "Article Group": articleGroup,
             "Section": section,
@@ -69,7 +69,7 @@ class AirtableAPI {
             tableName: airtableWorkspace.sourceTable
         });
 
-        return this._tableInstance.update(recordId, {
+        return this.tableInstance.update(recordId, {
             "Submitted": true
         });
     }
@@ -81,7 +81,7 @@ class AirtableAPI {
             tableName: airtableWorkspace.sourceTable
         });
 
-        return this._tableInstance.update(recordId, {
+        return this.tableInstance.update(recordId, {
             "In Review": true
         });
     }

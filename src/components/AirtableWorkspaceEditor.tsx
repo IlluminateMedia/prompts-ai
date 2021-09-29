@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
     Card,
@@ -9,6 +9,7 @@ import {
     Typography
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
+import Airtable, { Base, Record, Table } from "airtable";
 
 import AirtableWorkspaceSelector from "./airtableWorkspaces/AirtableWorkspaceSelector";
 import AirtableField from "./airtableWorkspaces/AirtableField";
@@ -46,12 +47,36 @@ export default function AirtableWorkspaceEditor() {
     }, []);
 
     useEffect(() => {
+        console.log("use effect");
+        // const base = new Airtable({ apiKey: "keyDyO2hVA4ECe6Lq" }).base("appHzVVGiKtfK2aN5");
+        // base('Description Main Selection').select({
+        //     // Selecting the first 3 records in Grid view:
+        //     filterByFormula: "AND({In Review} = 0, {Submitted} = 0)",
+        //     pageSize: 100,
+        //     view: "Grid view"
+        // }).eachPage(function page(records, fetchNextPage) {
+        //     // This function (`page`) will get called for each page of records.
+
+        //     records.forEach(function (record) {
+        //         console.log('Retrieved', record.get('Name'));
+        //     });
+        //     console.log(records.length)
+
+        //     // To fetch the next page of records, call `fetchNextPage`.
+        //     // If there are more records, `page` will get called again.
+        //     // If there are no more records, `done` will get called.
+        //     fetchNextPage();
+
+        // }, function done(err) {
+        //     console.log("done");
+        //     if (err) { console.error(err); return; }
+        // });
 
     }, []);
 
     return (
-        <Grid 
-            container 
+        <Grid
+            container
             className={classes.container}
             direction="column"
         >
@@ -70,7 +95,7 @@ export default function AirtableWorkspaceEditor() {
                             <Typography gutterBottom>
                                 <strong>Airtable Workspace</strong>
                             </Typography>
-                            <AirtableWorkspaceSelector/>
+                            <AirtableWorkspaceSelector />
                         </CardContent>
                     </Card>
                 </Box>
@@ -83,7 +108,7 @@ export default function AirtableWorkspaceEditor() {
                 <Grid item xs={12} lg={6}>
                     {
                         airtableRecord?.articles.map((article, i) => (
-                            <AirtableField 
+                            <AirtableField
                                 text={article}
                                 onClick={handleClickAirtableField}
                                 key={i}
@@ -92,7 +117,7 @@ export default function AirtableWorkspaceEditor() {
                     }
                 </Grid>
                 <div className={classes.fixed}>
-                    <FinalSelectionForm 
+                    <FinalSelectionForm
                         title={airtableRecord?.title}
                         category={airtableRecord?.category}
                         description={airtableRecord?.description}
