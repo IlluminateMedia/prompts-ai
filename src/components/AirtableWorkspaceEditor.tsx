@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
     Card,
@@ -9,6 +9,7 @@ import {
     Typography
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
+import Airtable, { Base, Record, Table } from "airtable";
 
 import AirtableWorkspaceSelector from "./airtableWorkspaces/AirtableWorkspaceSelector";
 import AirtableField from "./airtableWorkspaces/AirtableField";
@@ -50,8 +51,8 @@ export default function AirtableWorkspaceEditor() {
     }, []);
 
     return (
-        <Grid 
-            container 
+        <Grid
+            container
             className={classes.container}
             direction="column"
         >
@@ -70,7 +71,7 @@ export default function AirtableWorkspaceEditor() {
                             <Typography gutterBottom>
                                 <strong>Airtable Workspace</strong>
                             </Typography>
-                            <AirtableWorkspaceSelector/>
+                            <AirtableWorkspaceSelector />
                         </CardContent>
                     </Card>
                 </Box>
@@ -83,7 +84,7 @@ export default function AirtableWorkspaceEditor() {
                 <Grid item xs={12} lg={6}>
                     {
                         airtableRecord?.articles.map((article, i) => (
-                            <AirtableField 
+                            <AirtableField
                                 text={article}
                                 onClick={handleClickAirtableField}
                                 key={i}
@@ -92,7 +93,7 @@ export default function AirtableWorkspaceEditor() {
                     }
                 </Grid>
                 <div className={classes.fixed}>
-                    <FinalSelectionForm 
+                    <FinalSelectionForm
                         title={airtableRecord?.title}
                         category={airtableRecord?.category}
                         description={airtableRecord?.description}

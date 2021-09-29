@@ -110,12 +110,17 @@ const fetchAirtableWorkspacesAsync = (): AppThunk => (dispatch, getState) => {
 };
 
 const fetchAirtableDataAsync = (airtableWorkspace: AirtableWorkspace): AppThunk => (dispatch, getState) => {
+    const state = getState();
     AirtableAPI.configure({
         apiKey: airtableWorkspace.apiKey,
         baseName: airtableWorkspace.sourceBase,
         tableName: airtableWorkspace.sourceTable
     });
-    AirtableAPI.fetch().then(records => {
+    AirtableAPI.tableInstance.select({
+        view: "Grid View",
+        filterByFormula: "AND({In Review} = 0, {Submitted} = 0)",
+        pageSize: 100
+    }).eachPage((records, fetchNextPage) => {
         const loadedRecords = records.map((record) => {
             return {
                 id: record.id,
@@ -123,14 +128,24 @@ const fetchAirtableDataAsync = (airtableWorkspace: AirtableWorkspace): AppThunk 
             };
         });
         if (loadedRecords.length > 0) {
-            const records = mapLoadedAirtableRecords(loadedRecords);
-            if (records.length > 0) {
+            const updatedRecords = mapLoadedAirtableRecords(loadedRecords);
+            if (updatedRecords.length > 0) {
                 dispatch(
                     updateLoadedAirtableData({
                         airtableWorkspaceId: airtableWorkspace.id,
-                        records
+                        records: updatedRecords
                     })
                 );
+            }
+        }
+    }, (err) => {
+        if (err) {
+            console.log(err);
+        } else {
+            const index = state.airtableWorkspace.loadedAirtableData.findIndex((item) => item.airtableWorkspaceId === airtableWorkspace.id);
+            const loadedAirtableData = state.airtableWorkspace.loadedAirtableData[index];
+            if (loadedAirtableData) {
+                const records = loadedAirtableData.records;
                 dispatch(
                     updateDicOfAirtableWorkspaceIdToRecordId({
                         airtableWorkspaceId: airtableWorkspace.id,
@@ -140,10 +155,37 @@ const fetchAirtableDataAsync = (airtableWorkspace: AirtableWorkspace): AppThunk 
                 dispatch(updateReviewAsync(records[0].id));
             }
         }
-    })
-    .catch(err => {
-        console.log(err);
-    })
+    });
+
+    // AirtableAPI.fetch().then(records => {
+    //     const loadedRecords = records.map((record) => {
+    //         return {
+    //             id: record.id,
+    //             ...record.fields
+    //         };
+    //     });
+    //     if (loadedRecords.length > 0) {
+    //         const records = mapLoadedAirtableRecords(loadedRecords);
+    //         if (records.length > 0) {
+    //             dispatch(
+    //                 updateLoadedAirtableData({
+    //                     airtableWorkspaceId: airtableWorkspace.id,
+    //                     records
+    //                 })
+    //             );
+    //             dispatch(
+    //                 updateDicOfAirtableWorkspaceIdToRecordId({
+    //                     airtableWorkspaceId: airtableWorkspace.id,
+    //                     recordId: records[0].id
+    //                 })
+    //             );
+    //             dispatch(updateReviewAsync(records[0].id));
+    //         }
+    //     }
+    // })
+    // .catch(err => {
+    //     console.log(err);
+    // });
 };
 
 const updateReviewAsync = (recordId: string): AppThunk => (dispatch, getState) => {
@@ -154,12 +196,12 @@ const updateReviewAsync = (recordId: string): AppThunk => (dispatch, getState) =
         return;
     }
     AirtableAPI.updateReviewField(recordId, currentAirtableWorkspace)
-    .then(response => {
-        console.log(`Review ${response.id}`);
-    }).catch(error => {
-        alert('Airtable API returned an error. Refer to the console to inspect it.')
-        console.log(error);
-    });
+        .then(response => {
+            console.log(`Review ${response.id}`);
+        }).catch(error => {
+            alert('Airtable API returned an error. Refer to the console to inspect it.')
+            console.log(error);
+        });
 }
 
 const updateSubmitAsync = (recordId: string): AppThunk => (dispatch, getState) => {
@@ -170,12 +212,12 @@ const updateSubmitAsync = (recordId: string): AppThunk => (dispatch, getState) =
         return;
     }
     AirtableAPI.updateSubmitField(recordId, currentAirtableWorkspace)
-    .then(response => {
-        console.log(`Submit ${response.id}`);
-    }).catch(error => {
-        alert('Airtable API returned an error. Refer to the console to inspect it.')
-        console.log(error);
-    });
+        .then(response => {
+            console.log(`Submit ${response.id}`);
+        }).catch(error => {
+            alert('Airtable API returned an error. Refer to the console to inspect it.')
+            console.log(error);
+        });
 }
 
 const storeFinalSelectionAsync = (): AppThunk => (dispatch, getState) => {
@@ -200,35 +242,35 @@ const storeFinalSelectionAsync = (): AppThunk => (dispatch, getState) => {
         airtableWorkspaceId: currentAirtableWorkspaceId,
         isRunning: true
     }));
-    
+
     AirtableAPI.storeFinalSelection({
         articleGroup: airtableRecord.name,
         section: airtableRecord.category,
         article: finalArticle.article!,
         selectorUser: user!.name
     }, currentAirtableWorkspace)
-    .then(record => {
-        console.log(record.id);
-        dispatch(updateSubmitAsync(airtableRecordId!));
-    }).catch(error => {
-        alert('API returned an error. Refer to the console to inspect it.')
-        console.log(error);
-    }).finally(() => {
-        dispatch(updateAirtableSubmitStatus({
-            airtableWorkspaceId: currentAirtableWorkspaceId,
-            isRunning: false
-        }));
-        const currentRecordIndex = airtableRecords.findIndex(record => record.id === airtableRecordId);
-        if (currentRecordIndex >= 0 && currentRecordIndex < airtableRecords.length - 1) {
-            const newRecord = airtableRecords[currentRecordIndex + 1];
-            dispatch(updateDicOfAirtableWorkspaceIdToRecordId({
+        .then(record => {
+            console.log(record.id);
+            dispatch(updateSubmitAsync(airtableRecordId!));
+        }).catch(error => {
+            alert('API returned an error. Refer to the console to inspect it.')
+            console.log(error);
+        }).finally(() => {
+            dispatch(updateAirtableSubmitStatus({
                 airtableWorkspaceId: currentAirtableWorkspaceId,
-                recordId: newRecord.id
+                isRunning: false
             }));
-            dispatch(updateReviewAsync(newRecord.id));
-            dispatch(updateFinalArticle(undefined));
-        }
-    })
+            const currentRecordIndex = airtableRecords.findIndex(record => record.id === airtableRecordId);
+            if (currentRecordIndex >= 0 && currentRecordIndex < airtableRecords.length - 1) {
+                const newRecord = airtableRecords[currentRecordIndex + 1];
+                dispatch(updateDicOfAirtableWorkspaceIdToRecordId({
+                    airtableWorkspaceId: currentAirtableWorkspaceId,
+                    recordId: newRecord.id
+                }));
+                dispatch(updateReviewAsync(newRecord.id));
+                dispatch(updateFinalArticle(undefined));
+            }
+        })
 };
 
 const selectAirtableRecords = (state: RootState) => state.airtableWorkspace.loadedAirtableData.find(item => item.airtableWorkspaceId === state.airtableWorkspace.currentAirtableWorkspaceId)?.records || [];
@@ -241,7 +283,7 @@ const selectAirtableRecord = (state: RootState) => {
     // console.log(records);
     // console.log(selectRecordId);
     // console.log(selectRecord);
-    
+
     return selectRecord;
 }
 const selectAirtableWorkspaces = (state: RootState) => state.airtableWorkspace.airtableWorkspaces;
