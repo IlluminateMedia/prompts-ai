@@ -22,6 +22,7 @@ export interface CompletionParameters {
     prompt: string;
     temperature: number;
     topP: number;
+    bestOf: number;
     presencePenalty: number;
     frequencyPenalty: number;
 }
@@ -34,6 +35,7 @@ export interface NewCompletionParameters {
     prompt: string;
     temperature: number | string;
     topP: number | string;
+    bestOf: number | string;
     n: number;
     presencePenalty: number | string;
     frequencyPenalty: number | string;
@@ -68,6 +70,7 @@ export interface Variation {
     temperature: number;
     maxTokens: number;
     topP: number;
+    bestOf: number;
     frequencyPenalty: number;
     presencePenalty: number;
     modelName: string;
@@ -96,6 +99,7 @@ export interface ConversationCompletionParameters {
     prompt: string;
     temperature: number;
     topP: number;
+    bestOf: number;
     presencePenalty: number;
     frequencyPenalty: number;
 }
@@ -207,6 +211,7 @@ export interface Workspace {
     modelName: string;
     temperature: number;
     topP: number;
+    bestOf: number;
     frequencyPenalty: number;
     presencePenalty: number;
     stopSymbols: Array<string>;
@@ -232,6 +237,7 @@ export interface NewWorkspace extends Record<string, any> {
     model: CustomModel;
     temperature: string;
     topP: string;
+    bestOf: string;
     n: string;
     frequencyPenalty: string;
     presencePenalty: string;
@@ -274,6 +280,7 @@ export interface AddVariationActionPayload {
     temperature: number;
     maxTokens: number;
     topP: number;
+    bestOf: number;
     frequencyPenalty: number;
     presencePenalty: number;
     modelName: string;
@@ -329,6 +336,7 @@ export interface LoadTemplateFromFileDataActionPayload {
     prompt: string;
     temperature: number;
     topP: number;
+    bestOf: number;
     frequencyPenalty: number;
     presencePenalty: number;
     maxTokens: number;
@@ -348,4 +356,11 @@ export interface LoadTemplateActionPayload {
     tabIndex: number;
     startSequence?: string;
     restartSequence?: string;
+}
+
+export interface CompletionError {
+    index: number;
+    error?: string;
+    message: string;
+    statusCode?: number;
 }

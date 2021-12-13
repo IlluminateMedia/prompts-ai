@@ -7,6 +7,7 @@ import { sleep } from "../libs/useSleep";
 import { hasPromptVariables, makeKeywordPattern, splitRegExp } from "../libs/useKeyword";
 import { Record } from "airtable";
 import AirtableError from "airtable/lib/airtable_error";
+import { AxiosError } from "axios";
 
 import GptAPI from "../services/GptAPI";
 import RestAPI from "../services/RestAPI";
@@ -15,7 +16,8 @@ import {
     NewCompletionParameters,
     ChoiceResult,
     NewWorkspace,
-    NewEditorState
+    NewEditorState,
+    CompletionError
 } from "../common/interfaces";
 
 const initialState: NewEditorState = {
@@ -28,14 +30,6 @@ const newEditorSlice = createSlice({
     name: "newEditor",
     initialState,
     reducers: {
-        // setAirtable: (state, action: PayloadAction<Airtable>) => {
-        //     state.airtable = action.payload;
-        //     AirtableAPI.configure({
-        //         apiKey: state.airtable.apiKey,
-        //         baseName: state.airtable.base,
-        //         tableName: state.airtable.table
-        //     });
-        // },
         setChoiceResults: (state, action: PayloadAction<ChoiceResult[][]>) => {
             state.choiceResults = action.payload;
         },
@@ -76,22 +70,12 @@ const fetchWorkspacesAsync = (): AppThunk => (dispatch, getState) => {
     });
 };
 
-const storeAirtableAsync = (
-        choiceResults: Array<ChoiceResult>,
-        category: string, 
-        airtableName: string
-    ): AppThunk => (dispatch, getState) => {
-        AirtableAPI.create(choiceResults, category, airtableName).then((record: Record<any>) => {
-            console.log(record.id);
-        }).catch((error: AirtableError) => {
-            console.log(error);
-        });
-};
-
 const fetchBasicOutputAsync = (): AppThunk => (dispatch, getState) => {
+    let timerHandler: NodeJS.Timeout;
     const state = getState();
     const workspace = selectWorkspace(state);
     const choiceResults = selectChoiceResults(state);
+    let errors = Array<CompletionError>();
     if (!workspace) {
         alert("Workspaces are not loaded.");
         return;
@@ -118,34 +102,86 @@ const fetchBasicOutputAsync = (): AppThunk => (dispatch, getState) => {
     }
 
     const completionParams = selectCompletionParameters(state);
+    let completionParamsIndex = 0;
     dispatch(setChoiceResults([]));
     dispatch(setLoading(false));
 
-    completionParams.forEach((completionParam, i) => {
-        (function() {
-            setTimeout(() => {
-                GptAPI.generateCompletions(completionParam.prompt, completionParam, workspace.model.value, completionParam.n).then(response => {
-                    console.log(response.data);
-                    return { ...response.data };
-                }).then(response => {
+    const loopFunction: Function = async (delay: number = 5000) => {
+        timerHandler = setTimeout(async () => {
+            if (completionParamsIndex < completionParams.length) {
+                const completionParam = completionParams[completionParamsIndex];
+                try {
+                    const res = await GptAPI.generateCompletions(completionParam.prompt, completionParam, workspace.model.value, completionParam.n);
                     AirtableAPI.configure({
                         apiKey: completionParam.airtableApiKey,
                         baseName: completionParam.airtableBase,
                         tableName: completionParam.airtableTable
                     });
-                    dispatch(appendChoiceResults(response.choices));
-                    dispatch(storeAirtableAsync(response.choices, completionParam.category, completionParam.airtableName || 'Variable Name'));
-                }).catch(error => {
-                    alert("API returned an error. Refer to the console to inspect it.");
-                    console.log(error.response);
-                }).finally(() => {
-                    if (workspace.keywords.length === choiceResults.length) {
-                        dispatch(setLoading(true));
+                    console.log(res.data);
+                    console.log(`main block => ${completionParamsIndex}`);
+                    await dispatch(appendChoiceResults(res.data.choices));
+                    const record: Record<any> = await AirtableAPI.create(res.data.choices, completionParam.category, completionParam.airtableName || 'Variable Name');
+                    console.log(record.id);
+                    errors = Array<CompletionError>();
+                    completionParamsIndex++;
+                    loopFunction(5000);
+                } catch (err) {
+                    let _delay = 30000;
+                    const axiosError = err as AxiosError;
+                    const airtableError = err as AirtableError;
+
+                    if (axiosError.isAxiosError) {
+                        errors.push({
+                            index: completionParamsIndex,
+                            message: axiosError.message,
+                            statusCode: axiosError.response?.status,
+                            error: axiosError.response?.statusText
+                        });
+                        const errors4XX = errors.filter(e => e.index === completionParamsIndex).filter((e) => e.statusCode || 0 >= 400);
+                        if (errors4XX.filter(e => e.statusCode === axiosError.response?.status).length > 1) {
+                            clearTimeout(timerHandler);
+                            return;
+                        } else if (errors4XX.length == 1)  {
+                            _delay = 30000;
+                            console.log("detected a new 4XX error. --first");
+                        } else {
+                            _delay = 45000;
+                            console.log("detected a new 4XX error. --second");
+                        }
+                        
+                        loopFunction(_delay);
+                    } else if (airtableError.error) {
+                        errors.push({
+                            index: completionParamsIndex,
+                            message: airtableError.message,
+                            error: airtableError.error,
+                            statusCode: airtableError.statusCode
+                        });
+                        const errors4XX = errors.filter(e => e.index === completionParamsIndex).filter((e) => e.statusCode || 0 >= 400);
+                        console.log(errors4XX);
+                        if (errors4XX.filter(e => e.statusCode === airtableError.statusCode).length > 1) {
+                            console.log("cleared a timeout")
+                            clearTimeout(timerHandler);
+                            return;
+                        } else if (errors4XX.length == 1)  {
+                            _delay = 30000;
+                            console.log("detected a new 4XX error. --first");
+                        } else {
+                            _delay = 45000;
+                            console.log("detected a new 4XX error. --second");
+                        }
+
+                        console.log(_delay);
+                        loopFunction(_delay);
                     }
-                });
-            }, 5000 * (i + 1));
-        }())
-    });
+                }
+                
+            } else {
+                await dispatch(setLoading(true));
+            }
+        }, delay);
+    }
+    loopFunction(0);
 };
 
 const selectCurrentWorkspaceId = (state: RootState) => state.newEditor.currentWorkspaceId;
@@ -174,7 +210,6 @@ const selectCompletionParameters = (state: RootState) => {
             ...variables
         };
     });
-    console.log(updatedWorkspaces);
 
     const completionParameters: NewCompletionParameters[] = updatedWorkspaces.map(workspace => {
         return {
@@ -194,6 +229,7 @@ const selectCompletionParameters = (state: RootState) => {
                 prompt: workspace.prompt,
                 temperature: Number(workspace.temperature),
                 topP: Number(workspace.topP),
+                bestOf: Number(workspace.bestOf),
                 presencePenalty: Number(workspace.presencePenalty),
                 frequencyPenalty: Number(workspace.frequencyPenalty),
                 airtableApiKey: workspace.airtableApiKey,
@@ -203,7 +239,6 @@ const selectCompletionParameters = (state: RootState) => {
                 category: workspace.category,
         }
     });
-    console.log(completionParameters);
 
     return completionParameters;
 };

@@ -13,6 +13,7 @@ interface WorkspaceResponse {
     temperature: string,
     max_tokens: string,
     top_p: string,
+    best_of: string,
     n: string,
     presence_penalty: string;
     frequency_penalty: string;
@@ -64,6 +65,7 @@ export function mapWorkspaceResponse(response: Array<WorkspaceResponse>): Array<
             temperature: item.temperature,
             maxTokens: item.max_tokens,
             topP: item.top_p,
+            bestOf: item.best_of,
             n: item.n,
             frequencyPenalty: item.frequency_penalty,
             presencePenalty: item.presence_penalty,
@@ -77,6 +79,7 @@ export function mapWorkspaceResponse(response: Array<WorkspaceResponse>): Array<
             airtableTable: item.airtable_table,
             airtableName: item.airtable_name
         };
+        console.log(workspace);
 
         return workspace;
     });

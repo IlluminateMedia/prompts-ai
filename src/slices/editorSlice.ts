@@ -37,6 +37,7 @@ const initialState: EditorState = {
         // model: undefined,
         temperature: 0.5,
         topP: 1,
+        bestOf: 1,
         // n: 1,
         frequencyPenalty: 0,
         presencePenalty: 0,
@@ -158,6 +159,7 @@ const editorSlice = createSlice({
                 temperature: action.payload.temperature,
                 maxTokens: action.payload.maxTokens,
                 topP: action.payload.topP,
+                bestOf: action.payload.bestOf,
                 frequencyPenalty: action.payload.frequencyPenalty,
                 presencePenalty: action.payload.presencePenalty,
                 modelName: action.payload.modelName,
@@ -333,6 +335,7 @@ const editorSlice = createSlice({
             workspace.prompt = action.payload.prompt;
             workspace.temperature = action.payload.temperature;
             workspace.topP = action.payload.topP;
+            workspace.bestOf = action.payload.bestOf;
             workspace.frequencyPenalty = action.payload.frequencyPenalty;
             workspace.presencePenalty = action.payload.presencePenalty;
             workspace.maxTokens = action.payload.maxTokens;
@@ -476,10 +479,6 @@ const fetchBasicOutputAsync = (): AppThunk => (dispatch, getState) => {
         return;
     }
 
-    // completionParams.map(completionParams => {
-        
-    // });
-
     const completionParams = selectCompletionParameters(state);
     dispatch(setBasicLoading(true));
     GptAPI.generateCompletions(completionParams.prompt, completionParams, workspace.modelName).then(response => {
@@ -586,6 +585,7 @@ const fetchVariationsAsync = (): AppThunk => (dispatch, getState) => {
                 temperature: completionParams.temperature,
                 maxTokens: completionParams.maxTokens,
                 topP: completionParams.topP,
+                bestOf: completionParams.bestOf,
                 presencePenalty: completionParams.presencePenalty,
                 frequencyPenalty: completionParams.frequencyPenalty,
                 modelName: completionParams.engine
@@ -661,6 +661,7 @@ const selectWorkspace = (state: RootState) => state.editor.present.workspaces.fi
 const selectModelName = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.modelName;
 const selectTemperature = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.temperature;
 const selectTopP = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.topP;
+const selectBestOf = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.bestOf;
 const selectFrequencyPenalty = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.frequencyPenalty;
 const selectPresencePenalty = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.presencePenalty;
 const selectMaxTokens = (state: RootState) => state.editor.present.workspaces.find(w => w.id === state.editor.present.currentWorkspaceId)!.maxTokens;
@@ -682,6 +683,7 @@ const selectCompletionParameters = (state: RootState) => {
         prompt: workspace.prompt,
         temperature: workspace.temperature,
         topP: workspace.topP,
+        bestOf: workspace.bestOf,
         presencePenalty: workspace.presencePenalty,
         frequencyPenalty: workspace.frequencyPenalty,
     };
@@ -736,7 +738,7 @@ export type {
 export {
     // Common
     selectTabIndex, selectPrompt, selectStopSymbols, selectApiKey, selectModelName,
-    selectTemperature, selectTopP, selectFrequencyPenalty, selectPresencePenalty, selectMaxTokens, 
+    selectTemperature, selectTopP, selectBestOf, selectFrequencyPenalty, selectPresencePenalty, selectMaxTokens, 
     selectApiKeyDialogVisible, selectTemplateDialogVisible, selectCompletionParameters, selectCurrentWorkspaceId, selectEditableWorkspaceName, selectCurrentWorkspaceName, selectWorkspacesList,
 
     // Modes

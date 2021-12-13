@@ -3,6 +3,7 @@ from rest_framework import serializers
 from .custom_model_serializer import CustomModelSerializer
 from ..models import Workspace
 
+
 class WorkspaceReadSerializer(serializers.ModelSerializer):
     custom_model = CustomModelSerializer()
 
@@ -10,10 +11,11 @@ class WorkspaceReadSerializer(serializers.ModelSerializer):
         model = Workspace
         fields = (
             "id",
-            "name", 
+            "name",
             "temperature",
             "max_tokens",
-            "top_p", 
+            "top_p",
+            "best_of",
             "n",
             "presence_penalty",
             "frequency_penalty",
@@ -24,5 +26,5 @@ class WorkspaceReadSerializer(serializers.ModelSerializer):
             "airtable_table",
             "airtable_name",
             "category",
-            "custom_model"
+            "custom_model",
         )

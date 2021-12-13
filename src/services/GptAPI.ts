@@ -1,5 +1,5 @@
 import axios from "axios";
-import {AxiosPromise} from "axios";
+import { AxiosPromise, AxiosResponse } from "axios";
 import {
     CompletionParameters,
     NewCompletionParameters
@@ -9,7 +9,7 @@ const defaultModels = ["davinci", "davinci-instruct-beta", "curie", "curie-instr
 
 class GptAPI {
     static generateCompletions(prompt: string | Array<string>, completionParams: CompletionParameters | NewCompletionParameters, modelName: string,
-                               n: number = 1): AxiosPromise {
+                               n: number = 1): Promise<AxiosResponse<any>> {
         
         let data: any = {
             "prompt": prompt,
@@ -18,6 +18,7 @@ class GptAPI {
             "temperature": completionParams.temperature,
             "stop": completionParams.stop,
             "top_p": completionParams.topP,
+            "best_of": completionParams.bestOf,
             "presence_penalty": completionParams.presencePenalty,
             "frequency_penalty": completionParams.frequencyPenalty
         }
