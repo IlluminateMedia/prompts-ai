@@ -143,7 +143,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATIC_URL = env("STATIC_URL", default="/static/")
+STATIC_URL = env("STATIC_URL", default="/be/static/")
 STATIC_ROOT = environ.Path("static/")
 
 # Default primary key field type
@@ -158,4 +158,5 @@ CORS_ORIGIN_WHITELIST = (
     "http://illuminatenetwork.org",
     "http://localhost:8000",
     "http://localhost:3000",
+    "http://illuminatecontent.org"
 )
