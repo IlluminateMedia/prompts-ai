@@ -19,10 +19,10 @@ class GptAPI {
             "temperature": completionParams.temperature,
             "stop": completionParams.stop,
             "top_p": completionParams.topP,
-            "best_of": completionParams.bestOf,
             "presence_penalty": completionParams.presencePenalty,
             "frequency_penalty": completionParams.frequencyPenalty
-        }
+        };
+
         let url = `https://api.openai.com/v1/engines/davinci/completions`; //${completionParams.engine}
         if (v3Models.includes(modelName)) {
             url = `https://api.openai.com/v1/engines/davinci-instruct-beta-v3/completions`
@@ -31,6 +31,13 @@ class GptAPI {
             data = {
                 ...data,
                 "model": modelName
+            };
+        }
+
+        if (completionParams.bestOf != 1) {
+            data = {
+                ...data,
+                "best_of": completionParams.bestOf,
             };
         }
 
