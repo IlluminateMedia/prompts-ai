@@ -5,7 +5,8 @@ import {
     NewCompletionParameters
 } from "../common/interfaces";
 
-const defaultModels = ["davinci", "davinci-instruct-beta", "davinci-instruct-beta-v3", "curie", "curie-instruct-beta", "babbage", "ada"];
+const davinciModels = ["davinci", "davinci-instruct-beta", "curie", "curie-instruct-beta", "babbage", "ada"];
+const v3Models = ["davinci-instruct-beta-v3"];
 
 class GptAPI {
     static generateCompletions(prompt: string | Array<string>, completionParams: CompletionParameters | NewCompletionParameters, modelName: string,
@@ -23,14 +24,16 @@ class GptAPI {
             "frequency_penalty": completionParams.frequencyPenalty
         }
         let url = `https://api.openai.com/v1/engines/davinci/completions`; //${completionParams.engine}
-        if (!defaultModels.includes(modelName)) {
+        if (v3Models.includes(modelName)) {
+            url = `https://api.openai.com/v1/engines/davinci-instruct-beta-v3/completions`
+        } else if (!davinciModels.includes(modelName)) {
             url = 'https://api.openai.com/v1/completions';
             data = {
                 ...data,
                 "model": modelName
             };
         }
-        console.log(data);
+
         return axios({
             method: "POST",
             //url: `https://api.openai.com/v1/engines/${completionParams.engine}/completions`,
