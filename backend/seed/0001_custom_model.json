@@ -1,0 +1,50 @@
+[
+    {
+        "model": "restapi.CustomModel",
+        "pk": 1,
+        "fields": {
+            "label": "davinci",
+            "value": "davinci"
+        }
+    },
+    {
+        "model": "restapi.CustomModel",
+        "pk": 2,
+        "fields": {
+            "label": "davinci-instruct-beta",
+            "value": "davinci-instruct-beta"
+        }
+    },
+    {
+        "model": "restapi.CustomModel",
+        "pk": 3,
+        "fields": {
+            "label": "curie",
+            "value": "curie"
+        }
+    },
+    {
+        "model": "restapi.CustomModel",
+        "pk": 4,
+        "fields": {
+            "label": "curie-instruct-beta",
+            "value": "curie-instruct-beta"
+        }
+    },
+    {
+        "model": "restapi.CustomModel",
+        "pk": 5,
+        "fields": {
+            "label": "babbage",
+            "value": "babbage"
+        }
+    },
+    {
+        "model": "restapi.CustomModel",
+        "pk": 6,
+        "fields": {
+            "label": "ada",
+            "value": "ada"
+        }
+    }
+]

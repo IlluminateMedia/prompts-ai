@@ -1,0 +1,11 @@
+[
+    {
+        "model": "restapi.Airtable",
+        "fields": {
+            "base": "sample_base",
+            "table": "sample_table",
+            "category": "Job Description",
+            "api_key": "key0FwUTcMcvldnB5"
+        }
+    }
+]

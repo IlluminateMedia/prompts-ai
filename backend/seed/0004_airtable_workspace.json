@@ -1,0 +1,22 @@
+[
+    {
+        "model": "restapi.AirtableWorkspace",
+        "fields": {
+            "api_key": "keyDyO2hVA4ECe6Lq",
+            "source_base": "appHzVVGiKtfK2aN5",
+            "source_table": "Description Main Selection",
+            "destination_base": "appHzVVGiKtfK2aN5",
+            "destination_table": "Final Selections"
+        }
+    },
+    {
+        "model": "restapi.AirtableWorkspace",
+        "fields": {
+            "api_key": "keyDyO2hVA4ECe6Lq",
+            "source_base": "appHzVVGiKtfK2aN5",
+            "source_table": "How To Selection",
+            "destination_base": "appHzVVGiKtfK2aN5",
+            "destination_table": "How To Final"
+        }
+    }
+]

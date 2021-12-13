@@ -22,10 +22,11 @@ import {
     selectStopSymbols,
     addStopSymbol,
     deleteStopSymbol,
+    selectTopP,
+    selectBestOf,
     editTopP,
     editFrequencyPenalty,
     editPresencePenalty,
-    selectTopP,
     selectFrequencyPenalty, selectPresencePenalty, 
     selectModelName, editModelName, 
     fetchAvailableModelsAsync, selectAvailableModels
@@ -47,17 +48,17 @@ export function PromptEditor() {
     const prompt = useSelector(selectPrompt);
     const temperature = useSelector(selectTemperature);
     const topP = useSelector(selectTopP);
+    const bestOf = useSelector(selectBestOf);
     const frequencyPenalty = useSelector(selectFrequencyPenalty);
     const presencePenalty = useSelector(selectPresencePenalty);
     const maxTokens = useSelector(selectMaxTokens);
     const stopSymbols = useSelector(selectStopSymbols);
-    const availableModelNames = useSelector(selectAvailableModels);
+    const availableModels = useSelector(selectAvailableModels);
+    const modelName = useSelector(selectModelName);
 
     useEffect(() => {
         dispatch(fetchAvailableModelsAsync());
-    });
-
-    const modelName = useSelector(selectModelName);
+    }, [dispatch]);
 
     const handlePromptChange = (event: React.FormEvent<HTMLTextAreaElement | HTMLInputElement>) => {
         dispatch(editPrompt(event.currentTarget.value));
@@ -77,12 +78,12 @@ export function PromptEditor() {
     const handleMaxTokensChange = (event: React.ChangeEvent<{}>, value: number | number[]) => {
         dispatch(editMaxTokens(value as number));
     }
-    const handleModelNameChange = (event: any) => {
-        dispatch(editModelName(event.target.value));
+    const handleModelNameChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+        dispatch(editModelName(event.target.value as string));
     }
 
     return (
-        <div>
+        <>
             <Grid
                 container
                 direction="row"
@@ -91,61 +92,6 @@ export function PromptEditor() {
                 spacing={3}
             >
                 <Grid item xs={12} sm={3} md={3}>
-                    {/*<Box mb={1}>
-                        <Card>
-                            <CardContent>
-                                <Box>
-                                    <Grid container>
-                                        <Grid item><Button
-                                            onClick={() => dispatch(ActionCreators.undo())}
-                                        >
-                                            Undo
-                                        </Button></Grid>
-                                        <Grid item>
-                                            <Button
-                                                aria-label="Undo last change"
-                                                onClick={() => dispatch(ActionCreators.redo())}
-                                            >
-                                                Redo
-                                            </Button>
-                                        </Grid>
-                                        <Grid item>
-                                            <Button
-                                                aria-label="Save as a file"
-                                                onClick={handleSaveAndDownload}
-                                            >
-                                                Save
-                                            </Button>
-                                        </Grid>
-                                    </Grid>
-                                </Box>
-                                <hr/>
-                                <Box mt={2}>
-                                    <Grid container>
-                                        <Grid item
-                                              className={styles.fullWidth}>
-                                            <TextField type="password"
-                                                       variant="outlined"
-                                                       label="API Key"
-                                                       size={'small'}
-                                                       value={apiKey}
-                                                       onChange={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-                                                           dispatch(editApiKey(event.currentTarget.value));
-                                                       }}
-                                                       inputProps={{
-                                                           autoComplete: 'new-password',
-                                                           form: {
-                                                               autoComplete: 'off',
-                                                           },
-                                                       }}
-                                                       className={styles.fullWidth}
-                                            />
-                                        </Grid>
-                                    </Grid>
-                                </Box>
-                            </CardContent>
-                        </Card>
-                    </Box>*/}
                     <Box mb={1}>
                         <Card>
                             <CardContent>
@@ -169,7 +115,7 @@ export function PromptEditor() {
                             </Tooltip>
                             <Slider
                                 defaultValue={0.5}
-                                value={temperature}
+                                // value={temperature}
                                 onChange={handleTemperatureChange}
                                 aria-labelledby="temperature-slider"
                                 valueLabelDisplay="auto"
@@ -198,14 +144,17 @@ export function PromptEditor() {
                                     value: 1,
                                     label: '1',
                                 }, {
-                                    value: 512,
-                                    label: '512',
+                                    value: 1500,
+                                    label: '1500',
                                 }]}
                                 min={1}
-                                max={512}
+                                max={1500}
                             />
 
-                            <Tooltip title="On which symbols GPT-3 should stop generating text. Enter \n for a line break." placement="left">
+                            <Tooltip 
+                                title="On which symbols GPT-3 should stop generating text. Enter \n for a line break." 
+                                placement="left"
+                            >
                                 <Typography gutterBottom>
                                     Stop sequences:
                                 </Typography>
@@ -214,7 +163,7 @@ export function PromptEditor() {
                                 value={stopSymbols}
                                 onAdd={(chip) => dispatch(addStopSymbol(chip))}
                                 onDelete={(deletedChip) => dispatch(deleteStopSymbol(deletedChip))}
-                                onBeforeAdd={() => stopSymbols.length !== 4}
+                                onBeforeAdd={() => stopSymbols?.length !== 4}
                                 newChipKeys={['Tab']}
                                 className={styles.fullWidth}
                             />
@@ -224,9 +173,20 @@ export function PromptEditor() {
                             <Typography gutterBottom>
                                 <strong>Advanced parameters</strong>
                             </Typography>
-                            <Tooltip title={'"Controls diversity via nucleus sampling: 0.5 means half of all likelihood-weighted options are considered."'} placement="left">
+                            <Tooltip 
+                                title={'"Controls diversity via nucleus sampling: 0.5 means half of all likelihood-weighted options are considered."'}
+                                placement="left"
+                            >
                                 <Typography id="top-p-slider" gutterBottom>
                                     Top P: <strong>{topP}</strong>
+                                </Typography>
+                            </Tooltip>
+                            <Tooltip 
+                                title={'"When used with n, best_of controls the number of candidate completions and n specifies how many to return – best_of must be greater than n."'}
+                                placement="left"
+                            >
+                                <Typography id="top-p-slider" gutterBottom>
+                                    Best Of: <strong>{bestOf}</strong>
                                 </Typography>
                             </Tooltip>
                             <Slider
@@ -293,10 +253,25 @@ export function PromptEditor() {
                             <Typography id="model-name-typography" gutterBottom>
                                 Model name:
                             </Typography>
-                            <Select native id="model-name-select" name="modelName" value={modelName} onChange={handleModelNameChange} className={styles.fullWidth}>
-                                {availableModelNames && Object.keys(availableModelNames).map((index: any) => (
-                                    <option key={availableModelNames[index].id} value={availableModelNames[index].value}>{availableModelNames[index].label}</option>
-                                ))}
+                            <Select 
+                                native id="model-name-select"
+                                name="modelName"
+                                margin="dense"
+                                value={modelName}
+                                onChange={handleModelNameChange}
+                                className={styles.fullWidth}
+                            >
+                                {
+                                    availableModels && Object.keys(availableModels)
+                                        .map((index: any) => (
+                                            <option 
+                                                key={availableModels[index].id}
+                                                value={availableModels[index].value}
+                                            >
+                                                {availableModels[index].label}
+                                            </option>
+                                        ))
+                                }
                             </Select>
                         </CardContent>
                     </Card>
@@ -319,6 +294,6 @@ export function PromptEditor() {
                 </Grid>
 
             </Grid>
-        </div>
+        </>
     );
 }

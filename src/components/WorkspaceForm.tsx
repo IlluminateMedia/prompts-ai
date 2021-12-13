@@ -2,9 +2,9 @@ import React from 'react';
 import { Grid, Button } from '@material-ui/core';
 import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import WorkspaceSelector from "./workspaceSelector/WorkspaceSelector";
-import {makeStyles} from "@material-ui/styles";
-import {toggleTemplateDialog} from "../slices/editorSlice";
-import {useDispatch} from "react-redux";
+import { makeStyles } from "@material-ui/styles";
+import { toggleTemplateDialog } from "../slices/editorSlice";
+import { useDispatch } from "react-redux";
 import DownloadButton from "./fileExport/DownloadButton";
 import UploadButton from "./fileExport/UploadButton";
 

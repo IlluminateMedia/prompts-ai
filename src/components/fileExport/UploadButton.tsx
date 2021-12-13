@@ -3,7 +3,10 @@ import React from 'react';
 import Files from "react-files";
 import {Button} from "@material-ui/core";
 import {useDispatch} from "react-redux";
-import {loadTemplateFromFileData, LoadTemplateFromFileDataActionPayload} from "../../slices/editorSlice";
+import {
+    loadTemplateFromFileData,
+    LoadTemplateFromFileDataActionPayload
+} from "../../slices/editorSlice";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 
 interface Props {
@@ -21,6 +24,7 @@ export default function UploadButton(props: Props) {
         if (event.target!.result === undefined) {
             return;
         }
+        // dispatch(loadKeywords(event.target!.result as string));
         const template: LoadTemplateFromFileDataActionPayload = JSON.parse(event.target!.result as string);
 
         template.stopSymbols = template.stopSymbols.map(symbol => {
@@ -29,25 +33,27 @@ export default function UploadButton(props: Props) {
         dispatch(loadTemplateFromFileData(template));
     };
 
-    return <Files
-        className="files-dropzone"
-        onChange={(file: any) => {
-            fileReader.readAsText(file[0]);
-        }}
-        onError={(err: any) => console.log(err)}
-        accepts={['.json']}
-        maxFileSize={10000000}
-        minFileSize={0}
-        clickable
-    >
-        <Button
-            variant="outlined"
-            color="default"
-            className={props.className}
-            size={'small'}
-            startIcon={<CloudUploadIcon />}
+    return (
+        <Files
+            className="files-dropzone"
+            onChange={(file: any) => {
+                fileReader.readAsText(file[0]);
+            }}
+            onError={(err: any) => console.log(err)}
+            accepts={['.json']}
+            maxFileSize={10000000}
+            minFileSize={0}
+            clickable
         >
-            Upload
-        </Button>
-    </Files>;
+            <Button
+                variant="outlined"
+                color="default"
+                className={props.className}
+                size={'small'}
+                startIcon={<CloudUploadIcon />}
+            >
+                Upload
+            </Button>
+        </Files>
+    );
 }
