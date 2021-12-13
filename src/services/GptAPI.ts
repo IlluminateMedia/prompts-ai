@@ -5,7 +5,7 @@ import {
     NewCompletionParameters
 } from "../common/interfaces";
 
-const defaultModels = ["davinci", "davinci-instruct-beta", "curie", "curie-instruct-beta", "babbage", "ada"];
+const defaultModels = ["davinci", "davinci-instruct-beta", "davinci-instruct-beta-v3", "curie", "curie-instruct-beta", "babbage", "ada"];
 
 class GptAPI {
     static generateCompletions(prompt: string | Array<string>, completionParams: CompletionParameters | NewCompletionParameters, modelName: string,
