@@ -44,6 +44,7 @@ export const migrations = {
             editor: {
                 ...state.editor,
                 topP: 1,
+                bestOf: 1,
                 frequencyPenalty: 0,
                 presencePenalty: 0,
             }
@@ -57,6 +58,7 @@ export const migrations = {
                 creativeCompletions: state.creativeCompletions.map((completion: any) => ({
                     ...completion,
                     topP: 1,
+                    bestOf: 1,
                     frequencyPenalty: 0,
                     presencePenalty: 0,
                 }))
@@ -144,6 +146,7 @@ export const migrations = {
                         modelName: 'davinci',
                         temperature: 0.5,
                         topP: 1,
+                        bestOf: 1,
                         frequencyPenalty: 0,
                         presencePenalty: 0,
                         stopSymbols: ["\\n"],

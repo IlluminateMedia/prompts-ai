@@ -3,18 +3,21 @@ from rest_framework import serializers
 from .custom_model_serializer import CustomModelSerializer
 from ..models import Workspace, CustomModel
 
+
 class WorkspaceWriteSerializer(serializers.ModelSerializer):
-    custom_model = serializers.PrimaryKeyRelatedField(queryset=CustomModel.objects.all(),
-                                                  many=False)
+    custom_model = serializers.PrimaryKeyRelatedField(
+        queryset=CustomModel.objects.all(), many=False
+    )
 
     class Meta:
         model = Workspace
         fields = (
             "id",
-            "name", 
+            "name",
             "temperature",
             "max_tokens",
-            "top_p", 
+            "top_p",
+            "best_of",
             "n",
             "presence_penalty",
             "frequency_penalty",
@@ -25,5 +28,5 @@ class WorkspaceWriteSerializer(serializers.ModelSerializer):
             "airtable_table",
             "airtable_name",
             "category",
-            "custom_model"
+            "custom_model",
         )

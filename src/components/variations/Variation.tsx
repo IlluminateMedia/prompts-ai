@@ -11,6 +11,7 @@ interface Props {
     temperature: number;
     maxTokens: number;
     topP: number;
+    bestOf: number;
     frequencyPenalty: number;
     presencePenalty: number;
     modelName: string;
@@ -54,6 +55,7 @@ export default function Variation(props: Props) {
                 <Typography variant="caption">Temperature: {props.temperature}</Typography>
                 <Typography variant="caption">Max tokens: {props.maxTokens}</Typography>
                 <Typography variant="caption">Top P: {props.topP}</Typography>
+                <Typography variant="caption">Top P: {props.bestOf}</Typography>
                 <Typography variant="caption">Frequency penalty: {props.frequencyPenalty}</Typography>
                 <Typography variant="caption">Presence penalty: {props.presencePenalty}</Typography>
                 <Typography variant="caption">Model: {props.modelName}</Typography>

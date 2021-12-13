@@ -82,6 +82,7 @@ export default function SharePopup() {
                         prompt: completionParameters.prompt,
                         temperature: completionParameters.temperature,
                         topP: completionParameters.topP,
+                        bestOf: completionParameters.bestOf,
                         presencePenalty: completionParameters.presencePenalty,
                         frequencyPenalty: completionParameters.frequencyPenalty,
                         examples: (includeExamples ? examples : undefined),

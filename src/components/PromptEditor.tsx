@@ -23,6 +23,7 @@ import {
     addStopSymbol,
     deleteStopSymbol,
     selectTopP,
+    selectBestOf,
     editTopP,
     editFrequencyPenalty,
     editPresencePenalty,
@@ -47,6 +48,7 @@ export function PromptEditor() {
     const prompt = useSelector(selectPrompt);
     const temperature = useSelector(selectTemperature);
     const topP = useSelector(selectTopP);
+    const bestOf = useSelector(selectBestOf);
     const frequencyPenalty = useSelector(selectFrequencyPenalty);
     const presencePenalty = useSelector(selectPresencePenalty);
     const maxTokens = useSelector(selectMaxTokens);
@@ -177,6 +179,14 @@ export function PromptEditor() {
                             >
                                 <Typography id="top-p-slider" gutterBottom>
                                     Top P: <strong>{topP}</strong>
+                                </Typography>
+                            </Tooltip>
+                            <Tooltip 
+                                title={'"When used with n, best_of controls the number of candidate completions and n specifies how many to return – best_of must be greater than n."'}
+                                placement="left"
+                            >
+                                <Typography id="top-p-slider" gutterBottom>
+                                    Best Of: <strong>{bestOf}</strong>
                                 </Typography>
                             </Tooltip>
                             <Slider

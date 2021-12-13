@@ -7,6 +7,7 @@ interface SharedPromptWriteProperties {
     prompt: string;
     temperature: number;
     topP: number;
+    bestOf: number;
     presencePenalty: number;
     frequencyPenalty: number;
     examples?: Array<SharedPromptExample>;

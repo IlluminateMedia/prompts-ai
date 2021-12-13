@@ -3,12 +3,16 @@ from django.utils.translation import gettext_lazy as _
 
 from .custom_model import CustomModel
 
+
 class Workspace(models.Model):
     name = models.CharField(max_length=255, blank=False)
-    custom_model = models.ForeignKey(CustomModel, related_name="workspaces", on_delete=models.CASCADE, blank=True)
+    custom_model = models.ForeignKey(
+        CustomModel, related_name="workspaces", on_delete=models.CASCADE, blank=True
+    )
     temperature = models.CharField(max_length=255, blank=False)
     max_tokens = models.CharField(max_length=255, blank=False)
     top_p = models.CharField(max_length=255, blank=False)
+    best_of = models.CharField(max_length=255, blank=False)
     n = models.CharField(max_length=255, blank=False)
     presence_penalty = models.CharField(max_length=255, blank=False)
     frequency_penalty = models.CharField(max_length=255, blank=False)
