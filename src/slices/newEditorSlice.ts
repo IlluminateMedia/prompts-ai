@@ -212,6 +212,7 @@ const selectCompletionParameters = (state: RootState) => {
     });
 
     const completionParameters: NewCompletionParameters[] = updatedWorkspaces.map(workspace => {
+        console.log(workspace);
         return {
                 apiKey: state.editor.present.apiKey === undefined ? '' : state.editor.present.apiKey,
                 engine: workspace.model.value,
